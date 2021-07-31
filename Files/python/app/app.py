@@ -1,7 +1,7 @@
 #!flask/bin/python
 
 import os
-from flask import Flask, send_file, render_template, request, make_response
+from flask import Flask, send_from_directory, send_file, render_template, request, make_response
 
 app = Flask(__name__)
 
@@ -9,6 +9,10 @@ fname, lname, gender, vehicle1, vehicle2, vehicle3, favcolor, pictures, img = []
 
 uploads_dir = os.path.join(app.root_path, 'uploads')
 os.makedirs(uploads_dir, mode=0o777, exist_ok=True)
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route('/', methods=['GET'])
 def get_exercise():
