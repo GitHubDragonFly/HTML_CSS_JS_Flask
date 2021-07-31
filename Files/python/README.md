@@ -1,4 +1,4 @@
-Make sure to install python3 and flask package.
+Make sure to install `python3` and `flask` package.
 
 Then just run this project with: `python3 -m app`
 
