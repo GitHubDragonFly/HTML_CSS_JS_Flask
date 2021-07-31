@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta content="utf-8" charset="utf-8" http-equiv="encoding">
+
+    <script src="static/js/three.js"></script>
+    <script src="static/js/PLYLoader.js"></script>
+    <script src="static/js/OrbitControls.js"></script>
+
+    <style>
+      body,html{
+        display: block;
+        background-color: black;
+        background-image: url('static/Images/DragonFly.png');
+        background-position: 50% 50%;
+        background-repeat: no-repeat;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      p.full_screen {
+        text-align: center;
+        content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAf0lEQVRIie1VQQ6AMAjb/x9M4IRePICoK7GLB5eQbElpCTAY7j6YRiUPAvvxbNMkN76XIDhSRKCdjhmB494hzzwngcoBIa/eASgisMgTBo4ODqCTAiSFrW6Biv8LfL/I1DbtfDRV9VLgjVFhZp59A4g+7JaM6yULh7IyWUYX2AAPDxz26GjX+gAAAABJRU5ErkJggg==);
+        margin: 1px 1px 1px 1px;
+        padding: 0;
+        width: 15px;
+        height: 15px;
+      }
+
+      div { color: navy; width: 99%; border: 1px solid navy; -webkit-border-radius: 2px; border-radius: 2px; padding: 4px; margin: 1px; }
+      #scene { display: block; position: absolute; margin: 0; width: 100%; height: 100%; }
+
+      .fixed-menu {
+        position: fixed;
+        z-index: 1;
+        display: inline-block;
+        background-color: whitesmoke;
+        margin: 0px;
+        padding: 1px;
+        width: 100%;
+      }
+    </style>
+
+    <!-- Original OBJ source code that inspired this: https://codepen.io/Mamboleoo/pen/PqjGdN -->
+    <!-- PLY Examples from: https://github.com/mrdoob/three.js -->
+    <!-- More PLY examples: https://people.math.sc.edu/Burkardt/data/data.html -->
+    <title>PLY Viewer</title>
+  </head>
+  <body onload="reset_all()" onresize="resize()">
+    <div class="fixed-menu">
+      <div>
+        <label for="file" style="color: #CE8704; margin: 2px 2px 2px 5px;">PLY:</label>
+        <input type="file" id="file_input" name="file" onchange="init()" style="margin: 2px 5px 2px 0;" multiple />
+        <label for="file_image_input" style="color: #CE8704; margin: 2px 2px 2px 0;">BG Image:</label>
+        <input type="file" id="file_image_input" name="file_image_input" accept="image/png, image/jpeg, image/bmp, image/gif, image/svg+xml" onchange="set_scene_image()" style="margin: 2px 5px 2px 0;" />
+        <label for="ply_opacity" style="margin: 2px 2px 2px 0;">Opacity:</label>
+        <input type="number" id="ply_opacity" name="ply_opacity" min="0" max="1" step="0.05" value="1" onchange="set_ply_opacity()" style="width: 48px; margin: 2px 5px 2px 0;" />
+        <label for="ply_scale" style="margin: 2px 2px 2px 0;">Scale:</label>
+        <input type="number" id="ply_scale" name="ply_scale" onchange="set_ply_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 5px 2px 0; width: 48px;" />
+        <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" />Wireframe</label>
+        <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" />Shadow</label>
+        <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 40px;">Reset</button>
+        <button onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
+      </div>
+      <div>
+        <label style="color: blue; margin: 2px 0 2px 0;"><input type="radio" id="hlight" name="mode" value="HL" onchange="radio_changed()" />HL</label>
+        <label style="color: blue; margin: 2px 0 2px 0;"><input type="radio" id="slight" name="mode" value="SL" onchange="radio_changed()" />SL</label>
+        <label style="color: blue; margin: 2px 0 2px 0;"><input type="radio" id="dlight" name="mode" value="DL" onchange="radio_changed()" />DL</label>
+        <label style="color: blue; margin: 2px 0 2px 0;"><input type="radio" id="rotate" name="mode" value="Rotate" onchange="radio_changed()" checked />Rotate :</label>
+        <label for="rotation_x" style="color: blue;">X</label>
+        <input type="number" id="rotation_x" onchange="rot_x_changed()" min="-50" max="50" value="0" step="1" style="width: 50px; margin: 2px 0 2px 0;" />&nbsp;
+        <label for="rotation_y" style="color: blue;">Y</label>
+        <input type="number" id="rotation_y" onchange="rot_y_changed()" min="-50" max="50" value="0" step="1" style="width: 50px; margin: 2px 0 2px 0;" />&nbsp;
+        <label for="rotation_z" style="color: blue;">Z</label>
+        <input type="number" id="rotation_z" onchange="rot_z_changed()" min="-50" max="50" value="0" step="1" style="width: 50px; margin: 2px 0 2px 0;" />&nbsp; &nbsp;
+        <label style="color: green; margin: 2px 0 2px 0;">Position : </label>
+        <label for="position_x" style="color: green;">X</label>
+        <input type="number" id="position_x" onchange="pos_x_changed()" min="-1000" max="1000" value="0" step="1" style="width: 55px; margin: 2px 0 2px 0;" />&nbsp;
+        <label for="position_y" style="color: green;">Y</label>
+        <input type="number" id="position_y" onchange="pos_y_changed()" min="-1000" max="1000" value="0" step="1" style="width: 55px; margin: 2px 0 2px 0;" />&nbsp;
+        <label for="position_z" style="color: green;">Z</label>
+        <input type="number" id="position_z" onchange="pos_z_changed()" min="-2000" max="2000" value="0" step="1" style="width: 55px; margin: 2px 10px 2px 0;" />
+        <label for="directional_light_intensity" style="margin: 2px 2px 2px 0;">DLi:</label>
+        <input type="number" id="directional_light_intensity" name="directional_light_intensity" min="0" max="2" step="0.05" value="1" onchange="set_directional_light_intensity()" style="width: 50px; margin: 2px 5px 2px 0;" />
+        <label for="spot_light_intensity" style="margin: 2px 2px 2px 0;">SLi:</label>
+        <input type="number" id="spot_light_intensity" name="spot_light_intensity" min="0" max="2" step="0.05" value="0" onchange="set_spot_light_intensity()" style="width: 50px; margin: 2px 5px 2px 0;" />
+        <label for="spot_light_color" style="margin: 2px 0 2px 0;">SL:</label>
+        <input type="color" id="spot_light_color" name="spot_light_color" onchange="set_spot_light_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 5px 0 0;" />
+        <label for="hemisphere_light_color" style="margin: 2px 0 2px 0;">HL:</label>
+        <input type="color" id="hemisphere_light_color" name="hemisphere_light_color" onchange="set_hemisphere_light_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 5px 0 0;" />
+        <label for="ambient_light_color" style="margin: 2px 0 2px 0;">AL:</label>
+        <input type="color" id="ambient_light_color" name="ambient_light_color" onchange="set_ambient_light_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 5px 0 0;" />
+        <label for="back_color" style="margin: 2px 0 2px 0;">BG:</label>
+        <input type="color" id="back_color" name="back_color" onchange="set_back_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 2px 0 0;" />
+      </div>
+    </div><br />
+
+    <div style="border: 0; margin: 0; padding: 0;">
+      <canvas id="scene">
+        Your browser does not support HTML5 canvas tag
+      </canvas>
+    </div>
+
+    <script>
+      function initialize_event_listeners() {
+        var cnvs = document.getElementById('scene');
+
+        cnvs.addEventListener( 'wheel', (event) => {
+          var pz = document.getElementById('position_z');
+          var val = parseInt(pz.value) + parseInt(event.deltaY * 0.01745)
+          pz.value = val;
+          pz.onchange();
+        }, false);
+
+        cnvs.addEventListener( 'mousedown', (event) => {
+          if (event.button == 0) {
+            mouse_rotation = true;
+          }
+        }, false);
+
+        cnvs.addEventListener( 'mouseup', (event) => {
+          if (event.button == 0) {
+            mouse_rotation = false;
+          }
+        }, false);
+
+        cnvs.addEventListener( 'mousemove', (event) => {
+          if (mouse_rotation) {
+            event.preventDefault();
+            let x = Math.abs(mesh.rotation.x);
+            let y = Math.abs(mesh.rotation.y);
+
+            if (x > 2 * Math.PI ) { mesh.rotation.x = 0; }
+            if (y > 2 * Math.PI ) { mesh.rotation.y = 0; }
+
+            mesh.rotation.x += event.clientX * event.movementY * 0.0000087;
+
+            if (x > 1.57 && x < 4.71) {
+              mesh.rotation.y -= event.clientY * event.movementX * 0.00001745;
+            } else {
+              mesh.rotation.y += event.clientY * event.movementX * 0.00001745;
+            }
+          }
+        }, false);
+      }
+
+      function resize() {
+        if (camera) {
+          renderer.setSize( window.innerWidth, window.innerHeight );
+
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+
+          ww = window.innerWidth;
+          wh = window.innerHeight;
+        }
+      }
+
+      function full_screen() {
+        if (document.requestFullscreen) {
+          document.requestFullscreen = false;
+          document.exitFullscreen();
+        } else {
+          document.requestFullscreen = true;
+          document.body.requestFullscreen();
+        }
+      }
+    </script>
+
+    <script>
+      var renderer, scene, camera, ambientLight, hemisphereLight, spotLight, directionalLight, mesh, material, texture, shadowMesh, shadowMaterial;
+      var ww = window.innerWidth,	wh = window.innerHeight;
+      var mouse_rotation = false, reset_rotation = false, events_initialized = false;
+      var rot_x = 0, rot_y = 0, rot_z = 0, pos_x = 0, pos_y = 0, pos_z = 0;
+      var previous_ply_scale = '1';
+      var selected_ply_file = null;
+      var texture_files_png, texture_files_jpg;
+
+      // Manager from ThreeJs to track a loader and its status
+      var manager = new THREE.LoadingManager();
+      // Loader for selected file from Three.js
+      const ply_loader = new THREE.PLYLoader( manager );
+
+      function set_back_color() { document.body.style.backgroundColor = document.getElementById('back_color').value; }
+
+      function set_ply_opacity() {
+        if (material) {
+          material.opacity = document.getElementById('ply_opacity').value;
+          if (document.getElementById('shadow').checked) {
+            shadowMaterial.opacity = material.opacity * document.getElementById('spot_light_intensity').value;
+          }
+        }
+      }
+
+      function set_scene_image() {
+        fii = document.getElementById('file_image_input');
+
+        if (fii.files[0]) {
+          if (fii.files[0].type.startsWith('image/')) {
+            const loader = new THREE.TextureLoader();
+            loader.load( URL.createObjectURL( fii.files[0] ) , function(texture) {
+              scene.background = texture;
+              document.getElementById('back_color').disabled = true;
+            });
+          } else {
+            fii.value = "";
+            scene.background = null;
+            document.getElementById('back_color').disabled = false;
+          }
+        } else {
+          scene.background = null;
+          document.getElementById('back_color').disabled = false;
+        }
+      }
+
+      function set_ambient_light_color() {
+        let colors = document.getElementById('ambient_light_color').value; // hex format '#rrggbb'
+        ambientLight.color = {
+          'r': parseInt(colors.substring(1, 3), 16) / 10,
+          'g': parseInt(colors.substring(3, 5), 16) / 10,
+          'b': parseInt(colors.substring(5), 16) / 10
+        };
+      }
+
+      function set_hemisphere_light_color() {
+        let hl_colors = document.getElementById('hemisphere_light_color').value; // hex format '#rrggbb'
+
+        hemisphereLight.color = {
+          'r': parseInt(hl_colors.substring(1, 3), 16) / 10,
+          'g': parseInt(hl_colors.substring(3, 5), 16) / 10,
+          'b': parseInt(hl_colors.substring(5), 16) / 10
+        };
+
+        if (hl_colors == '#000000') {
+          hemisphereLight.groundColor = { 'r': 0, 'g': 0, 'b': 0 }}
+        else {
+          hemisphereLight.groundColor = { 'r': 9.2, 'g': 9.2, 'b': 9.2 }}
+      }
+
+      function set_spot_light_color() {
+        let sl_colors = document.getElementById('spot_light_color').value; // hex format '#rrggbb'
+
+        if (sl_colors == '#000000') { spotLight.color = { 'r': 1, 'g': 1, 'b': 1 }; }
+        else {
+          spotLight.color = {
+            'r': parseInt(sl_colors.substring(1, 3), 16) / 250,
+            'g': parseInt(sl_colors.substring(3, 5), 16) / 250,
+            'b': parseInt(sl_colors.substring(5), 16) / 250
+          };
+        }
+      }
+
+      function set_spot_light_intensity() {
+        spotLight.intensity = parseFloat( document.getElementById('spot_light_intensity').value );
+        if (document.getElementById('shadow').checked) { shadowMaterial.opacity = spotLight.intensity * document.getElementById('ply_opacity').value; }
+      }
+
+      function set_directional_light_intensity() {
+        directionalLight.intensity = parseFloat( document.getElementById('directional_light_intensity').value );
+      }
+
+      function set_ply_scale() {
+        let current_ply_scale = document.getElementById('ply_scale').value;
+
+        switch (previous_ply_scale) {
+          case '0.25':
+            mesh.scale.multiplyScalar( 2 );
+            break;
+          case '0.5':
+            mesh.scale.multiplyScalar( (current_ply_scale == '0.75') ? 3/2 : 1/2 );
+            break;
+          case '0.75':
+            mesh.scale.multiplyScalar( (current_ply_scale == '1') ? 4/3 : 2/3 );
+            break;
+          case '1':
+            mesh.scale.multiplyScalar( (current_ply_scale == '1.25') ? 5/4 : 3/4 );
+            break;
+          case '1.25':
+            mesh.scale.multiplyScalar( (current_ply_scale == '1.5') ? 6/5 : 4/5 );
+            break;
+          case '1.5':
+            mesh.scale.multiplyScalar( (current_ply_scale == '1.75') ? 7/6 : 5/6 );
+            break;
+          case '1.75':
+            mesh.scale.multiplyScalar( (current_ply_scale == '2') ? 8/7 : 6/7 );
+            break;
+          default:
+            mesh.scale.multiplyScalar( 7/8 );
+            break;
+        }
+
+        previous_ply_scale = current_ply_scale;
+      }
+
+      function radio_changed() {
+        if (document.getElementById('dlight').checked) {
+          document.getElementById('rotation_x').value = directionalLight.position.x;
+          document.getElementById('rotation_y').value = directionalLight.position.y;
+          document.getElementById('rotation_z').value = directionalLight.position.z;
+          document.getElementById('rotation_x').min = document.getElementById('rotation_y').min = document.getElementById('rotation_z').min = -500;
+          document.getElementById('rotation_x').max = document.getElementById('rotation_y').max = document.getElementById('rotation_z').max = 500;
+          document.getElementById('rotation_x').step = document.getElementById('rotation_y').step = document.getElementById('rotation_z').step = 10;
+        } else if (document.getElementById('slight').checked) {
+          document.getElementById('rotation_x').value = spotLight.position.x;
+          document.getElementById('rotation_y').value = spotLight.position.y;
+          document.getElementById('rotation_z').value = spotLight.position.z;
+          document.getElementById('rotation_x').min = document.getElementById('rotation_y').min = document.getElementById('rotation_z').min = -500;
+          document.getElementById('rotation_x').max = document.getElementById('rotation_y').max = document.getElementById('rotation_z').max = 500;
+          document.getElementById('rotation_x').step = document.getElementById('rotation_y').step = document.getElementById('rotation_z').step = 10;
+        } else if (document.getElementById('hlight').checked) {
+          document.getElementById('rotation_x').value = hemisphereLight.position.x;
+          document.getElementById('rotation_y').value = hemisphereLight.position.y;
+          document.getElementById('rotation_z').value = hemisphereLight.position.z;
+          document.getElementById('rotation_x').min = document.getElementById('rotation_y').min = document.getElementById('rotation_z').min = -100;
+          document.getElementById('rotation_x').max = document.getElementById('rotation_y').max = document.getElementById('rotation_z').max = 100;
+          document.getElementById('rotation_x').step = document.getElementById('rotation_y').step = document.getElementById('rotation_z').step = 5;
+        } else {
+          document.getElementById('rotation_x').value = parseInt(rot_x * 1000);
+          document.getElementById('rotation_y').value = parseInt(rot_y * 1000);
+          document.getElementById('rotation_z').value = parseInt(rot_z * 1000);
+          document.getElementById('rotation_x').min = document.getElementById('rotation_y').min = document.getElementById('rotation_z').min = -50;
+          document.getElementById('rotation_x').max = document.getElementById('rotation_y').max = document.getElementById('rotation_z').max = 50;
+          document.getElementById('rotation_x').step = document.getElementById('rotation_y').step = document.getElementById('rotation_z').step = 1;
+        }
+      }
+
+      function rot_x_changed() {
+        let x = parseFloat(document.getElementById('rotation_x').value);
+
+        if (document.getElementById('dlight').checked) {
+          directionalLight.position.x = x;
+        } else if (document.getElementById('slight').checked) {
+          spotLight.position.x = x;
+        } else if (document.getElementById('hlight').checked) {
+          hemisphereLight.position.x = x;
+        } else {
+          rot_x = x / 1000;
+        }
+      }
+
+      function rot_y_changed() {
+        let y = parseFloat(document.getElementById('rotation_y').value);
+
+        if (document.getElementById('dlight').checked) {
+          directionalLight.position.y = y;
+        } else if (document.getElementById('slight').checked) {
+          spotLight.position.y = y;
+        } else if (document.getElementById('hlight').checked) {
+          hemisphereLight.position.y = y;
+        } else {
+          rot_y = y / 1000;
+        }
+      }
+
+      function rot_z_changed() {
+        let z = parseFloat(document.getElementById('rotation_z').value);
+
+        if (document.getElementById('dlight').checked) {
+          directionalLight.position.z = z;
+        } else if (document.getElementById('slight').checked) {
+          spotLight.position.z = z;
+        } else if (document.getElementById('hlight').checked) {
+          hemisphereLight.position.z = z;
+        } else {
+          rot_z = z / 1000;
+        }
+      }
+
+      function pos_x_changed() { pos_x = parseInt(document.getElementById('position_x').value); }
+      function pos_y_changed() { pos_y = parseInt(document.getElementById('position_y').value); }
+      function pos_z_changed() { pos_z = parseInt(document.getElementById('position_z').value); }
+
+      function init(){
+        // Loaded file
+        var fi = document.getElementById('file_input');
+
+        if (scene != null) {
+          scene.remove.apply( scene, scene.children );
+
+          if (shadowMesh) { shadowMesh = null; }
+
+          // Reset all values
+          reset_all( false, true );
+        }
+
+        if (!fi.files) { return; }
+
+        selected_ply_file = null;
+        texture_files_jpg = [];
+        texture_files_png = [];
+        enable_disable( true );
+
+        // Include check for JPG/PNG
+        for (let i = 0; i < fi.files.length; i++) {
+          if (fi.files[i].name.toUpperCase().endsWith('.PLY')) { selected_ply_file = fi.files[i]; }
+          else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
+          else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
+        };
+
+        if (!selected_ply_file) { return; }
+
+        document.body.style.backgroundImage = "none";
+        enable_disable( false );
+
+        renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.setSize( ww, wh );
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.setClearColor( 0xFFFFFF, 0); // Allow setting the background color
+        renderer.autoClear = false;
+
+        // The following can be used instead of the canvas but the window mouse
+        // events might be tricky to set due to the presence of the fixed menu.
+        // Possibly use Orbit Controls instead.
+        //document.body.appendChild( renderer.domElement );
+
+        scene = new THREE.Scene();
+
+        // Canvas mouse events, could be replaced with Orbit Controls but some features
+        // might not work as expected, since the camera is being rotated instead of the object
+        if (!events_initialized) { initialize_event_listeners(); events_initialized = true; }
+
+        // Add grid helper for use with Orbit Controls
+        //scene.add(new THREE.GridHelper(200, 200, "yellow"));
+
+        camera = new THREE.PerspectiveCamera( 45, ww/wh, 0.1, 2000 );
+        camera.position.set( 0, 0, 250 );
+        scene.add( camera );
+
+        // Add AmbientLight to the scene
+        ambientLight = new THREE.AmbientLight(0x000000, 0.05);
+        ambientLight.position.set( 0, 0, 250 );
+        scene.add( ambientLight );
+
+        // Add HemisphereLight to the scene
+        hemisphereLight = new THREE.HemisphereLight( 0x000000, 0x000000, 0.05 );
+        hemisphereLight.position.set( 0, 10, 0 );
+        scene.add( hemisphereLight );
+
+        // The following provides a plane that can receive a shadow but is also a sort of
+        // "liquid background" that an object will go through at a certain distance.
+        // This plane is set in the background.
+        shadowMaterial = new THREE.ShadowMaterial();
+        shadowMaterial.opacity = 0.1;
+        shadowMesh = new THREE.Mesh( new THREE.PlaneGeometry( ww, wh ), shadowMaterial );
+        shadowMesh.position.set( 0, 0, -1500 );
+        shadowMesh.scale.set( 2.5, 2.5, 1 );
+        shadowMesh.receiveShadow = true;
+
+        // Add SpotLight to the scene
+        spotLight = new THREE.SpotLight( 0xFFFFFF, 0, 0, Math.PI/4 );
+        spotLight.position.set( 150, -50, 350 );
+        spotLight.target.position.set( 0, 0, -1500 );
+        spotLight.castShadow = true;
+
+        spotLight.shadow.mapSize.width = 1024;
+        spotLight.shadow.mapSize.height = 1024;
+
+        spotLight.shadow.camera.near = 10;
+        spotLight.shadow.camera.far = 2000;
+        spotLight.shadow.camera.fov = 10;
+
+        scene.add( spotLight );
+        scene.add( spotLight.target );
+
+        // Add DirectionalLight to the scene
+        directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 0.8 );
+        directionalLight.position.set( 0, 0, 250 );
+        directionalLight.lookAt(new THREE.Vector3( 0, 0, 0 ));
+        scene.add( directionalLight );
+
+        // Orbit Controls can be used for rotation, zoom and move but are camera related
+        //controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+        // Load the ply file
+        loadFile();
+      }
+
+      function loadFile(){
+        // Launch loading of the selected file, addFileInScene is the callback when it's ready
+        ply_loader.load( URL.createObjectURL( selected_ply_file ), addFileInScene );
+      }
+
+      function addFileInScene( object ){
+        let smooth = object.clone();
+        smooth.computeVertexNormals();
+        smooth.mergeVertices();
+
+        //material = new THREE.MeshStandardMaterial({ color: 0x0077FF }); //shades of blue
+
+        //material = new THREE.MeshPhysicalMaterial( { // metalic look
+        //  sheen: new THREE.Color( 0x0055FF ),
+        //  vertexColors: THREE.VertexColors,
+        //  metalness: 1,
+        //  roughness: 0,
+        //  reflectivity: 1,
+        //  clearcoatMap: null,
+        //  clearcoatRoughnessMap: null
+        //});
+
+        if (texture_files_jpg.length > 0) {
+          const loader = new THREE.TextureLoader();
+          texture = loader.load( URL.createObjectURL( texture_files_jpg[0] ));
+          material = new THREE.MeshLambertMaterial( {
+            map: texture,
+            fog: true,
+            opacity: 1,
+            transparent: true,
+            vertexColors: THREE.VertexColors,
+            reflectivity: 1
+          });
+        } else if (texture_files_png.length > 0) {
+          const loader = new THREE.TextureLoader();
+          texture = loader.load( URL.createObjectURL( texture_files_png[0] ));
+          material = new THREE.MeshLambertMaterial( {
+            map: texture,
+            fog: true,
+            opacity: 1,
+            transparent: true,
+            vertexColors: THREE.VertexColors,
+            reflectivity: 1
+          });
+        } else {
+          material = new THREE.MeshPhongMaterial( {
+          polygonOffset: true,
+          polygonOffsetFactor: 1,
+          polygonOffsetUnits: 1,
+          color: 0xFFFFFF,
+          specular: 0x111111,
+          shininess: 100,
+          opacity: 1,
+          transparent: true,
+          vertexColors: THREE.VertexColors,
+          flatShading: false
+        });
+        }
+
+        mesh = new THREE.Mesh( smooth, material );
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        resize();
+
+        // Add mesh to the scene
+        scene.add( mesh )
+
+        camera.lookAt( mesh.position );
+
+        render();
+      }
+
+      function show_wireframe() {
+        // Go through all children of the loaded object and search for a Mesh
+        mesh.traverse( function ( child ) {
+          // This allow us to check if the children is an instance of the Mesh constructor
+    	    if(child instanceof THREE.Mesh){
+            if (document.getElementById('wireframe').checked) {
+              child.material.wireframe = true;
+            } else {
+              child.material.wireframe = false;
+            }
+    		  }
+    	  });
+      }
+
+      function show_shadow() {
+        if (document.getElementById('shadow').checked) {
+          scene.add( shadowMesh );
+          shadowMaterial.opacity = document.getElementById('ply_opacity').value * document.getElementById('spot_light_intensity').value;
+        } else {
+          scene.remove( shadowMesh );
+        }
+      }
+
+      function render() {
+        requestAnimationFrame( render );
+
+        // Move the mesh in the scene
+        mesh.position.x = pos_x;
+        mesh.position.y = pos_y;
+        mesh.position.z = pos_z;
+
+        // Reset mesh rotational values
+        if (reset_rotation) {
+          mesh.rotation.x = 0;
+          mesh.rotation.y = 0;
+          mesh.rotation.z = 0;
+          reset_rotation = false;
+        }
+
+        // Rotate the mesh
+        if (!mouse_rotation) {
+          mesh.rotation.x += rot_x;
+          mesh.rotation.y += rot_y;
+          mesh.rotation.z += rot_z;
+          if (Math.abs(mesh.rotation.x) > 2 * Math.PI ) { mesh.rotation.x = 0; }
+          if (Math.abs(mesh.rotation.y) > 2 * Math.PI ) { mesh.rotation.y = 0; }
+          if (Math.abs(mesh.rotation.z) > 2 * Math.PI ) { mesh.rotation.z = 0; }
+        }
+
+        renderer.clear();
+      	renderer.render( scene, camera );
+      }
+
+      function reset_only() {
+        scene.remove( mesh );
+        reset_all( false, true );
+        loadFile();
+      }
+
+      function reset_all( values = false, reset = false ) {
+        // Reset all current positional and rotational values
+        document.getElementById('rotation_x').value = 0;
+        document.getElementById('rotation_y').value = 0;
+        document.getElementById('rotation_z').value = 0;
+        document.getElementById('position_x').value = 0;
+        document.getElementById('position_y').value = 0;
+        document.getElementById('position_z').value = 0;
+        rot_x = 0;
+        rot_y = 0;
+        rot_z = 0;
+        pos_x = 0;
+        pos_y = 0;
+        pos_z = 0;
+
+        // Reset the background and related values
+        document.getElementById('file_image_input').value = "";
+        document.getElementById('back_color').value = "0x000000";
+        document.getElementById('ambient_light_color').value = "0x000000";
+        document.getElementById('hemisphere_light_color').value = "0x000000";
+        document.getElementById('spot_light_color').value = "0x000000";
+        document.getElementById('spot_light_intensity').value = 0;
+        document.getElementById('directional_light_intensity').value = 1;
+
+        // Reset the radio inputs
+        document.getElementById('rotate').checked = true;
+        document.getElementById('dlight').checked = false;
+        document.getElementById('slight').checked = false;
+        document.getElementById('hlight').checked = false;
+        radio_changed();
+
+        // Reset the ply opacity and scale values
+        document.getElementById('ply_opacity').value = 1;
+        document.getElementById('ply_scale').value = 1;
+        previous_ply_scale = '1';
+
+        // Reset the wireframe and shadow checkboxes
+        document.getElementById('wireframe').checked = false;
+        document.getElementById('shadow').checked = false;
+
+        reset_rotation = true;
+
+        // Reset the view
+        if (!values && reset) {
+          hemisphereLight.position.set( 0, 10, 0 );
+          spotLight.position.set( 150, -50, 350 );
+          directionalLight.position.set( 0, 0, 250 );
+          set_scene_image();
+          show_wireframe();
+          show_shadow();
+          set_back_color();
+          set_ambient_light_color();
+          set_hemisphere_light_color();
+          set_spot_light_color();
+          set_spot_light_intensity();
+          set_directional_light_intensity();
+        }
+
+        if (!values && !reset) {
+          // Page (re)loading so reset the file input and disable controls
+          document.getElementById('file_input').value = "";
+          enable_disable( true );
+        }
+      }
+
+      function enable_disable( disable = false ) {
+        document.getElementById('file_image_input').disabled = disable;
+        document.getElementById('hlight').disabled = disable;
+        document.getElementById('slight').disabled = disable;
+        document.getElementById('dlight').disabled = disable;
+        document.getElementById('rotate').disabled = disable;
+        document.getElementById('rotation_x').disabled = disable;
+        document.getElementById('rotation_y').disabled = disable;
+        document.getElementById('rotation_z').disabled = disable;
+        document.getElementById('position_x').disabled = disable;
+        document.getElementById('position_y').disabled = disable;
+        document.getElementById('position_z').disabled = disable;
+        document.getElementById('wireframe').disabled = disable;
+        document.getElementById('shadow').disabled = disable;
+        document.getElementById('ply_scale').disabled = disable;
+        document.getElementById('ply_opacity').disabled = disable;
+        document.getElementById('ambient_light_color').disabled = disable;
+        document.getElementById('hemisphere_light_color').disabled = disable;
+        document.getElementById('spot_light_color').disabled = disable;
+        document.getElementById('spot_light_intensity').disabled = disable;
+        document.getElementById('directional_light_intensity').disabled = disable;
+        document.getElementById('back_color').disabled = disable;
+        document.getElementById('reset').disabled = disable;
+      }
+    </script>
+  </body>
+</html>

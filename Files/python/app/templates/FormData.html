@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta content="width=device-width, initial-scale=1" charset="utf-8" http-equiv="encoding">
+
+    <style>
+      body { z-index: 2; background-image: url('static/Images/dark_blue.png'); background-size: 100% 100%; overflow-x: hidden; }
+      div { background-color: aliceblue; width: 99%; border: 2px solid green; -webkit-border-radius: 5px; border-radius: 5px; padding: 3px; margin: 5px; }
+      p { text-align: center; color: blue; border: 1px solid lightblue; margin-bottom: 10px; }
+
+      A { text-decoration: none; margin: 0px 3px 0px 3px; }
+      A:hover { color:#262626; background-color:#dad9fc; text-decoration: none; }
+      A[target="_blank"]:after {
+        content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAQElEQVR42qXKwQkAIAxDUUdxtO6/RBQkQZvSi8I/pL4BoGw/XPkh4XigPmsUgh0626AjRsgxHTkUThsG2T/sIlzdTsp52kSS1wAAAABJRU5ErkJggg==);
+        margin: 3px 3px 0 5px;
+      }
+
+      table { margin-left: auto; margin-right: auto; border: 1px solid black; padding: 2px; background-color: blue; }
+      th { border: 1px solid black; border-spacing: 1px; padding: 4px; color: navy; background-color: #f2f4f4; overflow: hidden; }
+      td { text-align:center; border: 1px solid black; border-spacing: 1px; padding: 4px; background-color: #f8f1c1; overflow: hidden; }
+
+      .bgcolor { background-color: var(--bgcolor); }
+
+      .footer { position: static; margin: 0px; left: 0px; bottom: 0px; width: 99.7%; background-color: yellow; text-align: center; }
+
+      blkt { color: black; }
+      blut { color: blue; }
+      grnt { color: green; }
+    </style>
+
+    <title>Submitted Form Entries</title>
+  </head>
+  <!-- Lots of code lines below have been separated to single lines for clarity -->
+  <!-- Inline styling is generally used to override the preset for different appearance -->
+  <body>
+    <div style="color: blue; text-align: center;"><p><marquee width="15%">Submitted Form Entries</marquee></p>
+      <div style="background-color: #eee; width: 80%; border: 1px solid #111; padding: 2px; margin: auto;">
+        <table style="background: darkgrey; width: 100%; font-size: 90%; table-layout: fixed;">
+          <col width="4%" />
+          <col width="24%" />
+          <col width="24%" />
+          <col width="6%" />
+          <col width="6%" />
+          <col width="6%" />
+          <col width="6%" />
+          <col width="6%" />
+          <col width="6%" />
+          <col width="6%" />
+          <col width="6%" />
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>Male</th>
+              <th>Female</th>
+              <th>Other</th>
+              <th>Bike</th>
+              <th>Car</th>
+              <th>Boat</th>
+              <th>Color</th>
+              <th>Picture</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for index in range(fname|length) %}
+              <tr>
+                <td><grnt>{{ index + 1 }}</grnt></td>
+                <td><blkt>{{ fname[index] }}</blkt></td>
+                <td><blkt>{{ lname[index] }}</blkt></td>
+
+                {% if gender[index] == 'male' %}
+                  <td style="background-color: lightgray;"><blut>&#10004</blut></td>
+                  <td style="background-color: lightgray;"></td>
+                  <td style="background-color: lightgray;"></td>
+                {% elif gender[index] == 'female' %}
+                  <td style="background-color: lightgray;"></td>
+                  <td style="background-color: lightgray;"><blut>&#10004</blut></td>
+                  <td style="background-color: lightgray;"></td>
+                {% else %}
+                  <td style="background-color: lightgray;"></td>
+                  <td style="background-color: lightgray;"></td>
+                  <td style="background-color: lightgray;"><blut>&#10004</blut></td>
+                {% endif %}
+
+                {% if vehicle1[index] %}
+                  <td><blut>&#10004</blut></td>
+                {% else %}
+                  <td></td>
+                {% endif %}
+
+                {% if vehicle2[index] %}
+                  <td><blut>&#10004</blut></td>
+                {% else %}
+                  <td></td>
+                {% endif %}
+
+                {% if vehicle3[index] %}
+                  <td><blut>&#10004</blut></td>
+                {% else %}
+                  <td></td>
+                {% endif %}
+
+                <td class="bgcolor" style="--bgcolor: {{ favcolor[index] }}"></td>
+
+                {% if pictures[index] != 'None' %}
+                  <td><a href="{{ pictures[index] }}" target="_blank"><img crossorigin="anonymous" src="{{ pictures[index] }}" alt="image" style="width: 24px; height: 22px; margin-right: 5px;" /></a></td>
+                {% else %}
+                  <td>None</td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div><br /><br />
+
+    <p class="footer"><a href="https://github.com/GitHubDragonFly/HTML_CSS_JS#Resources" target="_blank">References</a></p>
+  </body>
+</html>
