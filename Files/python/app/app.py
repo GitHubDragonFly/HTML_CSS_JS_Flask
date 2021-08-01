@@ -1,5 +1,7 @@
 #!flask/bin/python
 
+# If required then implement user access authentication / authorization
+
 import os
 from flask import Flask, send_from_directory, send_file, render_template, request, make_response
 
@@ -9,6 +11,9 @@ fname, lname, gender, vehicle1, vehicle2, vehicle3, favcolor, pictures, img = []
 
 uploads_dir = os.path.join(app.root_path, 'uploads')
 os.makedirs(uploads_dir, mode=0o777, exist_ok=True)
+
+def page_not_found(e):
+    return render_template('404.html'), 404
 
 @app.route('/favicon.ico')
 def favicon():
@@ -44,10 +49,13 @@ def display_form_data():
 
 @app.route('/<path:path>', methods=['GET'])
 def get_path(path):
-    if path.startswith('uploads/'):
-        return send_file(os.path.join(uploads_dir, path[8:]), attachment_filename=path[8:])
-    else:
-        return render_template(path)
+    try:
+        if path.startswith('uploads/'):
+            return send_file(os.path.join(uploads_dir, path[8:]), attachment_filename=path[8:])
+        else:
+            return render_template(path)
+    except Exception as e:
+        return page_not_found(e)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=False)
