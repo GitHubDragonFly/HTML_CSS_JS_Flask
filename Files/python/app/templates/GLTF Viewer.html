@@ -68,7 +68,7 @@
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" />Wireframe</label>
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" />Shadow</label>
         <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 40px;">Reset</button>
-        <button onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
+        <button id="btn_full_screen" onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
       </div>
       <div id="url" style="display: none;">
         <label for="url_entry" style="margin: 2px 2px 2px 5px;">URL:</label>
@@ -183,9 +183,11 @@
         if (document.requestFullscreen) {
           document.requestFullscreen = false;
           document.exitFullscreen();
+          document.getElementById('btn_full_screen').style.backgroundColor = '#d1cefc'
         } else {
           document.requestFullscreen = true;
           document.body.requestFullscreen();
+          document.getElementById('btn_full_screen').style.backgroundColor = '#ffff00'
         }
       }
     </script>
@@ -421,14 +423,14 @@
 
         enable_disable( true );
 
+        selected_gltf_file = null;
+        texture_files_jpg = [];
+        texture_files_png = [];
+        draco_files = [];
+
         if (!url_loading) {
           // Loaded file(s)
           let fi = document.getElementById('file_input');
-
-          selected_gltf_file = null;
-          texture_files_jpg = [];
-          texture_files_png = [];
-          draco_files = [];
 
           // Include check for JPG/PNG and DRC (DRACO)
           for (let i = 0; i < fi.files.length; i++) {
@@ -438,13 +440,12 @@
             else if (fi.files[i].name.toUpperCase().endsWith('.DRC')) { draco_files.push( fi.files[i] ); }
           };
 
-          if (!selected_gltf_file && draco_files.length == 0) { return; }
+          if (!selected_gltf_file && draco_files == undefined) { return; }
 
           selected_url_file = '';
         } else {
-          // Reset the file input and selected_gltf_file
+          // Reset the file input
           document.getElementById('file_input').value = '';
-          selected_gltf_file = null;
           url_loading = false;
         }
 
@@ -527,7 +528,7 @@
         // Load DRACO or gltf file
         if (selected_gltf_file) {
           loadFile();
-        } else if (draco_files) {
+        } else if (draco_files.length > 0) {
           loadDRACO();
         } else {
           loadURLFile();
@@ -595,7 +596,7 @@
         }
       }
 
-      function loadDRACO() {
+      function loadDRACO( url_file = null ) {
         draco_files.forEach( file => {
           draco_loader.load( URL.createObjectURL( file ) , function( geometry ) {
             draco_material = new THREE.MeshPhongMaterial( {
@@ -604,6 +605,7 @@
               polygonOffsetFactor: 1,
               polygonOffsetUnits: 1,
               color: 0x0077FF,
+              emissive: 0x000010,
               specular: 0x1122aa,
               shininess: 50,
               opacity: 1,
@@ -647,44 +649,93 @@
 
       function loadURLFile() {
         if (selected_url_file != '') {
-          gltf_loader.load( selected_url_file, ( gltf ) => {
-            // Go through all children of the loaded object and search for a Mesh
-            gltf.scene.traverse( function( child ) {
-              // This allow us to check if the children is an instance of the Mesh constructor
-          	  if (child instanceof THREE.Mesh) {
-                // Enable transparency for the Opacity control and enable shadows
-                child.material.opacity = 1;
-                child.material.transparent = true;
-                child.material.skinning = true;
-                child.castShadow = true;
-                child.receiveShadow = true;
-    		      }
-    	      });
+          if (selected_url_file.toUpperCase().endsWith('.DRC')) {
+            draco_loader.load( selected_url_file, function( geometry ) {
+              draco_material = new THREE.MeshPhongMaterial( {
+                side: THREE.DoubleSide,
+                polygonOffset: true,
+                polygonOffsetFactor: 1,
+                polygonOffsetUnits: 1,
+                color: 0x0077FF,
+                emissive: 0x000010,
+                specular: 0x1122aa,
+                shininess: 50,
+                opacity: 1,
+                transparent: true,
+                vertexColors: THREE.VertexColors,
+                flatShading: false,
+                skinning: true,
+                fog: false,
+                reflectivity: 1
+              });
 
-            gltf_obj = gltf.scene;
-            gltf_obj.name = 'url_model';
+              gltf_obj = new THREE.Mesh( geometry, draco_material );
+              gltf_obj.castShadow = true;
+              gltf_obj.receiveShadow = true;
+              gltf_obj.scale.multiplyScalar( 100 );
+              gltf_obj.position.set( 0, 0, 0 );
 
-            resize();
+              resize();
 
-            // Add gltf model to scene
-            scene.add( gltf_obj );
+              // Add DRACO model to scene
+              scene.add( gltf_obj );
 
-            camera.lookAt( gltf_obj.position );
+              camera.lookAt( gltf_obj.position );
 
-          }, function ( xhr ) {
-            let today = new Date();
-            let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+              render();
+            }, function ( xhr ) {
+              let today = new Date();
+              let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
 
-            if (xhr.loaded == 0 && xhr.total == 0) {
-              console.log( '0% loaded - ' + time );
-            } else {
-              console.log( parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
-            }
-          }, function ( error ) {
-            console.log( 'Error loading GLTF from URL!' );
-          });
+              if (xhr.loaded == 0 && xhr.total == 0) {
+                console.log( 'DRC from URL 0% loaded - ' + time );
+              } else {
+                console.log( 'DRC from URL ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              }
+            }, function ( error ) {
+              console.log( 'Error loading DRC from URL!' );
+              console.log( error );
+            });
+          } else {
+            gltf_loader.load( selected_url_file, ( gltf ) => {
+              // Go through all children of the loaded object and search for a Mesh
+              gltf.scene.traverse( function( child ) {
+                // This allow us to check if the children is an instance of the Mesh constructor
+            	  if (child instanceof THREE.Mesh) {
+                  // Enable transparency for the Opacity control and enable shadows
+                  child.material.opacity = 1;
+                  child.material.transparent = true;
+                  child.material.skinning = true;
+                  child.castShadow = true;
+                  child.receiveShadow = true;
+      		      }
+    	        });
 
-          render();
+              gltf_obj = gltf.scene;
+              gltf_obj.name = 'url_model';
+
+              resize();
+
+              // Add gltf model to scene
+              scene.add( gltf_obj );
+
+              camera.lookAt( gltf_obj.position );
+
+              render();
+            }, function ( xhr ) {
+              let today = new Date();
+              let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+              if (xhr.loaded == 0 && xhr.total == 0) {
+                console.log( 'GLTF from URL 0% loaded - ' + time );
+              } else {
+                console.log( 'GLTF from URL ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              }
+            }, function ( error ) {
+              console.log( 'Error loading GLTF from URL!' );
+              console.log( error );
+            });
+          }
         }
       }
 
