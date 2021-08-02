@@ -53,7 +53,7 @@ def display_form_data():
 def get_path(path):
     try:
         if path.startswith('uploads/'):
-            return send_file(os.path.join(uploads_dir, path[8:]), attachment_filename=path[8:])
+            return send_file(path)
         else:
             return render_template(path)
     except Exception as e:
