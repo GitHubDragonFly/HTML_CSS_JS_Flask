@@ -7,7 +7,7 @@ The main differences:
  - DRACO support was added to the GLTF Viewer:
    - this seems to work fine when using URL (see the screenshot)
    - this should work fine for browsing local files which are either in binary or embedded format
-   - you can also open `.drc` file types
+   - you can also open `.drc` file types (do note that the scale is currently set to `100x` upon loading, so change if needed)
    - see GLTF and DRACO examples in the `Images` folder (they were downloaded from [here](https://github.com/mrdoob/three.js))
 
 All it takes to run this project is to:
