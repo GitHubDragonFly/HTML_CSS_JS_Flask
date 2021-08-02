@@ -527,7 +527,7 @@
         // Load DRACO or gltf file
         if (selected_gltf_file) {
           loadFile();
-        } else if (draco_files.length > 0) {
+        } else if (draco_files) {
           loadDRACO();
         } else {
           loadURLFile();
@@ -597,7 +597,6 @@
 
       function loadDRACO() {
         draco_files.forEach( file => {
-          console.log(file);
           draco_loader.load( URL.createObjectURL( file ) , function( geometry ) {
             draco_material = new THREE.MeshPhongMaterial( {
               side: THREE.DoubleSide,
@@ -630,8 +629,18 @@
             camera.lookAt( gltf_obj.position );
 
             render();
-          }, function( xhr ) {	console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
-          }, function( error ) { console.log( 'An error happened' ); console.log( error );
+          }, function ( xhr ) {
+            let today = new Date();
+            let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+            if (xhr.loaded == 0 && xhr.total == 0) {
+              console.log( '0% loaded - ' + time );
+            } else {
+              console.log( parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+            }
+          }, function ( error ) {
+            console.log( 'Error loading DRC!' );
+            console.log( error );
           });
         });
       }
@@ -672,7 +681,7 @@
               console.log( parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
             }
           }, function ( error ) {
-            console.log( 'Error loading GLTF!' );
+            console.log( 'Error loading GLTF from URL!' );
           });
 
           render();
