@@ -1,6 +1,8 @@
 #!flask/bin/python
 
 # If required then implement user access authentication / authorization
+# Possibly include some sort of SQL for saving form data or just create a CSV file
+# The 'uploads' folder will be saving picture files uploaded via form
 
 import os
 from flask import Flask, send_from_directory, send_file, render_template, request, make_response
