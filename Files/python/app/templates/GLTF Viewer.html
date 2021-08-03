@@ -7,6 +7,7 @@
     <script src="static/js/OrbitControls.js"></script>
     <script src="static/js/DRACOLoader.js"></script>
     <script src="static/js/GLTFLoader.js"></script>
+    <script src="static/js/libs/meshopt_decoder.js"></script>
 
     <style>
       body,html {
@@ -193,15 +194,16 @@
     </script>
 
     <script>
-      var renderer, scene, camera, controls, gltf_obj
-      var ambientLight, hemisphereLight, spotLight, directionalLight
+      var ktx2_loader;
+      var renderer, scene, camera, controls, gltf_obj;
+      var ambientLight, hemisphereLight, spotLight, directionalLight;
       var shadowMesh, shadowMaterial, draco_material;
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation = false, reset_rotation = false, events_initialized = false;
       var rot_x = 0, rot_y = 0, rot_z = 0, pos_x = 0, pos_y = 0, pos_z = 0;
       var previous_gltf_scale = '1';
       var selected_gltf_file, selected_url_file = '', url_displayed, url_loading;
-      var texture_files_png, texture_files_jpg, draco_files;
+      var texture_files_png, texture_files_jpg, texture_files_ktx2, draco_files;
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
@@ -213,7 +215,11 @@
       draco_loader.preload();
       gltf_loader.setDRACOLoader( draco_loader );
 
-      function set_back_color() { document.body.style.backgroundColor = document.getElementById('back_color').value; }
+      function set_back_color() {
+        scene.background = null;
+        document.getElementById('file_image_input').value = "";
+        document.body.style.backgroundColor = document.getElementById('back_color').value;
+      }
 
       function set_gltf_opacity() {
         if (gltf_obj) {
@@ -236,20 +242,20 @@
         fii = document.getElementById('file_image_input');
 
         if (fii.files[0]) {
+          document.getElementById('back_color').value = "0x000000";
+          document.body.style.backgroundColor = document.getElementById('back_color').value;
+
           if (fii.files[0].type.startsWith('image/')) {
             const loader = new THREE.TextureLoader();
             loader.load( URL.createObjectURL( fii.files[0] ) , function ( texture ) {
               scene.background = texture;
-              document.getElementById('back_color').disabled = true;
             });
           } else {
             fii.value = "";
             scene.background = null;
-            document.getElementById('back_color').disabled = false;
           }
         } else {
           scene.background = null;
-          document.getElementById('back_color').disabled = false;
         }
       }
 
@@ -426,21 +432,23 @@
         selected_gltf_file = null;
         texture_files_jpg = [];
         texture_files_png = [];
+        texture_files_ktx2 = [];
         draco_files = [];
 
         if (!url_loading) {
           // Loaded file(s)
           let fi = document.getElementById('file_input');
 
-          // Include check for JPG/PNG and DRC (DRACO)
+          // Include check for JPG/PNG, KTX2 and DRC (DRACO)
           for (let i = 0; i < fi.files.length; i++) {
             if (fi.files[i].name.toUpperCase().endsWith('.GLB') || fi.files[i].name.toUpperCase().endsWith('.GLTF')) { selected_gltf_file = fi.files[i]; }
             else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.KTX2')) { texture_files_ktx2.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.DRC')) { draco_files.push( fi.files[i] ); }
           };
 
-          if (!selected_gltf_file && draco_files == undefined) { return; }
+          if (!selected_gltf_file && draco_files.length == 0) { return; }
 
           selected_url_file = '';
         } else {
@@ -451,20 +459,6 @@
 
         document.body.style.backgroundImage = "none";
         enable_disable( false );
-
-        renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
-        renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.setSize( ww, wh );
-        renderer.outputEncoding = THREE.sRGBEncoding;
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.setClearColor( 0xFFFFFF, 0); // Allow setting the background color
-        renderer.autoClear = false;
-
-        // The following can be used instead of the canvas but the window mouse
-        // events might be tricky to set due to the presence of the fixed menu.
-        // Possibly use Orbit Controls instead.
-        //document.body.appendChild( renderer.domElement );
 
         scene = new THREE.Scene();
         gltf_obj = new THREE.Object3D();
@@ -549,7 +543,20 @@
                 child.castShadow = true;
                 child.receiveShadow = true;
 
-                if (texture_files_png.length > 0 || texture_files_jpg.length > 0) {
+                if (texture_files_ktx2.length > 0) {
+                  texture_files_ktx2.forEach( file => {
+                    ktx2_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                      texture.encoding = THREE.sRGBEncoding;
+                      texture.wrapS = THREE.RepeatWrapping;
+                      texture.wrapT = THREE.RepeatWrapping;
+                      texture.magFilter = THREE.NearestFilter;
+
+                      // Apply texture
+                      child.material.map = texture;
+                      child.material.needsUpdate = true;
+                    });
+                  });
+                } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0) {
                   let files = (texture_files_png.length > 0) ? texture_files_png : texture_files_jpg;
 
                   files.forEach( file => {
@@ -590,13 +597,14 @@
             }
           }, function ( error ) {
             console.log( 'Error loading GLTF!' );
+            console.log( error );
           });
 
           render();
         }
       }
 
-      function loadDRACO( url_file = null ) {
+      function loadDRACO() {
         draco_files.forEach( file => {
           draco_loader.load( URL.createObjectURL( file ) , function( geometry ) {
             draco_material = new THREE.MeshPhongMaterial( {
@@ -620,7 +628,7 @@
             gltf_obj = new THREE.Mesh( geometry, draco_material );
             gltf_obj.castShadow = true;
             gltf_obj.receiveShadow = true;
-            gltf_obj.scale.multiplyScalar( 100 );
+            gltf_obj.scale.multiplyScalar( 100 ); // comment out or modify if needed
             gltf_obj.position.set( 0, 0, 0 );
 
             resize();
@@ -765,12 +773,12 @@
       function render() {
         requestAnimationFrame( render );
 
-        // Move the Obj in the scene
+        // Move the object in the scene
         gltf_obj.position.x = pos_x;
         gltf_obj.position.y = pos_y;
         gltf_obj.position.z = pos_z;
 
-        // Reset Obj rotational values
+        // Reset object rotational values
         if (reset_rotation) {
           gltf_obj.rotation.x = 0;
           gltf_obj.rotation.y = 0;
@@ -778,7 +786,7 @@
           reset_rotation = false;
         }
 
-        // Rotate the Obj
+        // Rotate the object
         if (!mouse_rotation) {
           gltf_obj.rotation.x += rot_x;
           gltf_obj.rotation.y += rot_y;
@@ -836,7 +844,7 @@
         document.getElementById('hlight').checked = false;
         radio_changed();
 
-        // Reset the Obj opacity and scale values
+        // Reset the object opacity and scale values
         document.getElementById('gltf_opacity').value = 1;
         document.getElementById('gltf_scale').value = 1;
         previous_gltf_scale = '1';
@@ -895,6 +903,33 @@
         document.getElementById('back_color').disabled = disable;
         document.getElementById('reset').disabled = disable;
       }
+    </script>
+
+    <script type="module">
+      import { KTX2Loader } from './static/js/KTX2Loader.js';
+
+      ktx2_loader = new KTX2Loader( manager );
+
+      renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
+      renderer.setPixelRatio( window.devicePixelRatio );
+      renderer.setSize( ww, wh );
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.setClearColor( 0xFFFFFF, 0); // Allow setting the background color
+      renderer.autoClear = false;
+
+      // The following can be used instead of the canvas but the window mouse
+      // events might be tricky to set due to the presence of the fixed menu.
+      // Possibly use Orbit Controls instead.
+      //document.body.appendChild( renderer.domElement );
+
+      ktx2_loader.setTranscoderPath('static/js/libs/basis/');
+      ktx2_loader.detectSupport(renderer);
+      manager.addHandler(/\.basis$/i, ktx2_loader);
+
+      gltf_loader.setKTX2Loader( ktx2_loader );
+      gltf_loader.setMeshoptDecoder( MeshoptDecoder );
     </script>
   </body>
 </html>

@@ -64,7 +64,7 @@
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" />Wireframe</label>
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" />Shadow</label>
         <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 40px;">Reset</button>
-        <button onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
+        <button id="btn_full_screen" onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
       </div>
       <div>
         <label style="color: blue; margin: 2px 0 2px 0;"><input type="radio" id="hlight" name="mode" value="HL" onchange="radio_changed()" />HL</label>
@@ -164,9 +164,11 @@
         if (document.requestFullscreen) {
           document.requestFullscreen = false;
           document.exitFullscreen();
+          document.getElementById('btn_full_screen').style.backgroundColor = '#d1cefc'
         } else {
           document.requestFullscreen = true;
           document.body.requestFullscreen();
+          document.getElementById('btn_full_screen').style.backgroundColor = '#ffff00'
         }
       }
     </script>
@@ -185,7 +187,11 @@
       // Loader for selected file from Three.js
       const ply_loader = new THREE.PLYLoader( manager );
 
-      function set_back_color() { document.body.style.backgroundColor = document.getElementById('back_color').value; }
+      function set_back_color() {
+        scene.background = null;
+        document.getElementById('file_image_input').value = "";
+        document.body.style.backgroundColor = document.getElementById('back_color').value;
+      }
 
       function set_ply_opacity() {
         if (material) {
@@ -200,20 +206,20 @@
         fii = document.getElementById('file_image_input');
 
         if (fii.files[0]) {
+          document.getElementById('back_color').value = "0x000000";
+          document.body.style.backgroundColor = document.getElementById('back_color').value;
+
           if (fii.files[0].type.startsWith('image/')) {
             const loader = new THREE.TextureLoader();
             loader.load( URL.createObjectURL( fii.files[0] ) , function(texture) {
               scene.background = texture;
-              document.getElementById('back_color').disabled = true;
             });
           } else {
             fii.value = "";
             scene.background = null;
-            document.getElementById('back_color').disabled = false;
           }
         } else {
           scene.background = null;
-          document.getElementById('back_color').disabled = false;
         }
       }
 
