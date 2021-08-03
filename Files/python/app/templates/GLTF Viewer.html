@@ -606,39 +606,85 @@
 
       function loadDRACO() {
         draco_files.forEach( file => {
-          draco_loader.load( URL.createObjectURL( file ) , function( geometry ) {
-            draco_material = new THREE.MeshPhongMaterial( {
-              side: THREE.DoubleSide,
-              polygonOffset: true,
-              polygonOffsetFactor: 1,
-              polygonOffsetUnits: 1,
-              color: 0x0077FF,
-              emissive: 0x000010,
-              specular: 0x1122aa,
-              shininess: 50,
-              opacity: 1,
-              transparent: true,
-              vertexColors: THREE.VertexColors,
-              flatShading: false,
-              skinning: true,
-              fog: false,
-              reflectivity: 1
-            });
+          draco_loader.load( URL.createObjectURL( file ), function( geometry ) {
+            geometry.computeVertexNormals();
 
-            gltf_obj = new THREE.Mesh( geometry, draco_material );
-            gltf_obj.castShadow = true;
-            gltf_obj.receiveShadow = true;
-            gltf_obj.scale.multiplyScalar( 100 ); // comment out or modify if needed
-            gltf_obj.position.set( 0, 0, 0 );
+            if (texture_files_ktx2.length > 0) {
+              texture_files_ktx2.forEach( file => {
+                ktx2_loader.load( URL.createObjectURL( file ), function( texture ) {
+                  texture.encoding = THREE.sRGBEncoding;
+                  texture.wrapS = THREE.RepeatWrapping;
+                  texture.wrapT = THREE.RepeatWrapping;
+                  texture.magFilter = THREE.NearestFilter;
 
-            resize();
+                  // Apply texture
+                  draco_material = new THREE.MeshStandardMaterial( {map: texture, opacity: 1, transparent: true } );
 
-            // Add DRACO model to scene
-            scene.add( gltf_obj );
+                  gltf_obj = new THREE.Mesh( geometry, draco_material );
+                  gltf_obj.castShadow = true;
+                  gltf_obj.receiveShadow = true;
+                  gltf_obj.scale.multiplyScalar( 100 ); // comment out or modify if needed
+                  gltf_obj.position.set( 0, 0, 0 );
 
-            camera.lookAt( gltf_obj.position );
+                  resize();
 
-            render();
+                  // Add DRACO model to scene
+                  scene.add( gltf_obj );
+
+                  camera.lookAt( gltf_obj.position );
+
+                  render();
+                });
+              });
+            } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0) {
+              let files = (texture_files_png.length > 0) ? texture_files_png : texture_files_jpg;
+
+              files.forEach( file => {
+                let loader = new THREE.TextureLoader();
+                loader.load( URL.createObjectURL( file ), function( texture ) {
+                  texture.encoding = THREE.sRGBEncoding;
+                  texture.wrapS = THREE.RepeatWrapping;
+                  texture.wrapT = THREE.RepeatWrapping;
+                  texture.magFilter = THREE.NearestFilter;
+
+                  // Apply texture
+                  draco_material = new THREE.MeshStandardMaterial( { map: texture, opacity: 1, transparent: true } );
+
+                  gltf_obj = new THREE.Mesh( geometry, draco_material );
+                  gltf_obj.castShadow = true;
+                  gltf_obj.receiveShadow = true;
+                  gltf_obj.scale.multiplyScalar( 100 ); // comment out or modify if needed
+                  gltf_obj.position.set( 0, 0, 0 );
+
+                  resize();
+
+                  // Add DRACO model to scene
+                  scene.add( gltf_obj );
+
+                  camera.lookAt( gltf_obj.position );
+
+                  render();
+                });
+              });
+            } else {
+              let texture = new THREE.TextureLoader().load( 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAAzSURBVBhXFYrJDQAxDAIHl5tG9pWOI8/aICGunO9qP0JRNZqwltgspltKdtmfihNMoc0PFNkQjHSfyTIAAAAASUVORK5CYII=' );
+              draco_material = new THREE.MeshStandardMaterial( { map: texture, opacity: 1, transparent: true } );
+
+              gltf_obj = new THREE.Mesh( geometry, draco_material );
+              gltf_obj.castShadow = true;
+              gltf_obj.receiveShadow = true;
+              gltf_obj.scale.multiplyScalar( 100 ); // comment out or modify if needed
+              gltf_obj.position.set( 0, 0, 0 );
+
+              resize();
+
+              // Add DRACO model to scene
+              scene.add( gltf_obj );
+
+              camera.lookAt( gltf_obj.position );
+
+              render();
+            }
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -659,23 +705,10 @@
         if (selected_url_file != '') {
           if (selected_url_file.toUpperCase().endsWith('.DRC')) {
             draco_loader.load( selected_url_file, function( geometry ) {
-              draco_material = new THREE.MeshPhongMaterial( {
-                side: THREE.DoubleSide,
-                polygonOffset: true,
-                polygonOffsetFactor: 1,
-                polygonOffsetUnits: 1,
-                color: 0x0077FF,
-                emissive: 0x000010,
-                specular: 0x1122aa,
-                shininess: 50,
-                opacity: 1,
-                transparent: true,
-                vertexColors: THREE.VertexColors,
-                flatShading: false,
-                skinning: true,
-                fog: false,
-                reflectivity: 1
-              });
+              geometry.computeVertexNormals();
+
+              let texture = new THREE.TextureLoader().load( 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAAzSURBVBhXFYrJDQAxDAIHl5tG9pWOI8/aICGunO9qP0JRNZqwltgspltKdtmfihNMoc0PFNkQjHSfyTIAAAAASUVORK5CYII=' );
+              draco_material = new THREE.MeshStandardMaterial( { map: texture, opacity: 1, transparent: true } );
 
               gltf_obj = new THREE.Mesh( geometry, draco_material );
               gltf_obj.castShadow = true;
@@ -808,6 +841,8 @@
 
         if (selected_gltf_file) {
           loadFile();
+        } else if (draco_files.length > 0) {
+          loadDRACO();
         } else {
           loadURLFile();
         }
