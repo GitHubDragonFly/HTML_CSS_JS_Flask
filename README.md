@@ -9,6 +9,7 @@ The main differences:
    - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG` texture file along just to see if and how it changes the object's appearance)
    - you can also open `.drc` file types either alone or together with a texture file (do note that the scale is currently set to `100x` upon loading, so change it if needed)
    - see GLTF and DRACO examples in the `Images` folder (they were downloaded from [here](https://github.com/mrdoob/three.js))
+ - New Collada DAE Viewer, using Orbit Controls which made the code and GUI slightly simpler (see the screenshot)
 
 All it takes to run this project is to:
  - Download a zip file of this project (or clone the repo)
