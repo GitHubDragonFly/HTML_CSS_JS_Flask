@@ -6,6 +6,8 @@
     <script src="static/js/three.js"></script>
     <script src="static/js/ColladaLoader.js"></script>
     <script src="static/js/OrbitControls.js"></script>
+    <script src="static/js/DDSLoader.js"></script>
+    <script src="static/js/libs/meshopt_decoder.js"></script>
 
     <style>
       body,html{
@@ -148,6 +150,7 @@
     </script>
 
     <script>
+      var ktx2_loader;
       var renderer, scene, camera, controls, dae_obj;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
       var shadowMesh, shadowMaterial;
@@ -156,12 +159,16 @@
       var rot_x = 0, rot_y = 0, rot_z = 0;
       var previous_dae_scale = '1';
       var selected_dae_file, selected_url_file = '', url_displayed, url_loading;
-      var texture_files_png, texture_files_jpg;
+      var texture_files_png, texture_files_jpg, texture_files_dds, texture_files_ktx2;
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
+
       // Loader for selected file from Three.js
       const dae_loader = new THREE.ColladaLoader( manager );
+
+      const dds_loader = new THREE.DDSLoader( manager );
+      manager.addHandler( /\.dds$/i, dds_loader );
 
       function set_back_color() { document.body.style.backgroundColor = document.getElementById('back_color').value; }
 
@@ -201,11 +208,12 @@
       }
 
       function set_ambient_light_color() {
-        let colors = document.getElementById('ambient_light_color').value; // hex format '#rrggbb'
+        let al_colors = document.getElementById('ambient_light_color').value; // hex format '#rrggbb'
+
         ambientLight.color = {
-          'r': parseInt(colors.substring(1, 3), 16) / 10,
-          'g': parseInt(colors.substring(3, 5), 16) / 10,
-          'b': parseInt(colors.substring(5), 16) / 10
+          'r': parseInt(al_colors.substring(1, 3), 16) / 10,
+          'g': parseInt(al_colors.substring(3, 5), 16) / 10,
+          'b': parseInt(al_colors.substring(5), 16) / 10
         };
       }
 
@@ -248,7 +256,7 @@
 
       function set_dae_scale() {
         let current_dae_scale = document.getElementById('dae_scale').value;
-
+        // There appears to be a pattern and this could possibly be further simplified and range expanded
         switch (previous_dae_scale) {
           case '0.25':
             dae_obj.scale.multiplyScalar( 2 );
@@ -301,14 +309,18 @@
         selected_dae_file = null;
         texture_files_jpg = [];
         texture_files_png = [];
+        texture_files_ktx2 = [];
+        texture_files_dds = [];
         enable_disable( true );
 
         if (!url_loading) {
-          // Include check for JPG/PNG
+          // Include check for JPG/PNG, KTX2 and DDS (DirectDraw Surface container file format)
           for (let i = 0; i < fi.files.length; i++) {
             if (fi.files[i].name.toUpperCase().endsWith('.DAE')) { selected_dae_file = fi.files[i]; }
             else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.KTX2')) { texture_files_ktx2.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.DDS')) { texture_files_dds.push( fi.files[i] ); }
           };
 
           if (!selected_dae_file) { return; }
@@ -322,14 +334,6 @@
 
         document.body.style.backgroundImage = "none";
         enable_disable( false );
-
-        renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
-        renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.setSize( ww, wh );
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.setClearColor( 0xFFFFFF, 0); // Allow setting the background color
-        renderer.autoClear = false;
 
         scene = new THREE.Scene();
         dae_obj = new THREE.Object3D();
@@ -419,12 +423,38 @@
                 child.castShadow = true;
                 child.receiveShadow = true;
 
-                if (texture_files_png.length > 0 || texture_files_jpg.length > 0) {
+                if (texture_files_ktx2.length > 0) {
+                  texture_files_ktx2.forEach( file => {
+                    ktx2_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                      texture.encoding = THREE.sRGBEncoding;
+                      texture.wrapS = THREE.RepeatWrapping;
+                      texture.wrapT = THREE.RepeatWrapping;
+                      texture.magFilter = THREE.NearestFilter;
+
+                      // Apply texture
+                      child.material.map = texture;
+                      child.material.needsUpdate = true;
+                    });
+                  });
+                } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0) {
                   let files = (texture_files_png.length > 0) ? texture_files_png : texture_files_jpg;
 
                   files.forEach( file => {
                     let loader = new THREE.TextureLoader();
                     loader.load( URL.createObjectURL( file ) , function( texture ) {
+                      texture.encoding = THREE.sRGBEncoding;
+                      texture.wrapS = THREE.RepeatWrapping;
+                      texture.wrapT = THREE.RepeatWrapping;
+                      texture.magFilter = THREE.NearestFilter;
+
+                      // Apply texture
+                      child.material.map = texture;
+                      child.material.needsUpdate = true;
+                    });
+                  });
+                } else if (texture_files_dds.length > 0) {
+                  texture_files_dds.forEach( file => {
+                    dds_loader.load( URL.createObjectURL( file ), function( texture ) {
                       texture.encoding = THREE.sRGBEncoding;
                       texture.wrapS = THREE.RepeatWrapping;
                       texture.wrapT = THREE.RepeatWrapping;
@@ -462,6 +492,7 @@
             }
           }, function ( error ) {
             console.log( 'Error loading DAE!' );
+            console.log( error );
           });
 
           render();
@@ -508,7 +539,8 @@
               console.log( parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
             }
           }, function ( error ) {
-            console.log( 'Error loading DAE!' );
+            console.log( 'Error loading DAE from URL!' );
+            console.log( error );
           });
 
           render();
@@ -644,6 +676,30 @@
         document.getElementById('back_color').disabled = disable;
         document.getElementById('reset').disabled = disable;
       }
+    </script>
+
+    <script type="module">
+      import { KTX2Loader } from './static/js/KTX2Loader.js';
+
+      ktx2_loader = new KTX2Loader( manager );
+
+      renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
+      renderer.setPixelRatio( window.devicePixelRatio );
+      renderer.setSize( ww, wh );
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.setClearColor( 0xFFFFFF, 0); // Allow setting the background color
+      renderer.autoClear = false;
+
+      // The following can be used instead of the canvas but the window mouse
+      // events might be tricky to set due to the presence of the fixed menu.
+      // Possibly use Orbit Controls instead.
+      //document.body.appendChild( renderer.domElement );
+
+      ktx2_loader.setTranscoderPath('static/js/libs/basis/');
+      ktx2_loader.detectSupport(renderer);
+      manager.addHandler(/\.basis$/i, ktx2_loader);
     </script>
   </body>
 </html>

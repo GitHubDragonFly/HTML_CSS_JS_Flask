@@ -188,6 +188,9 @@
       const mtl_loader = new THREE.MTLLoader( manager );
       const obj_loader = new THREE.OBJLoader( manager );
 
+      const dds_loader = new THREE.DDSLoader( manager );
+      manager.addHandler( /\.dds$/i, dds_loader );
+
       function set_back_color() {
         scene.background = null;
         document.getElementById('file_image_input').value = "";
@@ -404,7 +407,8 @@
         }
 
         obj_loader.setMaterials( null );
-        selected_obj_file = selected_mtl_file = null;
+        selected_obj_file = null;
+        selected_mtl_file = null;
         texture_files_jpg = [];
         texture_files_png = [];
         texture_files_dds = [];
@@ -487,7 +491,7 @@
         scene.add( spotLight.target );
 
         // Add DirectionalLight to the scene
-        directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 0.8 );
+        directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 1 );
         directionalLight.position.set( 0, 0, 250 );
         directionalLight.lookAt( new THREE.Vector3( 0, 0, 0 ) );
         scene.add( directionalLight );
@@ -506,7 +510,8 @@
               for (const [ key, value ] of Object.entries( mtl.materialsInfo )) {
                 texture_files_png.forEach( file => {
                   if (file.name === value.map_kd) {
-                    mtl.materialsInfo[ key ] = URL.createObjectURL( file );
+                    mtl.materials[ key ] = URL.createObjectURL( file );
+                    mtl.materialsInfo[ key ].map_kd = mtl.materials[ key ].substring(10);
                   }
                 });
               }
@@ -514,7 +519,8 @@
               for (const [ key, value ] of Object.entries( mtl.materialsInfo )) {
                 texture_files_jpg.forEach( file => {
                   if (file.name === value.map_kd) {
-                    mtl.materialsInfo[ key ] = URL.createObjectURL( file );
+                    mtl.materials[ key ] = URL.createObjectURL( file );
+                    mtl.materialsInfo[ key ].map_kd = mtl.materials[ key ].substring(10);
                   }
                 });
               }
@@ -522,13 +528,15 @@
               for (const [ key, value ] of Object.entries( mtl.materialsInfo )) {
                 texture_files_dds.forEach( file => {
                   if (file.name === value.map_kd) {
-                    mtl.materialsInfo[ key ] = URL.createObjectURL( file );
+                    mtl.materials[ key ] = URL.createObjectURL( file );
+                    mtl.materialsInfo[ key ].map_kd = mtl.materials[ key ].substring(10);
                   }
                 });
               }
+            } else {
+              mtl.preload();
+              obj_loader.setMaterials( mtl );
             }
-
-            obj_loader.setMaterials( mtl );
 
             // Launch loading of the selected file
             obj_loader.load( URL.createObjectURL( selected_obj_file ), function ( object ) {
@@ -538,33 +546,19 @@
               Obj.traverse( function ( child ) {
                 // This allow us to check if the children is an instance of the Mesh constructor
         	      if (child instanceof THREE.Mesh) {
+                  if (texture_files_dds.length > 0) {
+                    child.material.map = dds_loader.load( mtl.materials[ child.material.name ] );
+                  } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0) {
+                    child.material.map = mtl.loadTexture( mtl.materials[ child.material.name ] );
+                  }
+
                   // Enable transparency for the Opacity control and enable shadows
+                  child.material.opacity = 1;
                   child.material.transparent = true;
                   child.castShadow = true;
                   child.receiveShadow = true;
     		        }
     	        });
-
-              if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_dds.length > 0) {
-                for (const [key, value] of Object.entries( mtl.materialsInfo )) {
-                  let texture = null;
-
-                  if (texture_files_dds.length > 0) {
-                    let texture_dds_loader = new THREE.DDSLoader();
-                    texture = texture_dds_loader.load( value );
-                  } else {
-                    texture = mtl.loadTexture( value );
-                  }
-
-                  Obj.traverse( function( child ) {
-                    if (child instanceof THREE.Mesh) {
-                      // Apply texture
-                      child.material.map = texture;
-                      child.material.needsUpdate = true;
-                    }
-                  });
-                }
-              }
 
               resize();
 
@@ -585,7 +579,28 @@
             Obj.traverse( function( child ) {
               // This allow us to check if the children is an instance of the Mesh constructor
         	    if (child instanceof THREE.Mesh) {
+                if (texture_files_png.length > 0) {
+                  texture_files_png.forEach( file => {
+                    new THREE.TextureLoader().load( URL.createObjectURL( file ), function( texture ) {
+                      child.material.map = texture;
+                    });
+                  });
+                } else if (texture_files_jpg.length > 0) {
+                  texture_files_jpg.forEach( file => {
+                    new THREE.TextureLoader().load( URL.createObjectURL( file ), function( texture ) {
+                      child.material.map = texture;
+                    });
+                  });
+                } else if (texture_files_dds.length > 0) {
+                  texture_files_dds.forEach( file => {
+                    dds_loader.load( URL.createObjectURL( file ), function( texture ) {
+                      child.material.map = texture;
+                    });
+                  });
+                }
+
                 // Enable transparency for the Opacity control and enable shadows
+                child.material.opacity = 1;
                 child.material.transparent = true;
                 child.castShadow = true;
                 child.receiveShadow = true;
