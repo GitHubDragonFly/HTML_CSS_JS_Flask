@@ -1,5 +1,5 @@
 # HTML_CSS_JS_Flask
-This is a modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project so check a description of all the features there. It is set to be used with `python3` and `Flask` server.
+This is a modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project so check a description of all the features there. It is set to be used with `python3` and `Flask` server. Lots of Three.js viewers, not necessarily perfect but functional as they are.
 
 The main differences:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
@@ -9,7 +9,7 @@ The main differences:
    - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG` texture file along just to see if and how it changes the object's appearance)
    - you can also open `.drc` file types either alone or together with a texture file (do note that the scale is currently set to `100x` upon loading, so change it if needed)
  - New Collada DAE Viewer, using Orbit Controls which made the code and GUI slightly simpler (see the screenshot and do note that the scale is currently set to `80x` upon loading, so change it if needed)
- - See GLTF / DRACO / DAE examples in the `Images` folder (they were downloaded from [here](https://github.com/mrdoob/three.js) and there is more examples there)
+ - See GLTF / DRACO / DAE examples in the `Images` folder (they were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out)
 
 All it takes to run this project is to:
  - Download a zip file of this project (or clone the repo)
