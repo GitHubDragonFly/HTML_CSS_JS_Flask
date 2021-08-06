@@ -63,6 +63,7 @@
         <input type="number" id="dae_opacity" name="dae_opacity" min="0" max="1" step="0.05" value="1" onkeydown="return false" onchange="set_dae_opacity()" style="width: 48px; margin: 2px 5px 2px 0;" />
         <label for="dae_scale" style="margin: 2px 2px 2px 0;">Scale:</label>
         <input type="number" id="dae_scale" name="dae_scale" onkeydown="return false" onchange="set_dae_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 5px 2px 0; width: 48px;" />
+        <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="scale_10x" onchange="document.getElementById('reset').click();" />10x</label>
         <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 40px;">Reset</button>
         <button id="btn_full_screen" onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
       </div>
@@ -337,10 +338,11 @@
         }
 
         document.body.style.backgroundImage = "none";
+        document.getElementById('scale_10x').checked = false;
         enable_disable( false );
 
-        scene = new THREE.Scene();
-        dae_obj = new THREE.Object3D();
+        if (scene == undefined) { scene = new THREE.Scene(); }
+        if (dae_obj == undefined) { dae_obj = new THREE.Object3D(); }
 
         if (!events_initialized) { initialize_event_listeners(); events_initialized = true; }
 
@@ -475,7 +477,7 @@
 
             dae_obj = collada.scene;
             dae_obj.name = 'local_model';
-            dae_obj.scale.multiplyScalar( 80 ); // comment out or modify if needed
+            if (document.getElementById('scale_10x').checked) { dae_obj.scale.multiplyScalar( 10 ); }
             dae_obj.position.set( 0, 0, 0 );
 
             resize();
@@ -523,7 +525,7 @@
 
             dae_obj = collada.scene;
             dae_obj.name = 'url_model';
-            dae_obj.scale.multiplyScalar( 80 ); // comment out or modify if needed
+            if (document.getElementById('scale_10x').checked) { dae_obj.scale.multiplyScalar( 10 ); }
             dae_obj.position.set( 0, 0, 0 );
 
             resize();
@@ -656,9 +658,10 @@
         }
 
         if (!values && !reset) {
-          // Page (re)loading so reset the file input, URL entry and disable controls
+          // Page (re)loading so reset the file input, URL entry, scale_10x checkbox and disable controls
           document.getElementById('file_input').value = '';
           document.getElementById('url_entry').value = '';
+          document.getElementById('scale_10x').checked = false;
           enable_disable( true );
         }
       }
@@ -670,6 +673,7 @@
         document.getElementById('rotation_z').disabled = disable;
         document.getElementById('wireframe').disabled = disable;
         document.getElementById('shadow').disabled = disable;
+        document.getElementById('scale_10x').disabled = disable;
         document.getElementById('dae_scale').disabled = disable;
         document.getElementById('dae_opacity').disabled = disable;
         document.getElementById('ambient_light_color').disabled = disable;

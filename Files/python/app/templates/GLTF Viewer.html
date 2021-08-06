@@ -66,6 +66,7 @@
         <input type="number" id="gltf_opacity" name="gltf_opacity" min="0" max="1" step="0.05" value="1" onkeydown="return false" onchange="set_gltf_opacity()" style="width: 48px; margin: 2px 5px 2px 0;" />
         <label for="gltf_scale" style="margin: 2px 2px 2px 0;">Scale:</label>
         <input type="number" id="gltf_scale" name="gltf_scale" onkeydown="return false" onchange="set_gltf_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 5px 2px 0; width: 48px;" />
+        <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="scale_10x" onchange="document.getElementById('reset').click();" />10x</label>
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" />Wireframe</label>
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" />Shadow</label>
         <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 40px;">Reset</button>
@@ -458,6 +459,7 @@
         }
 
         document.body.style.backgroundImage = "none";
+        document.getElementById('scale_10x').checked = false;
         enable_disable( false );
 
         scene = new THREE.Scene();
@@ -469,6 +471,9 @@
 
         // Add grid helper for use with Orbit Controls
         //scene.add(new THREE.GridHelper(200, 200, "yellow"));
+
+        // Add axes helper
+        //scene.add( new THREE.AxesHelper( 50 ) );
 
         camera = new THREE.PerspectiveCamera( 45, ww/wh, 0.1, 2000 );
         camera.position.set( 0, 0, 250 );
@@ -578,6 +583,7 @@
 
             gltf_obj = gltf.scene;
             gltf_obj.name = 'local_model';
+            if (document.getElementById('scale_10x').checked) { gltf_obj.scale.multiplyScalar( 10 ); }
 
             resize();
 
@@ -623,7 +629,7 @@
                   gltf_obj = new THREE.Mesh( geometry, draco_material );
                   gltf_obj.castShadow = true;
                   gltf_obj.receiveShadow = true;
-                  gltf_obj.scale.multiplyScalar( 100 ); // comment out or modify if needed
+                  if (document.getElementById('scale_10x').checked) { gltf_obj.scale.multiplyScalar( 10 ); }
                   gltf_obj.position.set( 0, 0, 0 );
 
                   resize();
@@ -653,7 +659,7 @@
                   gltf_obj = new THREE.Mesh( geometry, draco_material );
                   gltf_obj.castShadow = true;
                   gltf_obj.receiveShadow = true;
-                  gltf_obj.scale.multiplyScalar( 100 ); // comment out or modify if needed
+                  if (document.getElementById('scale_10x').checked) { gltf_obj.scale.multiplyScalar( 10 ); }
                   gltf_obj.position.set( 0, 0, 0 );
 
                   resize();
@@ -673,7 +679,7 @@
               gltf_obj = new THREE.Mesh( geometry, draco_material );
               gltf_obj.castShadow = true;
               gltf_obj.receiveShadow = true;
-              gltf_obj.scale.multiplyScalar( 100 ); // comment out or modify if needed
+              if (document.getElementById('scale_10x').checked) { gltf_obj.scale.multiplyScalar( 10 ); }
               gltf_obj.position.set( 0, 0, 0 );
 
               resize();
@@ -713,7 +719,7 @@
               gltf_obj = new THREE.Mesh( geometry, draco_material );
               gltf_obj.castShadow = true;
               gltf_obj.receiveShadow = true;
-              gltf_obj.scale.multiplyScalar( 100 );
+              if (document.getElementById('scale_10x').checked) { gltf_obj.scale.multiplyScalar( 10 ); }
               gltf_obj.position.set( 0, 0, 0 );
 
               resize();
@@ -754,6 +760,7 @@
 
               gltf_obj = gltf.scene;
               gltf_obj.name = 'url_model';
+              if (document.getElementById('scale_10x').checked) { gltf_obj.scale.multiplyScalar( 10 ); }
 
               resize();
 
@@ -907,9 +914,10 @@
         }
 
         if (!values && !reset) {
-          // Page (re)loading so reset the file input, URL entry and disable controls
+          // Page (re)loading so reset the file input, URL entry, scale_10x checkbox and disable controls
           document.getElementById('file_input').value = '';
           document.getElementById('url_entry').value = '';
+          document.getElementById('scale_10x').checked = false;
           enable_disable( true );
         }
       }
@@ -928,6 +936,7 @@
         document.getElementById('position_z').disabled = disable;
         document.getElementById('wireframe').disabled = disable;
         document.getElementById('shadow').disabled = disable;
+        document.getElementById('scale_10x').disabled = disable;
         document.getElementById('gltf_scale').disabled = disable;
         document.getElementById('gltf_opacity').disabled = disable;
         document.getElementById('ambient_light_color').disabled = disable;
