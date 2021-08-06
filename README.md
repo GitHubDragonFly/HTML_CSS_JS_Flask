@@ -7,9 +7,9 @@ The main differences:
  - DRACO and KTX2 support was added to the GLTF Viewer:
    - this seems to work fine when using URL (see the screenshot)
    - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG` texture file along just to see if and how it changes the object's appearance)
-   - you can also open `.drc` file types either alone or together with a texture file (do note that the scale is currently set to `100x` upon loading, so change it if needed)
- - New Collada DAE Viewer, using Orbit Controls which made the code and GUI slightly simpler (see the screenshot and do note that the scale is currently set to `80x` upon loading, so change it if needed)
- - See GLTF / DRACO / DAE examples in the `Images` folder (they were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out)
+   - you can also open `.drc` file types either alone or together with a texture file
+ - New Collada DAE Viewer, using Orbit Controls which made the code and GUI slightly simpler (see the screenshot)
+ - See GLTF / DRACO / DAE examples in the `Images` folder (most were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out)
 
 All it takes to run this project is to:
  - Download a zip file of this project (or clone the repo)
