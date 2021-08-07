@@ -344,6 +344,17 @@
         document.getElementById('scale_10x').checked = false;
         enable_disable( false );
 
+        if (renderer == undefined) {
+          renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
+          renderer.setPixelRatio( window.devicePixelRatio );
+          renderer.setSize( ww, wh );
+          renderer.outputEncoding = THREE.sRGBEncoding;
+          renderer.shadowMap.enabled = true;
+          renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+          renderer.setClearColor( 0xFFFFFF, 0); // Allow setting the background color
+          renderer.autoClear = false;
+        }
+
         if (scene == undefined) { scene = new THREE.Scene(); }
         if (dae_obj == undefined) { dae_obj = new THREE.Object3D(); }
 
@@ -689,12 +700,12 @@
       }
     </script>
 
-    <script type="module">
-      import { KTX2Loader } from './static/js/KTX2Loader.js';
+    <script src="../static/js/KTX2Loader.js" type="module">
+      import { KTX2Loader } from '../static/js/KTX2Loader.js';
 
       ktx2_loader = new KTX2Loader( manager );
 
-      renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
+      let renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
       renderer.setPixelRatio( window.devicePixelRatio );
       renderer.setSize( ww, wh );
       renderer.outputEncoding = THREE.sRGBEncoding;
