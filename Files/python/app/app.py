@@ -52,8 +52,8 @@ def display_form_data():
 @app.route('/<path:path>', methods=['GET'])
 def get_path(path):
     try:
-        if path.startswith('uploads/'):
-            return send_file(path)
+        if path.startswith('uploads/') or path.endswith('.js'):
+            return send_file(path, as_attachment=True)
         else:
             return render_template(path)
     except Exception as e:
