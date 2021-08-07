@@ -4,6 +4,8 @@
     <meta content="utf-8" charset="utf-8" http-equiv="encoding">
     <link rel="shortcut icon" href="../static/favicon.ico" type="image/x-icon"/>
 
+    <base href=".">
+
     <script src="../static/js/three.js"></script>
     <script src="../static/js/ColladaLoader.js"></script>
     <script src="../static/js/OrbitControls.js"></script>
@@ -700,10 +702,10 @@
       }
     </script>
 
-    <script src="../static/js/KTX2Loader.js" type="module">
+    <script type="module">
       import { KTX2Loader } from '../static/js/KTX2Loader.js';
 
-      ktx2_loader = new KTX2Loader( manager );
+      ktx2_loader = new KTX2Loader();
 
       let renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
       renderer.setPixelRatio( window.devicePixelRatio );
@@ -719,7 +721,7 @@
       // Possibly use Orbit Controls instead.
       //document.body.appendChild( renderer.domElement );
 
-      ktx2_loader.setTranscoderPath('static/js/libs/basis/');
+      ktx2_loader.setTranscoderPath('../static/js/libs/basis/');
       ktx2_loader.detectSupport(renderer);
       manager.addHandler(/\.basis$/i, ktx2_loader);
     </script>

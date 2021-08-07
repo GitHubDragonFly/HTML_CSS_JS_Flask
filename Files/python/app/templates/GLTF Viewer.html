@@ -961,12 +961,12 @@
       }
     </script>
 
-    <script src="../static/js/KTX2Loader.js" type="module">
+    <script type="module">
       import { KTX2Loader } from '../static/js/KTX2Loader.js';
 
-      ktx2_loader = new KTX2Loader( manager );
+      ktx2_loader = new KTX2Loader();
 
-      let renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
+      renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
       renderer.setPixelRatio( window.devicePixelRatio );
       renderer.setSize( ww, wh );
       renderer.outputEncoding = THREE.sRGBEncoding;
