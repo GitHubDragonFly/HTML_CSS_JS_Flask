@@ -2,18 +2,19 @@
 <html lang="en">
   <head>
     <meta content="utf-8" charset="utf-8" http-equiv="encoding">
+    <link rel="shortcut icon" href="../static/favicon.ico" type="image/x-icon"/>
 
-    <script src="static/js/three.js"></script>
-    <script src="static/js/OrbitControls.js"></script>
-    <script src="static/js/DRACOLoader.js"></script>
-    <script src="static/js/GLTFLoader.js"></script>
-    <script src="static/js/libs/meshopt_decoder.js"></script>
+    <script src="../static/js/three.js"></script>
+    <script src="../static/js/OrbitControls.js"></script>
+    <script src="../static/js/DRACOLoader.js"></script>
+    <script src="../static/js/GLTFLoader.js"></script>
+    <script src="../static/js/libs/meshopt_decoder.js"></script>
 
     <style>
       body,html {
         display: block;
         background-color: black;
-        background-image: url('static/Images/DragonFly.png');
+        background-image: url('../static/Images/DragonFly.png');
         background-position: 50% 50%;
         background-repeat: no-repeat;
         width: 100%;
@@ -212,7 +213,7 @@
       const gltf_loader = new THREE.GLTFLoader( manager );
       const draco_loader = new THREE.DRACOLoader( manager );
 
-      draco_loader.setDecoderPath( 'static/js/libs/draco/' );
+      draco_loader.setDecoderPath( '../static/js/libs/draco/' );
       draco_loader.preload();
       gltf_loader.setDRACOLoader( draco_loader );
 
@@ -462,8 +463,8 @@
         document.getElementById('scale_10x').checked = false;
         enable_disable( false );
 
-        scene = new THREE.Scene();
-        gltf_obj = new THREE.Object3D();
+        if (scene == undefined) { scene = new THREE.Scene(); }
+        if (gltf_obj == undefined) { gltf_obj = new THREE.Object3D(); }
 
         // Canvas mouse events, could be replaced with Orbit Controls but some features
         // might not work as expected, since the camera is being rotated instead of the object
@@ -950,7 +951,7 @@
     </script>
 
     <script type="module">
-      import { KTX2Loader } from './static/js/KTX2Loader.js';
+      import { KTX2Loader } from '../static/js/KTX2Loader.js';
 
       ktx2_loader = new KTX2Loader( manager );
 
@@ -968,7 +969,7 @@
       // Possibly use Orbit Controls instead.
       //document.body.appendChild( renderer.domElement );
 
-      ktx2_loader.setTranscoderPath('static/js/libs/basis/');
+      ktx2_loader.setTranscoderPath('../static/js/libs/basis/');
       ktx2_loader.detectSupport(renderer);
       manager.addHandler(/\.basis$/i, ktx2_loader);
 

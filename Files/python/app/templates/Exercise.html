@@ -2,11 +2,12 @@
 <html lang="en">
   <head>
     <meta content="width=device-width, initial-scale=1" charset="utf-8" http-equiv="encoding">
+    <link rel="shortcut icon" href="../static/favicon.ico" type="image/x-icon"/>
 
-    <script src="static/js/jquery-3.6.0.js"></script>
+    <script src="../static/js/jquery-3.6.0.js"></script>
 
     <style>
-      body { z-index: 2; background-image: url('static/Images/dark_blue.png'); background-size: 100% 100%; overflow-x: hidden; }
+      body { z-index: 2; background-image: url('../static/Images/dark_blue.png'); background-size: 100% 100%; overflow-x: hidden; }
       div { background-color: aliceblue; width: 99%; border: 2px solid green; -webkit-border-radius: 5px; border-radius: 5px; padding: 3px; margin: 5px; }
       p { text-align: center; color: blue; border: 1px solid lightblue; margin-bottom: 10px; }
       h1, h2, h3, h4, h5, h6 { margin-top: 1px; margin-bottom: 3px;}
@@ -390,10 +391,10 @@
         </div>
       </div>
       <div class="dropdown" style="text-align: center; width: 85px; margin-left: auto; margin-right: auto; margin-top: 10px;">
-        <img src="static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 75px; height: 64px; display:block; margin: auto;" />
+        <img src="../static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 75px; height: 64px; display:block; margin: auto;" />
         <div class="dropdown-content" style="width: 400px; margin-top: 10px; transform: translateX(-150px);">
           <!-- Enlarged version of the SVG image to be displayed as a dropdown -->
-          <img src="static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 400px; height: 340px;" />
+          <img src="../static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 400px; height: 340px;" />
         </div>
         </div>
     </div><br />
@@ -524,13 +525,13 @@
       <!-- Sandboxing could practically be removed since it uses both 'allow-scripts' and 'allow-same-origin' -->
       <iframe src="iFrame1.html" name="ifrm" title="Inline Examples" style="background-color: white; width: 98%; height: 400px;" sandbox="allow-same-origin allow-scripts"></iframe>
       <p>
-        <a href="Tabs.html" target="_blank">xTabs</a>
-        <a href="Tabs.html" target="ifrm">iTabs</a>
-        <a href="iFrame1.html" target="ifrm">iFrame1</a>
-        <a href="iFrame2.html" target="ifrm">iFrame2</a>
-        <a href="3D Cube 1.html" target="ifrm">3D Cube 1</a>
-        <a href="3D Cube 2.html" target="ifrm">3D Cube 2</a>
-        <a href="ShowDateTime.html" target="ifrm">Date/Time</a>
+        <a href="./Tabs.html" target="_blank">xTabs</a>
+        <a href="./Tabs.html" target="ifrm">iTabs</a>
+        <a href="./iFrame1.html" target="ifrm">iFrame1</a>
+        <a href="./iFrame2.html" target="ifrm">iFrame2</a>
+        <a href="./3D Cube 1.html" target="ifrm">3D Cube 1</a>
+        <a href="./3D Cube 2.html" target="ifrm">3D Cube 2</a>
+        <a href="./ShowDateTime.html" target="ifrm">Date/Time</a>
         <label for="url" style="margin: 0px 2px 0px 3px;">URL:</label>
         <input type="text" id="url" name="url" size="60" value="" style="margin-right: 5px;" />
         <button id="btn_go" onclick="display_url()" style="-webkit-border-radius: 2px; border-radius: 2px; width: 30px; padding: 2px;">Go</button>
@@ -613,7 +614,7 @@
     <br id="P9" /><br />
     <div style="display: -webkit-inline-box; -webkit-box-orient: vertical; display: inline-block;"><p>Images & Text</p>
       <div style="background-color: white; width: 45%; float: left;">
-        <img src="static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 67px; height: 56px; float: left;" />
+        <img src="../static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 67px; height: 56px; float: left;" />
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec cursus dictum justo, nec finibus nisi auctor sed.
         In commodo odio et volutpat dictum. Vestibulum congue viverra orci, sit amet elementum eros.
         Morbi at quam in nibh sollicitudin sodales sit amet ut felis. Aenean at leo dignissim, gravida eros a, vulputate lectus.
@@ -622,7 +623,7 @@
         Cras porttitor sit amet ex iaculis venenatis. Morbi nec arcu ac velit sagittis rutrum.
       </div>&nbsp;
       <div style="background-color: white; width: 45%; float: right;">
-        <img src="static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 67px; height: 56px; float: right;" />
+        <img src="../static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 67px; height: 56px; float: right;" />
         Maecenas sit amet dolor vitae nisi maximus cursus. Curabitur ultricies in libero eget porttitor.
         Nulla congue luctus lobortis. Nulla efficitur, enim non euismod faucibus, nisl nibh facilisis nunc,
         sit amet luctus turpis nunc vel enim. Nulla eu lorem ex. Curabitur a justo dolor. Donec vel quam magna.
@@ -675,7 +676,7 @@
     <div style="display: -webkit-inline-box; -webkit-box-orient: vertical; -webkit-perspective: 400px; display: -moz-inline-box; -moz-perspective: 400px; display: -ms-inline-flexbox; -ms-perspective: 400px; display: inline-block; perspective: 400px;">
       <p>Rotating XYZ & Translating 3D & Perspective - Alternate Reverse</p><br />
       <div class="rotateXYZtranslate3D" style="text-align: center; width: 215px; height: 111px; margin: auto;">
-        <img src="static/Images/cube-1963036_640.jpg" alt="Cube Image" style="width: 215px; height: 111px;" />
+        <img src="../static/Images/cube-1963036_640.jpg" alt="Cube Image" style="width: 215px; height: 111px;" />
       </div><br /><br />
       <p>Image by
         <a href="https://pixabay.com/users/piro4d-2707530/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=1963036">PIRO4D</a>
@@ -728,7 +729,7 @@
     <div><p>Media - Video</p><br />
       <div style="text-align: center; width: 640px; height: 360px; margin: auto;">
         <video width="640" controls>
-          <source src="static/Videos/Beach - 3998.mp4" type="video/mp4">
+          <source src="../static/Videos/Beach - 3998.mp4" type="video/mp4">
           Your browser does not support HTML video.
         </video><br />
       </div><br />

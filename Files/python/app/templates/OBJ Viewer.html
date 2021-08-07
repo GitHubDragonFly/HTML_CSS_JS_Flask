@@ -2,18 +2,19 @@
 <html lang="en">
   <head>
     <meta content="utf-8" charset="utf-8" http-equiv="encoding">
+    <link rel="shortcut icon" href="../static/favicon.ico" type="image/x-icon"/>
 
-    <script src="static/js/three.js"></script>
-    <script src="static/js/OrbitControls.js"></script>
-    <script src="static/js/MTLLoader.js"></script>
-    <script src="static/js/OBJLoader.js"></script>
-    <script src="static/js/DDSLoader.js"></script>
+    <script src="../static/js/three.js"></script>
+    <script src="../static/js/OrbitControls.js"></script>
+    <script src="../static/js/MTLLoader.js"></script>
+    <script src="../static/js/OBJLoader.js"></script>
+    <script src="../static/js/DDSLoader.js"></script>
 
     <style>
       body,html {
         display: block;
         background-color: black;
-        background-image: url('static/Images/DragonFly.png');
+        background-image: url('../static/Images/DragonFly.png');
         background-position: 50% 50%;
         background-repeat: no-repeat;
         width: 100%;
@@ -428,20 +429,22 @@
         document.body.style.backgroundImage = "none";
         enable_disable( false );
 
-        renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
-        renderer.setPixelRatio( window.devicePixelRatio );
-        renderer.setSize( ww, wh );
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.setClearColor( 0xFFFFFF, 0); // Allow setting the background color
-        renderer.autoClear = false;
+        if (renderer == undefined) {
+          renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
+          renderer.setPixelRatio( window.devicePixelRatio );
+          renderer.setSize( ww, wh );
+          renderer.shadowMap.enabled = true;
+          renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+          renderer.setClearColor( 0xFFFFFF, 0); // Allow setting the background color
+          renderer.autoClear = false;
+        }
 
         // The following can be used instead of the canvas but the window mouse
         // events might be tricky to set due to the presence of the fixed menu.
         // Possibly use Orbit Controls instead.
         //document.body.appendChild( renderer.domElement );
 
-        scene = new THREE.Scene();
+        if (scene == undefined) { scene = new THREE.Scene(); }
 
         // Canvas mouse events, could be replaced with Orbit Controls but some features
         // might not work as expected, since the camera is being rotated instead of the object

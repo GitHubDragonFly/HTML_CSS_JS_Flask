@@ -2,18 +2,19 @@
 <html lang="en">
   <head>
     <meta content="utf-8" charset="utf-8" http-equiv="encoding">
+    <link rel="shortcut icon" href="../static/favicon.ico" type="image/x-icon"/>
 
-    <script src="static/js/three.js"></script>
-    <script src="static/js/ColladaLoader.js"></script>
-    <script src="static/js/OrbitControls.js"></script>
-    <script src="static/js/DDSLoader.js"></script>
-    <script src="static/js/libs/meshopt_decoder.js"></script>
+    <script src="../static/js/three.js"></script>
+    <script src="../static/js/ColladaLoader.js"></script>
+    <script src="../static/js/OrbitControls.js"></script>
+    <script src="../static/js/DDSLoader.js"></script>
+    <script src="../static/js/libs/meshopt_decoder.js"></script>
 
     <style>
       body,html{
         display: block;
         background-color: black;
-        background-image: url('static/Images/DragonFly.png');
+        background-image: url('../static/Images/DragonFly.png');
         background-position: 50% 50%;
         background-repeat: no-repeat;
         width: 100%;
@@ -143,9 +144,11 @@
         if (document.requestFullscreen) {
           document.requestFullscreen = false;
           document.exitFullscreen();
+          document.getElementById('btn_full_screen').style.backgroundColor = '#d1cefc'
         } else {
           document.requestFullscreen = true;
           document.body.requestFullscreen();
+          document.getElementById('btn_full_screen').style.backgroundColor = '#ffff00'
         }
       }
     </script>
