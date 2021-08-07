@@ -964,7 +964,7 @@
     <script type="module">
       import { KTX2Loader } from '../static/js/KTX2Loader.js';
 
-      ktx2_loader = new KTX2Loader();
+      ktx2_loader = new KTX2Loader( manager );
 
       renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
       renderer.setPixelRatio( window.devicePixelRatio );

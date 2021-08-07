@@ -4,8 +4,6 @@
     <meta content="utf-8" charset="utf-8" http-equiv="encoding">
     <link rel="shortcut icon" href="../static/favicon.ico" type="image/x-icon"/>
 
-    <base href=".">
-
     <script src="../static/js/three.js"></script>
     <script src="../static/js/ColladaLoader.js"></script>
     <script src="../static/js/OrbitControls.js"></script>
@@ -705,7 +703,7 @@
     <script type="module">
       import { KTX2Loader } from '../static/js/KTX2Loader.js';
 
-      ktx2_loader = new KTX2Loader();
+      ktx2_loader = new KTX2Loader( manager );
 
       let renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
       renderer.setPixelRatio( window.devicePixelRatio );
