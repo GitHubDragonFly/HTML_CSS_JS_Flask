@@ -18,7 +18,11 @@ All it takes to run this project is to:
 
 The server will show you the IP address and the port, generally accessible in the Internet browser via `localhost:5000`.
 
-Even though this is all intended to be used with the `Flask` server, thanks to the [GitHub & BitBucket HTML Preview](https://github.com/htmlpreview/htmlpreview.github.com) you can still preview the [Exercise](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/Exercise.html) page online and use its fixed menu to access the rest, including the GLTF Viewer which also seems to allow loading DRACO file but not KTX2 (check the module "import" console error). There will be limitations for the Form and Inline Frame, which will probably not work properly.
+Even though this is all intended to be used with the `Flask` server, thanks to the [GitHub & BitBucket HTML Preview](https://github.com/htmlpreview/htmlpreview.github.com) you can still preview the [Exercise](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/Exercise.html) page online and use its fixed menu to access the rest, with the following limitations:
+ - GLTF Viewer does allow loading DRACO files but does not allow loading KTX2 textures (check the module "import" console error)
+ - DAE Viewer will not allow loading KTX2 textures (check the module "import" console error)
+ - The Form entries are set to be handled by the server and will not work in the preview
+ - Inline Frame will work partially, with `Tabs` not being functional since those have injected scripts
 
 Optionally use VS Code for editing, troubleshooting and running the app, which should be far easier than using the command prompt.
 
