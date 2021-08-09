@@ -24,7 +24,6 @@ Even though this is all intended to be used with the `Flask` server, thanks to t
  - GLTF Viewer does allow loading DRACO files but does not allow loading KTX2 textures (check the module "import" console error)
  - DAE Viewer will not allow loading KTX2 textures (check the module "import" console error)
  - The Form entries are set to be handled by the server and will not work in the preview
- - Inline Frame will work partially, with `Tabs` not being functional since those have injected scripts
 
 Optionally use VS Code for editing, troubleshooting and running the app, which should be far easier than using the command prompt.
 
