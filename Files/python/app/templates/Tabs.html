@@ -72,15 +72,11 @@
           $(active_tab_selector).addClass('hide');
           $(active_tab_selector.substring(1,4) + '_iframe').show();
 
-          console.log(active_tab_selector);
-
           // show target tab content
           var target_tab_selector = $(this).attr('target');
           $(target_tab_selector).removeClass('hide');
           $(target_tab_selector).addClass('active');
           $(target_tab_selector.substring(1,4) + '_iframe').hide();
-
-          console.log(target_tab_selector);
         });
       });
     </script>
