@@ -181,7 +181,7 @@
       var rot_x = 0, rot_y = 0, rot_z = 0, pos_x = 0, pos_y = 0, pos_z = 0;
       var previous_ply_scale = '1';
       var selected_ply_file = null;
-      var texture_files_png, texture_files_jpg;
+      var texture_files_png, texture_files_jpg, texture_files_bmp;
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
@@ -397,15 +397,17 @@
         if (!fi.files) { return; }
 
         selected_ply_file = null;
-        texture_files_jpg = [];
         texture_files_png = [];
+        texture_files_jpg = [];
+        texture_files_bmp = [];
         enable_disable( true );
 
-        // Include check for JPG/PNG
+        // Include check for JPG/PNG/BMP
         for (let i = 0; i < fi.files.length; i++) {
           if (fi.files[i].name.toUpperCase().endsWith('.PLY')) { selected_ply_file = fi.files[i]; }
           else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
           else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
+          else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
         };
 
         if (!selected_ply_file) { return; }
@@ -500,18 +502,6 @@
         smooth.computeVertexNormals();
         smooth.mergeVertices();
 
-        //material = new THREE.MeshStandardMaterial({ color: 0x0077FF }); //shades of blue
-
-        //material = new THREE.MeshPhysicalMaterial( { // metalic look
-        //  sheen: new THREE.Color( 0x0055FF ),
-        //  vertexColors: THREE.VertexColors,
-        //  metalness: 1,
-        //  roughness: 0,
-        //  reflectivity: 1,
-        //  clearcoatMap: null,
-        //  clearcoatRoughnessMap: null
-        //});
-
         if (texture_files_jpg.length > 0) {
           const loader = new THREE.TextureLoader();
           texture = loader.load( URL.createObjectURL( texture_files_jpg[0] ));
@@ -526,6 +516,17 @@
         } else if (texture_files_png.length > 0) {
           const loader = new THREE.TextureLoader();
           texture = loader.load( URL.createObjectURL( texture_files_png[0] ));
+          material = new THREE.MeshLambertMaterial( {
+            map: texture,
+            fog: true,
+            opacity: 1,
+            transparent: true,
+            vertexColors: THREE.VertexColors,
+            reflectivity: 1
+          });
+        } else if (texture_files_bmp.length > 0) {
+          const loader = new THREE.TextureLoader();
+          texture = loader.load( URL.createObjectURL( texture_files_bmp[0] ));
           material = new THREE.MeshLambertMaterial( {
             map: texture,
             fog: true,
