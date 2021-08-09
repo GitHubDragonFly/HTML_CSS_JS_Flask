@@ -4,37 +4,10 @@
     <meta content="utf-8" charset="utf-8" http-equiv="encoding">
     <link rel="shortcut icon" href="../static/favicon.ico" type="image/x-icon"/>
 
-    <!-- Original tabs source code: https://mkyong.com/jquery/how-to-use-css-and-jquery-to-hide-and-show-tab-content/ -->
-    <title>Tabbed Browsing</title>
-
     <script src="../static/js/jquery-3.6.0.js"></script>
 
-    <script>
-      $(document).ready(function() {
-        $('.nav-tabs > li > a').click(function(event){
-        event.preventDefault(); // prevent browser from taking action for clicked anchor
-
-        // get displaying tab content jQuery selector
-        var active_tab_selector = $('.nav-tabs > li.active > a').attr('href');					
-
-        // find active navigation and remove 'active' css
-        var actived_nav = $('.nav-tabs > li.active');
-        actived_nav.removeClass('active');
-
-        // add 'active' css into clicked navigation
-        $(this).parents('li').addClass('active');
-
-        // hide displayed tab content
-        $(active_tab_selector).removeClass('active');
-        $(active_tab_selector).addClass('hide');
-
-        // show target tab content
-        var target_tab_selector = $(this).attr('href');
-        $(target_tab_selector).removeClass('hide');
-        $(target_tab_selector).addClass('active');
-         });
-      });
-    </script>
+    <!-- Original tabs source code: https://mkyong.com/jquery/how-to-use-css-and-jquery-to-hide-and-show-tab-content/ -->
+    <title>Tabbed Browsing</title>
 
     <style>
       /** Start: style navigation tab **/
@@ -76,433 +49,82 @@
       A { text-decoration: none; color: blue; }
       A:hover { color:#363636; background-color:#dad9fc; text-decoration: none; border: 1px solid black; border-radius: 2px; padding-left: 1px; padding-right: 1px; }
 
-      p { text-align:center; color: blue; border: 1px solid lightblue; border-radius: 2px; }
-      rdt { color: red; }
-
-      /** Start: style 3D Cube 2 **/
-      .scene {
-        width: 200px;
-        height: 200px;
-        margin: 60px auto 5px auto;
-        -webkit-perspective: 350px;
-        perspective: 350px;
-      }
-
-      .cube {
-        width: 200px;
-        height: 200px;
-        position: relative;
-        -webkit-transform-style: preserve-3d;
-        -webkit-transform: translateZ(-100px);
-        -webkit-transition: transform 1s;
-        transform-style: preserve-3d;
-        transform: translateZ(-100px);
-        transition: transform 1s;
-      }
-
-      .cube.show-front {
-        -webkit-transform: translateZ(-100px) rotateY(   0deg);
-        transform: translateZ(-100px) rotateY(   0deg); }
-      .cube.show-right {
-        -webkit-transform: translateZ(-100px) rotateY( -90deg);
-        transform: translateZ(-100px) rotateY( -90deg); }
-      .cube.show-back {
-        -webkit-transform: translateZ(-100px) rotateY(-180deg);
-        transform: translateZ(-100px) rotateY(-180deg); }
-      .cube.show-left {
-        -webkit-transform: translateZ(-100px) rotateY(  90deg);
-        transform: translateZ(-100px) rotateY(  90deg); }
-      .cube.show-top {
-        -webkit-transform: translateZ(-100px) rotateX( -90deg);
-        transform: translateZ(-100px) rotateX( -90deg); }
-      .cube.show-bottom {
-        -webkit-transform: translateZ(-100px) rotateX(  90deg);
-        transform: translateZ(-100px) rotateX(  90deg); }
-      .cube.show-rotateX {
-        -webkit-animation: rotationX 8s infinite linear;
-        animation: rotationX 8s infinite linear; }
-      .cube.show-rotateY {
-        -webkit-animation: rotationY 8s infinite linear;
-        animation: rotationY 8s infinite linear; }
-      .cube.show-rotateZ {
-        -webkit-animation: rotationZ 8s infinite linear;
-        animation: rotationZ 8s infinite linear; }
-      .cube.show-rotateXY {
-        -webkit-animation: rotationXY 8s infinite linear;
-        animation: rotationXY 8s infinite linear; }
-      .cube.show-rotateXZ {
-        -webkit-animation: rotationXZ 8s infinite linear;
-        animation: rotationXZ 8s infinite linear; }
-      .cube.show-rotateYZ {
-        -webkit-animation: rotationYZ 8s infinite linear;
-        animation: rotationYZ 8s infinite linear; }
-      .cube.show-rotateXYZ {
-        -webkit-animation: rotationXYZ 8s infinite linear;
-        animation: rotationXYZ 8s infinite linear; }
-      .cube.show-rotateXYZtranslate3D {
-        -webkit-animation: rotationXYZtranslation3D 16s infinite linear alternate-reverse;
-        animation: rotationXYZtranslation3D 16s infinite linear alternate-reverse; }
-
-      .cube__face {
-        position: absolute;
-        width: 200px;
-        height: 200px;
-        border: 2px solid black;
-        line-height: 200px;
-        font-size: 40px;
-        font-weight: bold;
-        color: white;
-        text-align: center;
-      }
-
-      .cube__face--front  { background: hsla(  0, 100%, 50%, 0.6); }
-      .cube__face--right  { background: hsla( 60, 100%, 50%, 0.7); }
-      .cube__face--back   { background: hsla(120, 100%, 50%, 0.7); }
-      .cube__face--left   { background: hsla(180, 100%, 50%, 0.7); }
-      .cube__face--top    { background: hsla(240, 100%, 50%, 0.6); }
-      .cube__face--bottom { background: hsla(300, 100%, 50%, 0.7); }
-
-      .cube__face--front {
-        -webkit-transform: rotateY( 0deg) translateZ(100px);
-        transform: rotateY( 0deg) translateZ(100px); }
-      .cube__face--right {
-        -webkit-transform: rotateY( 90deg) translateZ(100px);
-        transform: rotateY( 90deg) translateZ(100px); }
-      .cube__face--back {
-        -webkit-transform: rotateY(180deg) translateZ(100px);
-        transform: rotateY(180deg) translateZ(100px); }
-      .cube__face--left {
-        -webkit-transform: rotateY(-90deg) translateZ(100px);
-        transform: rotateY(-90deg) translateZ(100px); }
-      .cube__face--top {
-        -webkit-transform: rotateX( 90deg) translateZ(100px);
-        transform: rotateX( 90deg) translateZ(100px); }
-      .cube__face--bottom {
-        -webkit-transform: rotateX(-90deg) translateZ(100px);
-        transform: rotateX(-90deg) translateZ(100px); }
-
-      label { margin-right: 10px; }
-
-      @-webkit-keyframes rotationX { from { -webkit-transform: translateZ(-100px) rotateX(0deg); } to { -webkit-transform: translateZ(-100px) rotateX(359deg); } }
-      @-webkit-keyframes rotationY { from { -webkit-transform: translateZ(-100px) rotateY(0deg); } to { -webkit-transform: translateZ(-100px) rotateY(359deg); } }
-      @-webkit-keyframes rotationZ { from { -webkit-transform: translateZ(-100px) rotateZ(0deg); } to { -webkit-transform: translateZ(-100px) rotateZ(359deg); } }
-      @-webkit-keyframes rotationXY { from { -webkit-transform: translateZ(-100px) rotate3d(1,1,0,0deg); } to { -webkit-transform: translateZ(-100px) rotate3d(1,1,0,359deg); } }
-      @-webkit-keyframes rotationXZ { from { -webkit-transform: translateZ(-100px) rotate3d(1,0,1,0deg); } to { -webkit-transform: translateZ(-100px) rotate3d(1,0,1,359deg); } }
-      @-webkit-keyframes rotationYZ { from { -webkit-transform: translateZ(-100px) rotate3d(0,1,1,0deg); } to { -webkit-transform: translateZ(-100px) rotate3d(0,1,1,359deg); } }
-      @-webkit-keyframes rotationXYZ { from { -webkit-transform: translateZ(-100px) rotate3d(1,1,1,0deg); } to { -webkit-transform: translateZ(-100px) rotate3d(1,1,1,359deg); } }
-      @-webkit-keyframes rotationXYZtranslation3D { from { -webkit-transform: translate3d(-450px, -25px, -450px) rotate3d(1,1,1,0deg); } to { -webkit-transform: translate3d(0px, 0px, -100px) rotate3d(1,1,1,359deg); } }
-
-      @keyframes rotationX { from { transform: translateZ(-100px) rotateX(0deg); } to { transform: translateZ(-100px) rotateX(359deg); } }
-      @keyframes rotationY { from { transform: translateZ(-100px) rotateY(0deg); } to { transform: translateZ(-100px) rotateY(359deg); } }
-      @keyframes rotationZ { from { transform: translateZ(-100px) rotateZ(0deg); } to { transform: translateZ(-100px) rotateZ(359deg); } }
-      @keyframes rotationXY { from { transform: translateZ(-100px) rotate3d(1,1,0,0deg); } to { transform: translateZ(-100px) rotate3d(1,1,0,359deg); } }
-      @keyframes rotationXZ { from { transform: translateZ(-100px) rotate3d(1,0,1,0deg); } to { transform: translateZ(-100px) rotate3d(1,0,1,359deg); } }
-      @keyframes rotationYZ { from { transform: translateZ(-100px) rotate3d(0,1,1,0deg); } to { transform: translateZ(-100px) rotate3d(0,1,1,359deg); } }
-      @keyframes rotationXYZ { from { transform: translateZ(-100px) rotate3d(1,1,1,0deg); } to { transform: translateZ(-100px) rotate3d(1,1,1,359deg); } }
-      @keyframes rotationXYZtranslation3D { from { transform: translate3d(-450px, -25px, -450px) rotate3d(1,1,1,0deg); } to { transform: translate3d(0px, 0px, -100px) rotate3d(1,1,1,359deg); } }
-      /** End: style 3D Cube 2 **/
+      iframe { position: absolute; display: block; width: 98%; height: 100%; border: none; overflow-y: hidden; }
     </style>
+
+    <script>
+      $(document).ready(function() {
+        $('.nav-tabs > li > a').click(function(event){
+          event.preventDefault(); // prevent browser from taking action for clicked anchor
+
+          // get displaying tab content jQuery selector
+          var active_tab_selector = $('.nav-tabs > li.active > a').attr('target');					
+
+          // find active navigation and remove 'active' css
+          var actived_nav = $('.nav-tabs > li.active');
+          actived_nav.removeClass('active');
+
+          // add 'active' css into clicked navigation
+          $(this).parents('li').addClass('active');
+
+          // hide displayed tab content
+          $(active_tab_selector).removeClass('active');
+          $(active_tab_selector).addClass('hide');
+          $(active_tab_selector.substring(1,4) + '_iframe').show();
+
+          console.log(active_tab_selector);
+
+          // show target tab content
+          var target_tab_selector = $(this).attr('target');
+          $(target_tab_selector).removeClass('hide');
+          $(target_tab_selector).addClass('active');
+          $(target_tab_selector.substring(1,4) + '_iframe').hide();
+
+          console.log(target_tab_selector);
+        });
+      });
+    </script>
   </head>
   <body>
     <div>
       <ul class="nav nav-tabs">
         <li class="active">
-          <a href="#tab1">iFrame1</a>
+          <a href="iFrame1.html" target="#tab1">iFrame1</a>
         </li>
         <li class="hide">
-          <a href="#tab2">iFrame2</a>
+          <a href="iFrame2.html" target="#tab2">iFrame2</a>
         </li>
         <li class="hide">
-          <a href="#tab3">3D Cube 1</a>
+          <a href="3D Cube 1.html" target="#tab3">3D Cube 1</a>
         </li>
         <li class="hide">
-          <a href="#tab4">3D Cube 2</a>
+          <a href="3D Cube 2.html" target="#tab4">3D Cube 2</a>
         </li>
         <li class="hide">
-          <a href="#tab5">Date/Time</a>
+          <a href="ShowDateTime.html" target="#tab5">Date/Time</a>
         </li>
       </ul>	
     </div>
 
     <section id="tab1" class="tab-content active">
-      <div>
-        <p style="font-size: 36px; margin-top: 2px; margin-bottom: 20px; padding-top: 10px; padding-bottom: 10px; border: 0px;">
-          &#128515; &#128516; ~ More Emojis ~ &#128517; &#128518;
-        </p><br /><br /><br />
-        <p style="font-size: 24px; width: 90%; margin: auto;">
-          <rdt>Note :</rdt> Most websites will probably not allow their pages to be displayed in an embedded frame
-        </p>
-      </div>
+      <iframe name="tab1_iframe" src="./iFrame1.html">Your browser does not support inline frames</iframe>
     </section>
 
     <section id="tab2" class="tab-content hide">
-      <div>
-        <p style="font-size: 36px; margin-top: 2px; margin-bottom: 20px; padding-top: 10px; padding-bottom: 10px; border: 0px;">
-          &#128508; &#128509; ~ Emojis Again ~ &#128510; &#128511;
-        </p><br /><br /><br />
-        <p style="font-size: 24px; width: 90%; margin: auto;">
-          This space intentionally contains this message only
-        </p>
-      </div>
+      <iframe name="tab2_iframe" src="./iFrame2.html">Your browser does not support inline frames</iframe>
     </section>
 
     <section id="tab3" class="tab-content hide">
-	    <!-- Original source code: https://codepen.io/MRokas/pen/aNBjdQ , https://www.sitepoint.com/building-3d-engine-javascript/ -->
-      <div><br />
-        <p style="text-align: center;">Just drag with mouse to rotate it!</p><br />
-        <div style="width: 360px; height: 280px; margin: auto;">
-          <svg view-box="0 0 360 280" width="360" height="280"></svg>
-        </div>
-
-        <script>
-        (function() {
-          'use strict';
-          class Point2 {
-            constructor (x, y) {
-              this.x = typeof x === 'number' ? x : 0;
-              this.y = typeof y === 'number' ? y : 0;
-            }
-          }
-
-          class Point3 extends Point2 {
-            constructor (x, y, z) {
-              super(x, y);
-              this.z = typeof z === 'number' ? z : 0;
-            }
-          }
-
-          class Cube {
-            constructor (center, size) {
-              const d = size / 2;
-
-              this.vertices = [
-                new Point3(center.x - d, center.y - d, center.z + d),
-                new Point3(center.x - d, center.y - d, center.z - d),
-                new Point3(center.x + d, center.y - d, center.z - d),
-                new Point3(center.x + d, center.y - d, center.z + d),
-                new Point3(center.x + d, center.y + d, center.z + d),
-                new Point3(center.x + d, center.y + d, center.z - d),
-                new Point3(center.x - d, center.y + d, center.z - d),
-                new Point3(center.x - d, center.y + d, center.z + d)
-              ];
-    
-              this.faces = [
-                [this.vertices[0], this.vertices[1], this.vertices[2], this.vertices[3]],
-                [this.vertices[3], this.vertices[2], this.vertices[5], this.vertices[4]],
-                [this.vertices[4], this.vertices[5], this.vertices[6], this.vertices[7]],
-                [this.vertices[7], this.vertices[6], this.vertices[1], this.vertices[0]],
-                [this.vertices[7], this.vertices[0], this.vertices[3], this.vertices[4]],
-                [this.vertices[1], this.vertices[6], this.vertices[5], this.vertices[2]]
-              ];
-            }
-
-            render (container, dx, dy) {
-              container.innerHTML = "";
-
-              for(let i = 0, ii = this.faces.length; i < ii; i++) {
-                let face = this.faces[i];
-                let point = Project(face[0]);
-                var str = `<path d="M${point.x + dx} ${-point.y + dy}`;
-
-                for(let o = 1, oo = face.length; o < oo; o++) {
-                  point = Project(face[o]);
-                  str += ` L ${point.x + dx} ${-point.y + dy}`;
-                }
-
-                str += ` Z" fill="rgba(205, 0, 175, 0.1)" stroke="rgba(0, 0, 255, 0.1)">`;
-                container.innerHTML += str;
-              }
-            }
-          }
-
-          const Project = (vertice) => new Point2(vertice.x, vertice.z);
-
-          const Rotate = (vertice, center, theta, phi) => {
-            var ct = Math.cos(theta),
-              st = Math.sin(theta),
-              cp = Math.cos(phi),
-              sp = Math.sin(phi),
-
-              x = vertice.x - center.x,
-              y = vertice.y - center.y,
-              z = vertice.z - center.z;
-
-            vertice.x = ct * x - st * cp * y + st * sp * z + center.x;
-            vertice.y = st * x + ct * cp * y - ct * sp * z + center.y;
-            vertice.z = sp * y + cp * z + center.z;
-          }
-
-          const container = document.querySelector('svg');
-          const width = container.attributes.width.value;
-          const height = container.attributes.height.value;
-          const dx = width / 2;
-          const dy = height / 2;
-          const center = new Point3(0, 0, 0);
-          const cube = new Cube(center, 150);
-
-          const mouse = {
-            down: false,
-            x: 0,
-            y: 0
-          };
-
-          const Tick = () => {
-            for (var i = 0, ii = 8; i < ii; i++) {
-              Rotate(cube.vertices[i], center, Math.PI / 220, Math.PI / 470);
-            }
-
-            cube.render(container, dx, dy);
-    
-            !mouse.down ? requestAnimationFrame(Tick) : null;
-          }
-
-          cube.render(container, dx, dy);
-
-          container.addEventListener('mousedown', (e) => {
-            mouse.down = true;
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-          });
-
-          container.addEventListener('mousemove', (e) => {
-            if (mouse.down) {
-              var theta = (e.clientX - mouse.x) * Math.PI / 360;
-              var phi = (e.clientY - mouse.y) * Math.PI / 180;
-
-              for (var i = 0, ii = 8; i < ii; i++) {
-                Rotate(cube.vertices[i], center, theta, phi);
-              }
-
-              mouse.x = e.clientX;
-              mouse.y = e.clientY;
-
-              cube.render(container, dx, dy);
-            }
-          });
-
-          container.addEventListener('mouseup', (e) => {
-            setTimeout( () => {mouse.down = false; requestAnimationFrame(Tick);}, 200);
-          });
-    
-          requestAnimationFrame(Tick);
-    
-        }());
-        </script>
-      </div>
+      <iframe name="tab3_iframe" src="./3D Cube 1.html">Your browser does not support inline frames</iframe>
     </section>
 
     <section id="tab4" class="tab-content hide">
-    	<!-- Original source code: https://codepen.io/desandro/pen/KRWjzm -->
-      <div>
-        <div class="scene">
-          <div class="cube">
-            <div class="cube__face cube__face--front">front</div>
-            <div class="cube__face cube__face--back">back</div>
-            <div class="cube__face cube__face--right">right</div>
-            <div class="cube__face cube__face--left">left</div>
-            <div class="cube__face cube__face--top">top</div>
-            <div class="cube__face cube__face--bottom">bottom</div>
-          </div>
-        </div><br /><br />
-
-        <p class="radio-group" style="text-align: center;">
-          <label>
-            <input type="radio" name="rotate-cube-side" value="front" checked /> front
-          </label>
-          <label>
-            <input type="radio" name="rotate-cube-side" value="right" /> right
-          </label>
-          <label>
-            <input type="radio" name="rotate-cube-side" value="back" /> back
-          </label>
-          <label>
-            <input type="radio" name="rotate-cube-side" value="left" /> left
-          </label>
-          <label>
-            <input type="radio" name="rotate-cube-side" value="top" /> top
-          </label>
-          <label>
-            <input type="radio" name="rotate-cube-side" value="bottom" /> bottom
-          </label><br /><br />
-          <label>
-            <input type="radio" name="rotate-cube-side" value="rotateX" /> rotateX
-          </label>
-          <label>
-            <input type="radio" name="rotate-cube-side" value="rotateY" /> rotateY
-          </label>
-          <label>
-            <input type="radio" name="rotate-cube-side" value="rotateZ" /> rotateZ
-          </label>
-          <label>
-            <input type="radio" name="rotate-cube-side" value="rotateXY" /> rotateXY
-          </label>
-          <label>
-            <input type="radio" name="rotate-cube-side" value="rotateXZ" /> rotateXZ
-          </label>
-          <label>
-            <input type="radio" name="rotate-cube-side" value="rotateYZ" /> rotateYZ
-          </label>
-          <label>
-            <input type="radio" name="rotate-cube-side" value="rotateXYZ" /> rotateXYZ
-          </label>
-          <label>
-            <input type="radio" name="rotate-cube-side" value="rotateXYZtranslate3D" /> rotateXYZtranslate3D
-          </label>
-        </p>
-
-        <script>
-          var cube = document.querySelector('.cube');
-          var radioGroup = document.querySelector('.radio-group');
-          var currentClass = '';
-
-          function changeSide() {
-            var checkedRadio = radioGroup.querySelector(':checked');
-            var showClass = 'show-' + checkedRadio.value;
-
-            if ( currentClass ) {
-              cube.classList.remove( currentClass );
-            }
-
-            cube.classList.add( showClass );
-            currentClass = showClass;
-          }
-
-          // set initial side
-          changeSide();
-
-          radioGroup.addEventListener( 'change', changeSide );
-        </script>
-      </div>
+      <iframe name="tab4_iframe" src="./3D Cube 2.html">Your browser does not support inline frames</iframe>
     </section>
 
     <section id="tab5" class="tab-content hide">
-      <div>
-        <br /><br /><br />
-        <div id="date" style="background-color: blue; color: white; width:50%; font-size: 150%; text-align: center; margin: auto; border: 2px solid green; border-radius: 5px; padding: 5px;"></div>
-        <div id="time" style="background-color: blue; color: white; width:50%; font-size: 150%; text-align: center; margin: auto; border: 2px solid green; border-radius: 5px; padding: 5px;"></div>
-        <div id="zone" style="background-color: blue; color: white; width:50%; font-size: 150%; text-align: center; margin: auto; border: 2px solid green; border-radius: 5px; padding: 5px;"></div>
-    
-        <script>
-          function showDateTime(){
-            var date = new Date();
-            var all_parts = date.toString().split(" ");
-            var str_date = "Date: ";
-            var str_time = "Time: ";
-            var str_zone = "Zone: ";
-            str_date = str_date.fontcolor("black");
-            str_time = str_time.fontcolor("black");
-            str_zone = str_zone.fontcolor("black");
-
-            document.getElementById("date").innerHTML = str_date + all_parts[0] + " " + date.toLocaleDateString();
-            document.getElementById("time").innerHTML = str_time + date.toLocaleTimeString();
-            document.getElementById("zone").innerHTML = str_zone + date.toString().substring(date.toString().indexOf("G"));
-        
-            setTimeout(showDateTime, 1000);
-          }
-    
-          showDateTime();
-        </script>
-      </div>
+      <iframe name="tab5_iframe" src="./ShowDateTime.html">Your browser does not support inline frames</iframe>
     </section>
+
   </body>
 </html>
