@@ -58,7 +58,7 @@
           event.preventDefault(); // prevent browser from taking action for clicked anchor
 
           // get displaying tab content jQuery selector
-          var active_tab_selector = $('.nav-tabs > li.active > a').attr('href');					
+          var active_tab_selector = $('.nav-tabs > li.active > a').attr('target');					
 
           // find active navigation and remove 'active' css
           var actived_nav = $('.nav-tabs > li.active');
@@ -70,11 +70,17 @@
           // hide displayed tab content
           $(active_tab_selector).removeClass('active');
           $(active_tab_selector).addClass('hide');
+          $(active_tab_selector.substring(1,4) + '_iframe').show();
+
+          console.log(active_tab_selector);
 
           // show target tab content
-          var target_tab_selector = $(this).attr('href');
+          var target_tab_selector = $(this).attr('target');
           $(target_tab_selector).removeClass('hide');
           $(target_tab_selector).addClass('active');
+          $(target_tab_selector.substring(1,4) + '_iframe').hide();
+
+          console.log(target_tab_selector);
         });
       });
     </script>
@@ -83,41 +89,41 @@
     <div>
       <ul class="nav nav-tabs">
         <li class="active">
-          <a href="#tab1">iFrame1</a>
+          <a href="iFrame1.html" target="#tab1">iFrame1</a>
         </li>
         <li class="hide">
-          <a href="#tab2">iFrame2</a>
+          <a href="iFrame2.html" target="#tab2">iFrame2</a>
         </li>
         <li class="hide">
-          <a href="#tab3">3D Cube 1</a>
+          <a href="3D Cube 1.html" target="#tab3">3D Cube 1</a>
         </li>
         <li class="hide">
-          <a href="#tab4">3D Cube 2</a>
+          <a href="3D Cube 2.html" target="#tab4">3D Cube 2</a>
         </li>
         <li class="hide">
-          <a href="#tab5">Date/Time</a>
+          <a href="ShowDateTime.html" target="#tab5">Date/Time</a>
         </li>
       </ul>	
     </div>
 
     <section id="tab1" class="tab-content active">
-      <iframe src="iFrame1.html">Your browser does not support inline frames</iframe>
+      <iframe name="tab1_iframe" src="./iFrame1.html">Your browser does not support inline frames</iframe>
     </section>
 
     <section id="tab2" class="tab-content hide">
-      <iframe src="iFrame2.html">Your browser does not support inline frames</iframe>
+      <iframe name="tab2_iframe" src="./iFrame2.html">Your browser does not support inline frames</iframe>
     </section>
 
     <section id="tab3" class="tab-content hide">
-      <iframe src="3D Cube 1.html">Your browser does not support inline frames</iframe>
+      <iframe name="tab3_iframe" src="./3D Cube 1.html">Your browser does not support inline frames</iframe>
     </section>
 
     <section id="tab4" class="tab-content hide">
-      <iframe src="3D Cube 2.html">Your browser does not support inline frames</iframe>
+      <iframe name="tab4_iframe" src="./3D Cube 2.html">Your browser does not support inline frames</iframe>
     </section>
 
     <section id="tab5" class="tab-content hide">
-      <iframe src="ShowDateTime.html">Your browser does not support inline frames</iframe>
+      <iframe name="tab5_iframe" src="./ShowDateTime.html">Your browser does not support inline frames</iframe>
     </section>
 
   </body>
