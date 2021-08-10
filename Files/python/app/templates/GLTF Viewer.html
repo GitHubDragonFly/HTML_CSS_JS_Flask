@@ -483,7 +483,6 @@
 
         document.body.style.backgroundImage = "none";
         document.getElementById('scale_10x').checked = false;
-        document.getElementById('btn_animate').disabled = true;
         enable_disable( false );
 
         if (renderer == undefined) {
@@ -602,7 +601,6 @@
             gltf.scene.traverse( function( child ) {
               // This allow us to check if the children is an instance of the Mesh constructor
           	  if (child instanceof THREE.Mesh) {
-                console.log(child);
                 // Enable transparency for the Opacity control and enable shadows
                 child.material.opacity = 1;
                 child.material.transparent = true;
