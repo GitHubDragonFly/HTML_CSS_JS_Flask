@@ -69,7 +69,8 @@
         <input type="number" id="gltf_scale" name="gltf_scale" onkeydown="return false" onchange="set_gltf_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 5px 2px 0; width: 48px;" />
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="scale_10x" onchange="document.getElementById('reset').click();" />10x</label>
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" />Wireframe</label>
-        <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" />Shadow</label>
+        <label style="margin: 2px 10px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" />Shadow</label>
+        <button id="btn_animate" onclick="animate_gltf()" style="background-color: #d1cefc; vertical-align: middle; width: 20px; margin: 2px 2px 2px 2px; padding: 0;" disabled>A</button>
         <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 40px;">Reset</button>
         <button id="btn_full_screen" onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
       </div>
@@ -196,7 +197,7 @@
     </script>
 
     <script>
-      var ktx2_loader;
+      var ktx2_loader, animation_mixer, animation_running, clock;
       var renderer, scene, camera, controls, gltf_obj;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
       var shadowMesh, shadowMaterial, draco_material;
@@ -205,7 +206,7 @@
       var rot_x = 0, rot_y = 0, rot_z = 0, pos_x = 0, pos_y = 0, pos_z = 0;
       var previous_gltf_scale = '1';
       var selected_gltf_file, selected_url_file = '', url_displayed, url_loading;
-      var texture_files_png, texture_files_jpg, texture_files_ktx2, draco_files;
+      var texture_files_png, texture_files_jpg, texture_files_ktx2, draco_files, animations;
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
@@ -419,6 +420,20 @@
       function pos_y_changed() { pos_y = parseInt(document.getElementById('position_y').value); }
       function pos_z_changed() { pos_z = parseInt(document.getElementById('position_z').value); }
 
+      function animate_gltf() {
+        animations.forEach( clip => {
+          if (animation_mixer.clipAction( clip ).isRunning()) {
+            animation_mixer.clipAction( clip ).stop();
+            document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
+            animation_running = false;
+          } else {
+            animation_mixer.clipAction( clip ).play();
+            document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
+            animation_running = true;
+          }
+        });
+      }
+
       function init(){
         if (scene) {
           scene.remove.apply( scene, scene.children );
@@ -436,6 +451,11 @@
         texture_files_png = [];
         texture_files_ktx2 = [];
         draco_files = [];
+        animations = [];
+        animation_mixer = null;
+        animation_running = false;
+        document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
+        document.getElementById('btn_animate').disabled = true;
 
         if (!url_loading) {
           // Loaded file(s)
@@ -461,6 +481,7 @@
 
         document.body.style.backgroundImage = "none";
         document.getElementById('scale_10x').checked = false;
+        document.getElementById('btn_animate').disabled = true;
         enable_disable( false );
 
         if (renderer == undefined) {
@@ -473,6 +494,8 @@
           renderer.setClearColor( 0xFFFFFF, 0); // Allow setting the background color
           renderer.autoClear = false;
         }
+
+        clock = new THREE.Clock();
 
         if (scene == undefined) { scene = new THREE.Scene(); }
         if (gltf_obj == undefined) { gltf_obj = new THREE.Object3D(); }
@@ -527,7 +550,7 @@
         scene.add( spotLight );
         scene.add( spotLight.target );
 
-        // Add DirectionalLight to the scene
+        // Add DirectionalLight to the scene (add it to the camera instead if using Orbit Controls)
         directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 0.8 );
         directionalLight.position.set( 0, 0, 250 );
         directionalLight.lookAt( new THREE.Vector3( 0, 0, 0 ) );
@@ -535,6 +558,15 @@
 
         // Orbit Controls can be used for rotation, zoom and move but are camera related
         //controls = new THREE.OrbitControls(camera, renderer.domElement);
+        //controls.enableKeys = false;
+        //controls.enableZoom = true;
+        //controls.enableDamping = true;
+        //controls.maxPolarAngle = 2.2;
+        //controls.minPolarAngle = 1.1;
+        //controls.dampingFactor = 0.1;
+        //controls.rotateSpeed = 0.2;
+        //controls.minDistance = 2;
+        //controls.maxDistance = 500;
 
         // Load DRACO or gltf file
         if (selected_gltf_file) {
@@ -549,6 +581,21 @@
       function loadFile() {
         if (selected_gltf_file) {
           gltf_loader.load( URL.createObjectURL( selected_gltf_file ), ( gltf ) => {
+            animations = gltf.animations;
+
+            if (animations.length > 0) {
+              animation_mixer = new THREE.AnimationMixer( gltf.scene );
+              document.getElementById('btn_animate').disabled = false;
+              document.getElementById('btn_animate').style.backgroundColor = 'green';
+
+              animations.forEach( clip => {
+                animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat;
+                animation_mixer.clipAction( clip ).play();
+              });
+
+              animation_running = true;
+            }
+
             // Go through all children of the loaded object and search for a Mesh
             gltf.scene.traverse( function( child ) {
               // This allow us to check if the children is an instance of the Mesh constructor
@@ -757,6 +804,21 @@
             });
           } else {
             gltf_loader.load( selected_url_file, ( gltf ) => {
+              animations = gltf.animations;
+
+              if (animations.length > 0) {
+                animation_mixer = new THREE.AnimationMixer( gltf.scene );
+                document.getElementById('btn_animate').disabled = false;
+                document.getElementById('btn_animate').style.backgroundColor = 'green';
+
+                animations.forEach( clip => {
+                  animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat;
+                  animation_mixer.clipAction( clip ).play();
+                });
+
+                animation_running = true;
+              }
+
               // Go through all children of the loaded object and search for a Mesh
               gltf.scene.traverse( function( child ) {
                 // This allow us to check if the children is an instance of the Mesh constructor
@@ -849,6 +911,13 @@
 
         }
 
+        if (animation_running) {
+          var delta = clock.getDelta();
+          animation_mixer.update( delta );
+        }
+
+        //controls.update();
+
         renderer.clear();
       	renderer.render( scene, camera );
       }
@@ -926,10 +995,12 @@
         }
 
         if (!values && !reset) {
-          // Page (re)loading so reset the file input, URL entry, scale_10x checkbox and disable controls
+          // Page (re)loading so reset the file input, URL entry, scale_10x checkbox, animate button and disable controls
           document.getElementById('file_input').value = '';
           document.getElementById('url_entry').value = '';
           document.getElementById('scale_10x').checked = false;
+          document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
+          document.getElementById('btn_animate').disabled = true;
           enable_disable( true );
         }
       }

@@ -64,7 +64,8 @@
         <input type="number" id="dae_opacity" name="dae_opacity" min="0" max="1" step="0.05" value="1" onkeydown="return false" onchange="set_dae_opacity()" style="width: 48px; margin: 2px 5px 2px 0;" />
         <label for="dae_scale" style="margin: 2px 2px 2px 0;">Scale:</label>
         <input type="number" id="dae_scale" name="dae_scale" onkeydown="return false" onchange="set_dae_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 5px 2px 0; width: 48px;" />
-        <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="scale_10x" onchange="document.getElementById('reset').click();" />10x</label>
+        <label style="margin: 2px 10px 2px 0;"><input type="checkbox" id="scale_10x" onchange="document.getElementById('reset').click();" />10x</label>
+        <button id="btn_animate" onclick="animate_dae()" style="background-color: #d1cefc; vertical-align: middle; width: 20px; margin: 2px 2px 2px 2px; padding: 0;" disabled>A</button>
         <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 40px;">Reset</button>
         <button id="btn_full_screen" onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
       </div>
@@ -154,7 +155,7 @@
     </script>
 
     <script>
-      var ktx2_loader;
+      var ktx2_loader, animation_mixer, animation_running, clock;
       var renderer, scene, camera, controls, dae_obj;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
       var shadowMesh, shadowMaterial;
@@ -299,6 +300,20 @@
       function rot_y_changed() { rot_y = parseFloat(document.getElementById('rotation_y').value) / 1000; }
       function rot_z_changed() { rot_z = parseFloat(document.getElementById('rotation_z').value) / 1000; }
 
+      function animate_dae() {
+        animations.forEach( clip => {
+          if (animation_mixer.clipAction( clip ).isRunning()) {
+            animation_mixer.clipAction( clip ).stop();
+            document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
+            animation_running = false;
+          } else {
+            animation_mixer.clipAction( clip ).play();
+            document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
+            animation_running = true;
+          }
+        });
+      }
+
       function init(){
         // Loaded file
         var fi = document.getElementById('file_input');
@@ -314,12 +329,18 @@
 
         if (!fi.files) { return; }
 
+        enable_disable( true );
+
         selected_dae_file = null;
         texture_files_jpg = [];
         texture_files_png = [];
         texture_files_ktx2 = [];
         texture_files_dds = [];
-        enable_disable( true );
+        animations = [];
+        animation_mixer = null;
+        animation_running = false;
+        document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
+        document.getElementById('btn_animate').disabled = true;
 
         if (!url_loading) {
           // Include check for JPG/PNG, KTX2 and DDS (DirectDraw Surface container file format)
@@ -354,6 +375,8 @@
           renderer.setClearColor( 0xFFFFFF, 0); // Allow setting the background color
           renderer.autoClear = false;
         }
+
+        clock = new THREE.Clock();
 
         if (scene == undefined) { scene = new THREE.Scene(); }
         if (dae_obj == undefined) { dae_obj = new THREE.Object3D(); }
@@ -406,13 +429,22 @@
         scene.add( spotLight );
         scene.add( spotLight.target );
 
-        // Add DirectionalLight to the camera
+        // Add DirectionalLight to the camera (add it to the scene instead if not using Orbit Controls)
         directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 0.8 );
         directionalLight.position.set( 0, 0, 250 );
         directionalLight.lookAt(new THREE.Vector3( 0, 0, 0 ));
         camera.add( directionalLight );
 
         controls = new THREE.OrbitControls(camera, renderer.domElement);
+        //controls.enableKeys = false;
+        //controls.enableZoom = true;
+        //controls.enableDamping = true;
+        //controls.maxPolarAngle = 2.2;
+        //controls.minPolarAngle = 1.1;
+        //controls.dampingFactor = 0.1;
+        //controls.rotateSpeed = 0.2;
+        //controls.minDistance = 2;
+        //controls.maxDistance = 500;
 
         // Load the dae file
         if (selected_dae_file) {
@@ -430,6 +462,21 @@
       function addFileInScene( object ){
         if (selected_dae_file) {
           dae_loader.load( URL.createObjectURL( selected_dae_file ), ( collada ) => {
+            animations = collada.scene.animations;
+
+            if (animations.length > 0) {
+              animation_mixer = new THREE.AnimationMixer( collada.scene );
+              document.getElementById('btn_animate').disabled = false;
+              document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
+
+              animations.forEach( clip => {
+                animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat;
+                animation_mixer.clipAction( clip ).play();
+              });
+
+              animation_running = true;
+            }
+
             // Go through all children of the loaded object and search for a Mesh
             collada.scene.traverse( function( child ) {
               // This allow us to check if the children is an instance of the Mesh constructor
@@ -522,6 +569,21 @@
       function loadURLFile() {
         if (selected_url_file != '') {
           dae_loader.load( selected_url_file, ( collada ) => {
+            animations = collada.scene.animations;
+
+            if (animations.length > 0) {
+              animation_mixer = new THREE.AnimationMixer( collada.scene );
+              document.getElementById('btn_animate').disabled = false;
+              document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
+
+              animations.forEach( clip => {
+                animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat;
+                animation_mixer.clipAction( clip ).play();
+              });
+
+              animation_running = true;
+            }
+
             // Go through all children of the loaded object and search for a Mesh
             collada.scene.traverse( function( child ) {
               // This allow us to check if the children is an instance of the Mesh constructor
@@ -609,6 +671,11 @@
           if (Math.abs(dae_obj.rotation.z) > 2 * Math.PI ) { dae_obj.rotation.z = 0; }
         }
 
+        if (animation_running) {
+          var delta = clock.getDelta();
+          animation_mixer.update( delta );
+        }
+
         controls.update();
 
         renderer.clear();
@@ -672,10 +739,12 @@
         }
 
         if (!values && !reset) {
-          // Page (re)loading so reset the file input, URL entry, scale_10x checkbox and disable controls
+          // Page (re)loading so reset the file input, URL entry, scale_10x checkbox, animate button and disable controls
           document.getElementById('file_input').value = '';
           document.getElementById('url_entry').value = '';
           document.getElementById('scale_10x').checked = false;
+          document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
+          document.getElementById('btn_animate').disabled = true;
           enable_disable( true );
         }
       }
