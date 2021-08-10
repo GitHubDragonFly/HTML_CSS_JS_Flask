@@ -51,13 +51,16 @@ def display_form_data():
 
 @app.route('/<path:path>', methods=['GET'])
 def get_path(path):
-    try:
-        if path.startswith('uploads/') or path.endswith('.js'):
-            return send_file(path, as_attachment=True)
-        else:
-            return render_template(path)
-    except Exception as e:
-        return page_not_found(e)
+    if path != 'undefined':
+        try:
+            if path.startswith('uploads/') or path.endswith('.js'):
+                return send_file(path, as_attachment=True)
+            else:
+                return render_template(path)
+        except Exception as e:
+            return page_not_found(e)
+    else:
+        return make_response('Path is undefined')
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=False)
