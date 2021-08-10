@@ -7,7 +7,7 @@ The main differences:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
  - uploading any pictures via the `Form` will then have those saved in the new `uploads` folder
  - DRACO and KTX2 support was added to the GLTF Viewer:
-   - this seems to work fine when using URL (see the screenshot)
+   - this seems to work fine when using URL (see the screenshot) so try using it for fetching files both locally and from the Internet
    - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG/BMP` texture file along just to see if and how it changes the object's appearance)
    - you can also open `.drc` file types either alone or together with some texture file
  - New Collada DAE Viewer, using Orbit Controls which made the code and GUI slightly simpler (see the screenshot)
