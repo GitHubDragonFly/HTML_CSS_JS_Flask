@@ -71,7 +71,7 @@
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" />Wireframe</label>
         <label style="margin: 2px 10px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" />Shadow</label>
         <button id="btn_animate" onclick="animate_gltf()" style="background-color: #d1cefc; vertical-align: middle; width: 20px; margin: 2px 2px 2px 2px; padding: 0;" disabled>A</button>
-        <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 40px;">Reset</button>
+        <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 20px;">Reset</button>
         <button id="btn_full_screen" onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
       </div>
       <div id="url" style="display: none;">
@@ -197,7 +197,7 @@
     </script>
 
     <script>
-      var ktx2_loader, animation_mixer, animation_running, clock;
+      var ktx2_loader, animations, animation_mixer, animation_running, clock;
       var renderer, scene, camera, controls, gltf_obj;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
       var shadowMesh, shadowMaterial, draco_material;
@@ -206,7 +206,7 @@
       var rot_x = 0, rot_y = 0, rot_z = 0, pos_x = 0, pos_y = 0, pos_z = 0;
       var previous_gltf_scale = '1';
       var selected_gltf_file, selected_url_file = '', url_displayed, url_loading;
-      var texture_files_png, texture_files_jpg, texture_files_ktx2, draco_files, animations;
+      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_ktx2, draco_files;
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
@@ -447,8 +447,9 @@
         enable_disable( true );
 
         selected_gltf_file = null;
-        texture_files_jpg = [];
         texture_files_png = [];
+        texture_files_jpg = [];
+        texture_files_bmp = [];
         texture_files_ktx2 = [];
         draco_files = [];
         animations = [];
@@ -461,11 +462,12 @@
           // Loaded file(s)
           let fi = document.getElementById('file_input');
 
-          // Include check for JPG/PNG, KTX2 and DRC (DRACO)
+          // Include check for JPG/PNG/BMP, KTX2 and DRC (DRACO)
           for (let i = 0; i < fi.files.length; i++) {
             if (fi.files[i].name.toUpperCase().endsWith('.GLB') || fi.files[i].name.toUpperCase().endsWith('.GLTF')) { selected_gltf_file = fi.files[i]; }
             else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.KTX2')) { texture_files_ktx2.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.DRC')) { draco_files.push( fi.files[i] ); }
           };
@@ -600,6 +602,7 @@
             gltf.scene.traverse( function( child ) {
               // This allow us to check if the children is an instance of the Mesh constructor
           	  if (child instanceof THREE.Mesh) {
+                console.log(child);
                 // Enable transparency for the Opacity control and enable shadows
                 child.material.opacity = 1;
                 child.material.transparent = true;
@@ -620,8 +623,8 @@
                       child.material.needsUpdate = true;
                     });
                   });
-                } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0) {
-                  let files = (texture_files_png.length > 0) ? texture_files_png : texture_files_jpg;
+                } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0) {
+                  let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : texture_files_bmp);
 
                   files.forEach( file => {
                     let loader = new THREE.TextureLoader();
@@ -701,8 +704,8 @@
                   render();
                 });
               });
-            } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0) {
-              let files = (texture_files_png.length > 0) ? texture_files_png : texture_files_jpg;
+            } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0) {
+              let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : texture_files_bmp);
 
               files.forEach( file => {
                 let loader = new THREE.TextureLoader();
