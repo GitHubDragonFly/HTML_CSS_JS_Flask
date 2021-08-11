@@ -32,6 +32,9 @@ Optionally use VS Code for editing, troubleshooting and running the app, which s
 # Licensing
 This is MIT licensed.
 
+Three.js MIT license is included in the `python/app/static/js` folder together with a link to jQuery MIT license.
+Some examples obtained from the three.js project might have a note included about their own license.
+
 The beach video and the cube/die image were downloaded as a free media content and are under the [Pixabay License](https://pixabay.com/service/license/).
 
 # Trademarks
