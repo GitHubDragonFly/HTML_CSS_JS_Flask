@@ -12,6 +12,7 @@
 
     <style>
       body,html {
+        position: relative;
         display: block;
         background-color: black;
         background-image: url('../static/Images/DragonFly.png');
@@ -24,6 +25,28 @@
         margin: 0;
         overflow: hidden;
       }
+
+      .spinner {
+        position: absolute;
+        display: block;
+        background-color: transparent;
+        width: 240px;
+        height: 240px;
+        top: 50%;
+        left: 50%;
+        margin-top: -129px;
+        margin-left: -129px;
+        border: 6px solid blue;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+        border-top-color: lightblue;
+        border-bottom-color: lightblue;
+        -webkit-animation: spin 4s ease-in-out infinite;
+        animation: spin 4s ease-in-out infinite;
+      }
+
+      @-webkit-keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
+      @keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
 
       p.full_screen {
         text-align: center;
@@ -67,7 +90,7 @@
         <input type="number" id="gltf_opacity" name="gltf_opacity" min="0" max="1" step="0.05" value="1" onkeydown="return false" onchange="set_gltf_opacity()" style="width: 48px; margin: 2px 5px 2px 0;" />
         <label for="gltf_scale" style="margin: 2px 2px 2px 0;">Scale:</label>
         <input type="number" id="gltf_scale" name="gltf_scale" onkeydown="return false" onchange="set_gltf_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 5px 2px 0; width: 48px;" />
-        <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="scale_10x" onchange="document.getElementById('reset').click();" />10x</label>
+        <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="scale_10x" onchange="scale_10x_set();" />10x</label>
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" />Wireframe</label>
         <label style="margin: 2px 10px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" />Shadow</label>
         <button id="btn_animate" onclick="animate_gltf()" style="background-color: #d1cefc; vertical-align: middle; width: 20px; margin: 2px 2px 2px 2px; padding: 0;" disabled>A</button>
@@ -111,6 +134,8 @@
         <input type="color" id="back_color" name="back_color" onchange="set_back_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 2px 0 0;" />
       </div>
     </div>
+
+    <div id="div_spinner" class="spinner"></div>
 
     <canvas id="scene">
       Your browser does not support HTML5 canvas tag
@@ -441,7 +466,7 @@
           if (shadowMesh) { shadowMesh = null; }
 
           // Reset all values
-          reset_all( false, true );
+          reset_all( true );
         }
 
         enable_disable( true );
@@ -482,7 +507,7 @@
         }
 
         document.body.style.backgroundImage = "none";
-        document.getElementById('scale_10x').checked = false;
+        document.getElementById('div_spinner').style.display = "none";
         enable_disable( false );
 
         if (renderer == undefined) {
@@ -643,7 +668,6 @@
 
             gltf_obj = gltf.scene;
             gltf_obj.name = 'local_model';
-            if (document.getElementById('scale_10x').checked) { gltf_obj.scale.multiplyScalar( 10 ); }
 
             resize();
 
@@ -689,7 +713,6 @@
                   gltf_obj = new THREE.Mesh( geometry, draco_material );
                   gltf_obj.castShadow = true;
                   gltf_obj.receiveShadow = true;
-                  if (document.getElementById('scale_10x').checked) { gltf_obj.scale.multiplyScalar( 10 ); }
                   gltf_obj.position.set( 0, 0, 0 );
 
                   resize();
@@ -719,7 +742,6 @@
                   gltf_obj = new THREE.Mesh( geometry, draco_material );
                   gltf_obj.castShadow = true;
                   gltf_obj.receiveShadow = true;
-                  if (document.getElementById('scale_10x').checked) { gltf_obj.scale.multiplyScalar( 10 ); }
                   gltf_obj.position.set( 0, 0, 0 );
 
                   resize();
@@ -739,7 +761,6 @@
               gltf_obj = new THREE.Mesh( geometry, draco_material );
               gltf_obj.castShadow = true;
               gltf_obj.receiveShadow = true;
-              if (document.getElementById('scale_10x').checked) { gltf_obj.scale.multiplyScalar( 10 ); }
               gltf_obj.position.set( 0, 0, 0 );
 
               resize();
@@ -779,7 +800,6 @@
               gltf_obj = new THREE.Mesh( geometry, draco_material );
               gltf_obj.castShadow = true;
               gltf_obj.receiveShadow = true;
-              if (document.getElementById('scale_10x').checked) { gltf_obj.scale.multiplyScalar( 10 ); }
               gltf_obj.position.set( 0, 0, 0 );
 
               resize();
@@ -835,7 +855,6 @@
 
               gltf_obj = gltf.scene;
               gltf_obj.name = 'url_model';
-              if (document.getElementById('scale_10x').checked) { gltf_obj.scale.multiplyScalar( 10 ); }
 
               resize();
 
@@ -923,10 +942,18 @@
       	renderer.render( scene, camera );
       }
 
+      function scale_10x_set() {
+        if (document.getElementById('scale_10x').checked) {
+          gltf_obj.scale.multiplyScalar( 10 );
+        } else {
+          gltf_obj.scale.multiplyScalar( 0.1 );
+        }
+      }
+
       function reset_only() {
         scene.remove( gltf_obj );
 
-        reset_all( false, true );
+        reset_all( true );
 
         if (selected_gltf_file) {
           loadFile();
@@ -937,7 +964,7 @@
         }
       }
 
-      function reset_all( values = false, reset = false ) {
+      function reset_all( reset = false ) {
         // Reset all current positional and rotational values
         document.getElementById('rotation_x').value = 0;
         document.getElementById('rotation_y').value = 0;
@@ -973,14 +1000,16 @@
         document.getElementById('gltf_scale').value = 1;
         previous_gltf_scale = '1';
 
-        // Reset the wireframe and shadow checkboxes
+        // Reset the wireframe, shadow and scale_10x checkboxes
         document.getElementById('wireframe').checked = false;
         document.getElementById('shadow').checked = false;
+        document.getElementById('scale_10x').checked = false;
 
         reset_rotation = true;
 
         // Reset the view
-        if (!values && reset) {
+        if (reset) {
+          gltf_obj.position.set( 0, 0, 0 );
           hemisphereLight.position.set( 0, 10, 0 );
           spotLight.position.set( 70, 0, 350 );
           directionalLight.position.set( 0, 0, 250 );
@@ -995,11 +1024,11 @@
           set_directional_light_intensity();
         }
 
-        if (!values && !reset) {
-          // Page (re)loading so reset the file input, URL entry, scale_10x checkbox, animate button and disable controls
+        if (!reset) {
+          // Page (re)loading so reset the file input, URL entry, spinner, animate button and disable controls
           document.getElementById('file_input').value = '';
           document.getElementById('url_entry').value = '';
-          document.getElementById('scale_10x').checked = false;
+          document.getElementById('div_spinner').style.display = "block";
           document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
           document.getElementById('btn_animate').disabled = true;
           enable_disable( true );
