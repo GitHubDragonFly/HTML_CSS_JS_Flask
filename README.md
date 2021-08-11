@@ -39,3 +39,8 @@ The beach video and the cube/die image were downloaded as a free media content a
 
 # Trademarks
 Any and all trademarks, either directly or indirectly mentioned here, belong to their respective owners.
+
+# Resources
+Check the resources mentioned in the original HTML_CSS_JS project.
+
+Here is also a link to another online 3D viewer: https://github.com/kovacsv/Online3DViewer
