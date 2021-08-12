@@ -12,6 +12,7 @@
 
     <style>
       body,html {
+        position: relative;
         display: block;
         background-color: black;
         background-image: url('../static/Images/DragonFly.png');
@@ -24,6 +25,28 @@
         margin: 0;
         overflow: hidden;
       }
+
+      .spinner {
+        position: absolute;
+        display: block;
+        background-color: transparent;
+        width: 240px;
+        height: 240px;
+        top: 50%;
+        left: 50%;
+        margin-top: -129px;
+        margin-left: -129px;
+        border: 6px solid blue;
+        -webkit-border-radius: 50%;
+        border-radius: 50%;
+        border-top-color: lightblue;
+        border-bottom-color: lightblue;
+        -webkit-animation: spin 4s ease-in-out infinite;
+        animation: spin 4s ease-in-out infinite;
+      }
+
+      @-webkit-keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
+      @keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
 
       p.full_screen {
         text-align: center;
@@ -68,6 +91,7 @@
         <input type="number" id="obj_opacity" name="obj_opacity" min="0" max="1" step="0.05" value="1" onkeydown="return false" onchange="set_obj_opacity()" style="width: 48px; margin: 2px 5px 2px 0;" />
         <label for="obj_scale" style="margin: 2px 2px 2px 0;">Scale:</label>
         <input type="number" id="obj_scale" name="obj_scale" onkeydown="return false" onchange="set_obj_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 5px 2px 0; width: 48px;" />
+        <label style="margin: 2px 10px 2px 0;"><input type="checkbox" id="scale_10x" onchange="scale_10x_set();" />10x</label>
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" />Wireframe</label>
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" />Shadow</label>
         <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 40px;">Reset</button>
@@ -105,6 +129,8 @@
         <input type="color" id="back_color" name="back_color" onchange="set_back_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 2px 0 0;" />
       </div>
     </div>
+
+    <div id="div_spinner" class="spinner"></div>
 
     <canvas id="scene">
       Your browser does not support HTML5 canvas tag
@@ -175,7 +201,9 @@
     </script>
 
     <script>
-      var renderer, scene, camera, controls, ambientLight, hemisphereLight, spotLight, directionalLight, Obj, shadowMesh, shadowMaterial;
+      var renderer, scene, camera, controls, Obj;
+      var ambientLight, hemisphereLight, spotLight, directionalLight;
+      var shadowMesh, shadowMaterial;
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation = false, reset_rotation = false, events_initialized = false;
       var rot_x = 0, rot_y = 0, rot_z = 0, pos_x = 0, pos_y = 0, pos_z = 0;
@@ -404,8 +432,10 @@
           if (shadowMesh) { shadowMesh = null; }
 
           // Reset all values
-          reset_all( false, true );
+          reset_all( true );
         }
+
+        enable_disable( true );
 
         obj_loader.setMaterials( null );
         selected_obj_file = null;
@@ -414,7 +444,6 @@
         texture_files_png = [];
         texture_files_bmp = [];
         texture_files_dds = [];
-        enable_disable( true );
 
         // Include check for JPG/PNG/BMP and DDS (DirectDraw Surface container file format)
         for (let i = 0; i < fi.files.length; i++) {
@@ -429,6 +458,7 @@
         if (!selected_obj_file) { return; }
 
         document.body.style.backgroundImage = "none";
+        document.getElementById('div_spinner').style.display = "none";
         enable_disable( false );
 
         if (renderer == undefined) {
@@ -495,7 +525,7 @@
         scene.add( spotLight );
         scene.add( spotLight.target );
 
-        // Add DirectionalLight to the scene
+        // Add DirectionalLight to the scene (add it to the camera instead if using Orbit Controls)
         directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 1 );
         directionalLight.position.set( 0, 0, 250 );
         directionalLight.lookAt( new THREE.Vector3( 0, 0, 0 ) );
@@ -503,6 +533,15 @@
 
         // Orbit Controls can be used for rotation, zoom and move but are camera related
         //controls = new THREE.OrbitControls(camera, renderer.domElement);
+        //controls.enableKeys = false;
+        //controls.enableZoom = true;
+        //controls.enableDamping = true;
+        //controls.maxPolarAngle = 2.2;
+        //controls.minPolarAngle = 1.1;
+        //controls.dampingFactor = 0.1;
+        //controls.rotateSpeed = 0.2;
+        //controls.minDistance = 2;
+        //controls.maxDistance = 500;
 
         // Load the Obj file
         loadFile();
@@ -727,17 +766,27 @@
 
         }
 
+        //controls.update();
+
         renderer.clear();
       	renderer.render( scene, camera );
       }
 
+      function scale_10x_set() {
+        if (document.getElementById('scale_10x').checked) {
+          Obj.scale.multiplyScalar( 10 );
+        } else {
+          Obj.scale.multiplyScalar( 0.1 );
+        }
+      }
+
       function reset_only() {
         scene.remove( Obj );
-        reset_all( false, true );
+        reset_all( true );
         loadFile();
       }
 
-      function reset_all( values = false, reset = false ) {
+      function reset_all( reset = false ) {
         // Reset all current positional and rotational values
         document.getElementById('rotation_x').value = 0;
         document.getElementById('rotation_y').value = 0;
@@ -773,14 +822,16 @@
         document.getElementById('obj_scale').value = 1;
         previous_obj_scale = '1';
 
-        // Reset the wireframe and shadow checkboxes
+        // Reset the wireframe, shadow and scale_10x checkboxes
         document.getElementById('wireframe').checked = false;
         document.getElementById('shadow').checked = false;
+        document.getElementById('scale_10x').checked = false;
 
         reset_rotation = true;
 
         // Reset the view
-        if (!values && reset) {
+        if (reset) {
+          Obj.position.set( 0, 0, 0 );
           hemisphereLight.position.set( 0, 10, 0 );
           spotLight.position.set( 150, -50, 350 );
           directionalLight.position.set( 0, 0, 250 );
@@ -795,9 +846,10 @@
           set_directional_light_intensity();
         }
 
-        if (!values && !reset) {
-          // Page (re)loading so reset the file input and disable controls
+        if (!reset) {
+          // Page (re)loading so reset the file input, spinner and disable controls
           document.getElementById('file_input').value = "";
+          document.getElementById('div_spinner').style.display = "block";
           enable_disable( true );
         }
       }
@@ -816,6 +868,7 @@
         document.getElementById('position_z').disabled = disable;
         document.getElementById('wireframe').disabled = disable;
         document.getElementById('shadow').disabled = disable;
+        document.getElementById('scale_10x').disabled = disable;
         document.getElementById('obj_scale').disabled = disable;
         document.getElementById('obj_opacity').disabled = disable;
         document.getElementById('ambient_light_color').disabled = disable;
