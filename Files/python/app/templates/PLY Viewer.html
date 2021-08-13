@@ -89,6 +89,7 @@
         <label style="margin: 2px 10px 2px 0;"><input type="checkbox" id="scale_10x" onchange="scale_10x_set();" disabled />10x</label>
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" disabled />Wireframe</label>
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" disabled />Shadow</label>
+        <button id="btn_edges" onclick="show_edges()" style="background-color: #d1cefc; vertical-align: middle; width: 20px; margin: 2px 2px 2px 2px; padding: 0;" disabled>E</button>
         <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 40px;" disabled>Reset</button>
         <button id="btn_full_screen" onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
       </div>
@@ -202,7 +203,7 @@
     </script>
 
     <script>
-      var renderer, scene, camera, controls, mesh;
+      var renderer, scene, camera, controls, mesh, edges, edges_visible = false;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
       var material, texture, shadowMesh, shadowMaterial;
       var ww = window.innerWidth,	wh = window.innerHeight;
@@ -435,6 +436,8 @@
         texture_files_jpg = [];
         texture_files_bmp = [];
         texture_files_dds = [];
+        edges = null;
+        edges_visible = false;
 
         // Include check for JPG/PNG/BMP and DDS (DirectDraw Surface container file format)
         for (let i = 0; i < fi.files.length; i++) {
@@ -607,6 +610,7 @@
         mesh = new THREE.Mesh( smooth, material );
         mesh.castShadow = true;
         mesh.receiveShadow = true;
+        edges = new THREE.LineSegments( new THREE.EdgesGeometry( mesh.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
 
         resize();
 
@@ -616,6 +620,18 @@
         camera.lookAt( mesh.position );
 
         render();
+      }
+
+      function show_edges() {
+        if (edges_visible) {
+          mesh.remove( edges );
+          edges_visible = false;
+          document.getElementById('btn_edges').style.backgroundColor = '#d1cefc';
+        } else {
+          mesh.add( edges );
+          edges_visible = true;
+          document.getElementById('btn_edges').style.backgroundColor = 'lightgreen';
+        }
       }
 
       function show_wireframe() {
@@ -728,6 +744,10 @@
         document.getElementById('shadow').checked = false;
         document.getElementById('scale_10x').checked = false;
 
+        // Reset edges related values
+        edges_visible = false;
+        document.getElementById('btn_edges').style.backgroundColor = '#d1cefc';
+
         reset_rotation = true;
 
         // Reset the view
@@ -778,6 +798,7 @@
         document.getElementById('spot_light_intensity').disabled = disable;
         document.getElementById('directional_light_intensity').disabled = disable;
         document.getElementById('back_color').disabled = disable;
+        document.getElementById('btn_edges').disabled = disable;
         document.getElementById('reset').disabled = disable;
       }
     </script>
