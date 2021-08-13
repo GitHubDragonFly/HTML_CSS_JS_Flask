@@ -590,7 +590,7 @@
             fog: false,
             opacity: 1,
             transparent: true,
-            vertexColors: THREE.VertexColors,
+            vertexColors: THREE.VertexColors
           });
         } else {
           material = new THREE.MeshPhongMaterial( {
@@ -615,7 +615,7 @@
         resize();
 
         // Add mesh to the scene
-        scene.add( mesh )
+        scene.add( mesh );
 
         camera.lookAt( mesh.position );
 
