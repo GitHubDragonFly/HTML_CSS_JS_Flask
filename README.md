@@ -14,7 +14,12 @@ The main differences:
  - GLTF and DAE viewers support animation whose button, with letter "A", will change green if any animation is detected and run it automatically
  - See GLTF / DRACO / DAE examples in the `Images` folder (most were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out)
 
-Note about showing the edges (button with letter "E"): these are aplied to the object itself and will not follow the animation in case of GLTF and DAE viewers
+Note about showing the edges (button with letter "E"):
+ - these are aplied to the object itself and will not follow the animation in case of GLTF and DAE viewers
+ - thresholdAngle is set to 30 which produces approximate outline edges
+ - use the opacity number input to control visibility of the object vs edges
+ - edges might not be visible if the wireframe is turned on
+ - edges are not set to cast shadow
 
 All it takes to run this project is to:
  - Download a zip file of this project (or clone the repo)
