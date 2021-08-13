@@ -53,8 +53,8 @@ def display_form_data():
 def get_path(path):
     if path != 'undefined':
         try:
-            if path.startswith('uploads/') or path.endswith('.js'):
-                return send_file(path, as_attachment=True)
+            if path.startswith('uploads/'):
+                return send_file(path)
             else:
                 return render_template(path)
         except Exception as e:
