@@ -10,9 +10,12 @@ The main differences:
    - this seems to work fine when using URL (see the screenshot) so try using it for fetching files both locally and from the Internet
    - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG/BMP` texture file along just to see if and how it changes the object's appearance)
    - you can also open `.drc` file types either alone or together with some texture file
+
+Additional Notes:
  - New Collada DAE Viewer, using Orbit Controls which made the code and GUI slightly simpler (see the screenshot)
  - GLTF and DAE viewers support animation whose button, with letter "A", will change green if any animation is detected and run it automatically
- - See GLTF / DRACO / DAE examples in the `Images` folder (most were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out)
+ - PLY viewer also includes STL file loader
+ - See GLTF / DRACO / DAE / STL examples in the `Images` folder (most were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out)
 
 Notes about showing the edges (button with letter "E"):
  - these are aplied to the object itself and will not follow the animation in case of GLTF and DAE viewers
