@@ -362,7 +362,7 @@ THREE.PLYLoader.prototype = {
 
 		} else if ( elementName === "face" ) {
 
-			var vertex_indices = element.vertex_indices;
+			var vertex_indices = element.vertex_indices || element.vertex_index;
 
 			if ( vertex_indices.length === 3 ) {
 
