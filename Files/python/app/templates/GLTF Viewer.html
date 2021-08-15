@@ -89,13 +89,13 @@
         <label for="gltf_opacity" style="margin: 2px 2px 2px 0;">Opacity:</label>
         <input type="number" id="gltf_opacity" name="gltf_opacity" min="0" max="1" step="0.05" value="1" onkeydown="return false" onchange="set_gltf_opacity()" style="width: 48px; margin: 2px 5px 2px 0;" disabled />
         <label for="gltf_scale" style="margin: 2px 2px 2px 0;">Scale:</label>
-        <input type="number" id="gltf_scale" name="gltf_scale" onkeydown="return false" onchange="set_gltf_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 5px 2px 0; width: 48px;" disabled />
+        <input type="number" id="gltf_scale" name="gltf_scale" onkeydown="return false" onchange="set_gltf_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 2px 2px 0; width: 48px;" disabled />
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="scale_10x" onchange="scale_10x_set();" disabled />10x</label>
-        <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" disabled />Wireframe</label>
+        <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" disabled />Wire</label>
         <label style="margin: 2px 10px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" disabled />Shadow</label>
         <button id="btn_edges" onclick="show_edges()" style="background-color: #d1cefc; vertical-align: middle; width: 20px; margin: 2px 2px 2px 2px; padding: 0;" disabled>E</button>
-        <button id="btn_animate" onclick="animate_gltf()" style="background-color: #d1cefc; vertical-align: middle; width: 20px; margin: 2px 2px 2px 2px; padding: 0;" disabled>A</button>
-        <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 20px;" disabled>Reset</button>
+        <button id="btn_animate" onclick="animate_gltf()" style="background-color: #d1cefc; vertical-align: middle; width: 28px; margin: 2px 2px 2px 2px; padding: 0;" disabled>A</button>
+        <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 10px;" disabled>Reset</button>
         <button id="btn_full_screen" onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
       </div>
       <div id="url" style="display: none;">
@@ -223,7 +223,7 @@
     </script>
 
     <script>
-      var ktx2_loader, animations, animation_mixer, animation_running, clock;
+      var ktx2_loader, animations, animation_mixer, animation_running, current_animation, clock;
       var renderer, scene, camera, controls, gltf_obj, edges, edges_visible = false;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
       var shadowMesh, shadowMaterial, draco_material;
@@ -447,17 +447,25 @@
       function pos_z_changed() { pos_z = parseInt(document.getElementById('position_z').value); }
 
       function animate_gltf() {
-        animations.forEach( clip => {
-          if (animation_mixer.clipAction( clip ).isRunning()) {
-            animation_mixer.clipAction( clip ).stop();
+        if (animation_running) {
+          animation_mixer.clipAction( animations[ current_animation ] ).stop();
+
+          if (current_animation == animations.length - 1) {
             document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
+            document.getElementById('btn_animate').innerHTML = 'A';
+            current_animation = 0;
             animation_running = false;
           } else {
-            animation_mixer.clipAction( clip ).play();
-            document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
-            animation_running = true;
+            current_animation += 1;
+            animation_mixer.clipAction( animations[ current_animation ] ).play();
+            document.getElementById('btn_animate').innerHTML = 'A' + current_animation;
           }
-        });
+        } else {
+          animation_mixer.clipAction( animations[ current_animation ] ).play();
+          document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
+          document.getElementById('btn_animate').innerHTML = 'A0';
+          animation_running = true;
+        }
       }
 
       function init(){
@@ -614,15 +622,8 @@
 
             if (animations.length > 0) {
               animation_mixer = new THREE.AnimationMixer( gltf.scene );
-              document.getElementById('btn_animate').disabled = false;
-              document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
-
-              animations.forEach( clip => {
-                animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat;
-                animation_mixer.clipAction( clip ).play();
-              });
-
-              animation_running = true;
+              current_animation = 0;
+              animations.forEach( clip => { animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat; });
             }
 
             let child_count = 1;
@@ -685,6 +686,16 @@
 
             camera.lookAt( gltf_obj.position );
 
+            if (animations.length > 0) {
+              animation_mixer.clipAction( animations[0] ).play();
+              document.getElementById('btn_animate').disabled = false;
+              document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
+              document.getElementById('btn_animate').innerHTML = 'A0';
+              animation_running = true;
+            }
+
+            render();
+
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -698,8 +709,6 @@
             console.log( 'Error loading GLTF!' );
             console.log( error );
           });
-
-          render();
         }
       }
 
@@ -846,15 +855,8 @@
 
               if (animations.length > 0) {
                 animation_mixer = new THREE.AnimationMixer( gltf.scene );
-                document.getElementById('btn_animate').disabled = false;
-                document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
-
-                animations.forEach( clip => {
-                  animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat;
-                  animation_mixer.clipAction( clip ).play();
-                });
-
-                animation_running = true;
+                current_animation = 0;
+                animations.forEach( clip => { animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat; });
               }
 
               let child_count = 1;
@@ -885,7 +887,16 @@
 
               camera.lookAt( gltf_obj.position );
 
+              if (animations.length > 0) {
+                animation_mixer.clipAction( animations[0] ).play();
+                document.getElementById('btn_animate').disabled = false;
+                document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
+                document.getElementById('btn_animate').innerHTML = 'A0';
+                animation_running = true;
+              }
+
               render();
+
             }, function ( xhr ) {
               let today = new Date();
               let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1039,9 +1050,12 @@
         document.getElementById('shadow').checked = false;
         document.getElementById('scale_10x').checked = false;
 
-        // Reset edges related values
+        // Reset edges and animation related values
         edges_visible = false;
         document.getElementById('btn_edges').style.backgroundColor = '#d1cefc';
+        animation_running = false;
+        document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
+        document.getElementById('btn_animate').innerHTML = 'A';
 
         reset_rotation = true;
 
