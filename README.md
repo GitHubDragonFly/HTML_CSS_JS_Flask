@@ -22,7 +22,7 @@ Additional Notes:
 Notes about showing the edges (button with letter "E"):
  - these are aplied to the still version of the object itself and will not follow the animation in case of GLTF and DAE viewers
  - thresholdAngle is set to 30 which produces approximate outline edges (if no edges are visible then lower this number)
- - use the opacity number input to control visibility of the object vs edges
+ - use a combination of different opacity / directional light values to control visibility of the object vs edges
  - edges might not be visible if the wireframe is turned on
  - edges are not set to cast shadow
 
