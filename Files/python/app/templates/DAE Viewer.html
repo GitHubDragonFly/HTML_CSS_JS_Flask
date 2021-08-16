@@ -88,6 +88,8 @@
         <label for="dae_scale" style="margin: 2px 2px 2px 0;">Scale:</label>
         <input type="number" id="dae_scale" name="dae_scale" onkeydown="return false" onchange="set_dae_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 2px 2px 0; width: 48px;" disabled />
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="scale_10x" onchange="scale_10x_set();" disabled />10x</label>
+        <button id="btn_edges" onclick="show_edges()" style="background-color: #d1cefc; vertical-align: middle; width: 20px; margin: 2px 2px 2px 2px; padding: 0;" disabled>E</button>
+        <button id="btn_animate" onclick="animate_dae()" style="background-color: #d1cefc; vertical-align: middle; width: 28px; margin: 2px 2px 2px 2px; padding: 0;" disabled>A</button>
         <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 15px;" disabled>Reset</button>
         <button id="btn_full_screen" onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
       </div>
@@ -97,13 +99,16 @@
         <button id="btn_load_url" onclick="load_url_file()" style="-webkit-border-radius: 2px; border-radius: 2px; width: 50px; margin: 2px 0 2px 0; padding: 2px;">Load</button>
       </div>
       <div>
-        <label style="color: blue; margin: 2px 0 2px 5px;">Rotate :</label>
+        <label style="color: blue; margin: 2px 0 2px 0;"><input type="radio" id="hlight" name="mode" value="HL" onchange="radio_changed()" disabled />HL</label>
+        <label style="color: blue; margin: 2px 0 2px 0;"><input type="radio" id="slight" name="mode" value="SL" onchange="radio_changed()" disabled />SL</label>
+        <label style="color: blue; margin: 2px 0 2px 0;"><input type="radio" id="dlight" name="mode" value="DL" onchange="radio_changed()" disabled />DL</label>
+        <label style="color: blue; margin: 2px 5px 2px 0;"><input type="radio" id="rotate" name="mode" value="Rotate" onchange="radio_changed()" checked disabled />Rotate :</label>
         <label for="rotation_x" style="color: blue;">X</label>
-        <input type="number" id="rotation_x" onchange="rot_x_changed()" min="-20" max="20" value="0" step="1" style="width: 40px; margin: 2px 5px 2px 0;" disabled />
+        <input type="number" id="rotation_x" onchange="rot_x_changed()" min="-20" max="20" value="0" step="1" style="width: 50px; margin: 2px 5px 2px 0;" disabled />
         <label for="rotation_y" style="color: blue;">Y</label>
-        <input type="number" id="rotation_y" onchange="rot_y_changed()" min="-20" max="20" value="0" step="1" style="width: 40px; margin: 2px 5px 2px 0;" disabled />
+        <input type="number" id="rotation_y" onchange="rot_y_changed()" min="-20" max="20" value="0" step="1" style="width: 50px; margin: 2px 5px 2px 0;" disabled />
         <label for="rotation_z" style="color: blue;">Z</label>
-        <input type="number" id="rotation_z" onchange="rot_z_changed()" min="-20" max="20" value="0" step="1" style="width: 40px; margin: 2px 10px 2px 0;" disabled />
+        <input type="number" id="rotation_z" onchange="rot_z_changed()" min="-20" max="20" value="0" step="1" style="width: 50px; margin: 2px 10px 2px 0;" disabled />
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" disabled />Wire</label>
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" disabled />Shadow</label>
         <label for="directional_light_intensity" style="margin: 2px 2px 2px 0;">DLi:</label>
@@ -117,9 +122,7 @@
         <label for="ambient_light_color" style="margin: 2px 0 2px 0;">AL:</label>
         <input type="color" id="ambient_light_color" name="ambient_light_color" onchange="set_ambient_light_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 5px 0 0;" disabled />
         <label for="back_color" style="margin: 2px 0 2px 0;">BG:</label>
-        <input type="color" id="back_color" name="back_color" onchange="set_back_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 5px 0 0;" disabled />
-        <button id="btn_edges" onclick="show_edges()" style="background-color: #d1cefc; vertical-align: middle; width: 20px; margin: 2px 2px 2px 5px; padding: 0;" disabled>E</button>
-        <button id="btn_animate" onclick="animate_dae()" style="background-color: #d1cefc; vertical-align: middle; width: 28px; margin: 2px 2px 2px 2px; padding: 0;" disabled>A</button>
+        <input type="color" id="back_color" name="back_color" onchange="set_back_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 2px 0 0;" disabled />
       </div>
     </div><br />
 
@@ -182,7 +185,7 @@
 
     <script>
       var ktx2_loader, animations, animation_mixer, animation_running, current_animation, clock;
-      var renderer, scene, camera, controls, dae_obj, edges, edges_visible = false;
+      var renderer, scene, camera, controls, dae_obj, edges, edges_visible = false, initial_load = false;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
       var shadowMesh, shadowMaterial;
       var ww = window.innerWidth,	wh = window.innerHeight;
@@ -322,9 +325,79 @@
         previous_dae_scale = current_dae_scale;
       }
 
-      function rot_x_changed() { rot_x = parseFloat(document.getElementById('rotation_x').value) / 1000; }
-      function rot_y_changed() { rot_y = parseFloat(document.getElementById('rotation_y').value) / 1000; }
-      function rot_z_changed() { rot_z = parseFloat(document.getElementById('rotation_z').value) / 1000; }
+      function radio_changed() {
+        if (document.getElementById('dlight').checked) {
+          document.getElementById('rotation_x').value = directionalLight.position.x;
+          document.getElementById('rotation_y').value = directionalLight.position.y;
+          document.getElementById('rotation_z').value = directionalLight.position.z;
+          document.getElementById('rotation_x').min = document.getElementById('rotation_y').min = document.getElementById('rotation_z').min = -500;
+          document.getElementById('rotation_x').max = document.getElementById('rotation_y').max = document.getElementById('rotation_z').max = 500;
+          document.getElementById('rotation_x').step = document.getElementById('rotation_y').step = document.getElementById('rotation_z').step = 10;
+        } else if (document.getElementById('slight').checked) {
+          document.getElementById('rotation_x').value = spotLight.position.x;
+          document.getElementById('rotation_y').value = spotLight.position.y;
+          document.getElementById('rotation_z').value = spotLight.position.z;
+          document.getElementById('rotation_x').min = document.getElementById('rotation_y').min = document.getElementById('rotation_z').min = -500;
+          document.getElementById('rotation_x').max = document.getElementById('rotation_y').max = document.getElementById('rotation_z').max = 500;
+          document.getElementById('rotation_x').step = document.getElementById('rotation_y').step = document.getElementById('rotation_z').step = 10;
+        } else if (document.getElementById('hlight').checked) {
+          document.getElementById('rotation_x').value = hemisphereLight.position.x;
+          document.getElementById('rotation_y').value = hemisphereLight.position.y;
+          document.getElementById('rotation_z').value = hemisphereLight.position.z;
+          document.getElementById('rotation_x').min = document.getElementById('rotation_y').min = document.getElementById('rotation_z').min = -100;
+          document.getElementById('rotation_x').max = document.getElementById('rotation_y').max = document.getElementById('rotation_z').max = 100;
+          document.getElementById('rotation_x').step = document.getElementById('rotation_y').step = document.getElementById('rotation_z').step = 1;
+        } else {
+          document.getElementById('rotation_x').value = parseInt(rot_x * 1000);
+          document.getElementById('rotation_y').value = parseInt(rot_y * 1000);
+          document.getElementById('rotation_z').value = parseInt(rot_z * 1000);
+          document.getElementById('rotation_x').min = document.getElementById('rotation_y').min = document.getElementById('rotation_z').min = -20;
+          document.getElementById('rotation_x').max = document.getElementById('rotation_y').max = document.getElementById('rotation_z').max = 20;
+          document.getElementById('rotation_x').step = document.getElementById('rotation_y').step = document.getElementById('rotation_z').step = 1;
+        }
+      }
+
+      function rot_x_changed() {
+        let x = parseFloat(document.getElementById('rotation_x').value);
+
+        if (document.getElementById('dlight').checked) {
+          directionalLight.position.x = x;
+        } else if (document.getElementById('slight').checked) {
+          spotLight.position.x = x;
+        } else if (document.getElementById('hlight').checked) {
+          hemisphereLight.position.x = x;
+        } else {
+          rot_x = x / 1000;
+        }
+      }
+
+      function rot_y_changed() {
+        let y = parseFloat(document.getElementById('rotation_y').value);
+
+        if (document.getElementById('dlight').checked) {
+          directionalLight.position.y = y;
+        } else if (document.getElementById('slight').checked) {
+          spotLight.position.y = y;
+        } else if (document.getElementById('hlight').checked) {
+          hemisphereLight.position.y = y;
+        } else {
+          rot_y = y / 1000;
+        }
+      }
+
+      function rot_z_changed() {
+        let z = parseFloat(document.getElementById('rotation_z').value);
+
+        if (document.getElementById('dlight').checked) {
+          directionalLight.position.z = z;
+        } else if (document.getElementById('slight').checked) {
+          spotLight.position.z = z;
+        } else if (document.getElementById('hlight').checked) {
+          hemisphereLight.position.z = z;
+        } else {
+          rot_z = z / 1000;
+        }
+      }
 
       function animate_dae() {
         if (animation_running) {
@@ -414,6 +487,11 @@
           renderer.autoClear = false;
         }
 
+        // The following can be used instead of the canvas but the window mouse
+        // events might be tricky to set due to the presence of the fixed menu.
+        // Possibly use Orbit Controls instead.
+        //document.body.appendChild( renderer.domElement );
+
         clock = new THREE.Clock();
 
         if (scene == undefined) { scene = new THREE.Scene(); }
@@ -422,12 +500,13 @@
         if (!events_initialized) { initialize_event_listeners(); events_initialized = true; }
 
         // Add grid helper for use with Orbit Controls
-        //scene.add(new THREE.GridHelper(200, 200, "yellow"));
+        //scene.add(new THREE.GridHelper( 200, 200, "yellow" ));
 
         // Add axes helper
         //scene.add( new THREE.AxesHelper( 50 ) );
 
         camera = new THREE.PerspectiveCamera( 45, ww/wh, 0.1, 2000 );
+        camera.aspect = window.innerWidth / window.innerHeight;
         camera.position.set( 0, 0, 250 );
         scene.add( camera );
 
@@ -453,7 +532,7 @@
 
         // Add SpotLight to the scene
         spotLight = new THREE.SpotLight( 0xFFFFFF, 0, 0, Math.PI/4 );
-        spotLight.position.set( 150, 0, 250 );
+        spotLight.position.set( 150, 0, 350 );
         spotLight.target.position.set( 0, 0, -1500 );
         spotLight.castShadow = true;
 
@@ -474,9 +553,9 @@
         camera.add( directionalLight );
 
         controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
         //controls.enableKeys = false;
         //controls.enableZoom = true;
-        //controls.enableDamping = true;
         //controls.maxPolarAngle = 2.2;
         //controls.minPolarAngle = 1.1;
         //controls.dampingFactor = 0.1;
@@ -583,6 +662,7 @@
             scene.add( dae_obj );
 
             camera.lookAt( dae_obj.position );
+            camera.updateProjectionMatrix();
 
             if (animations.length > 0) {
               animation_mixer.clipAction( animations[0] ).play();
@@ -591,6 +671,9 @@
               document.getElementById('btn_animate').innerHTML = 'A0';
               animation_running = true;
             }
+
+            // The re-load will set the Z-axis up for those files that have it set as such
+            if (!initial_load) { initial_load = true; reset_only(); }
 
             render();
 
@@ -651,6 +734,7 @@
             scene.add( dae_obj );
 
             camera.lookAt( dae_obj.position );
+            camera.updateProjectionMatrix();
 
             if (animations.length > 0) {
               animation_mixer.clipAction( animations[0] ).play();
@@ -659,6 +743,9 @@
               document.getElementById('btn_animate').innerHTML = 'A0';
               animation_running = true;
             }
+
+            // The re-load will set the Z-axis up for those files that have it set as such
+            if (!initial_load) { initial_load = true; reset_only(); }
 
             render();
 
@@ -716,9 +803,7 @@
 
         // Reset dae_obj rotational values
         if (reset_rotation) {
-          dae_obj.rotation.x = 0;
-          dae_obj.rotation.y = 0;
-          dae_obj.rotation.z = 0;
+          dae_obj.rotation.set( 0, 0, 0 );
           reset_rotation = false;
         }
 
@@ -727,6 +812,7 @@
           dae_obj.rotation.x += rot_x;
           dae_obj.rotation.y += rot_y;
           dae_obj.rotation.z += rot_z;
+
           if (Math.abs(dae_obj.rotation.x) > 2 * Math.PI ) { dae_obj.rotation.x = 0; }
           if (Math.abs(dae_obj.rotation.y) > 2 * Math.PI ) { dae_obj.rotation.y = 0; }
           if (Math.abs(dae_obj.rotation.z) > 2 * Math.PI ) { dae_obj.rotation.z = 0; }
@@ -780,6 +866,13 @@
         document.getElementById('spot_light_intensity').value = 0;
         document.getElementById('directional_light_intensity').value = 1;
 
+        // Reset the radio inputs
+        document.getElementById('rotate').checked = true;
+        document.getElementById('dlight').checked = false;
+        document.getElementById('slight').checked = false;
+        document.getElementById('hlight').checked = false;
+        radio_changed();
+
         // Reset the dae opacity and scale values
         document.getElementById('dae_opacity').value = 1;
         document.getElementById('dae_scale').value = 1;
@@ -804,7 +897,7 @@
           controls.reset();
           dae_obj.position.set( 0, 0, 0 );
           hemisphereLight.position.set( 0, 10, 0 );
-          spotLight.position.set( 150, -50, 350 );
+          spotLight.position.set( 150, 0, 350 );
           directionalLight.position.set( 0, 0, 250 );
           set_scene_image();
           show_wireframe();
@@ -819,6 +912,7 @@
 
         if (!reset) {
           // Page (re)loading so reset the file input, URL entry, spinner, animate button and disable controls
+          initial_load = false;
           document.getElementById('file_input').value = '';
           document.getElementById('url_entry').value = '';
           document.getElementById('div_spinner').style.display = "block";
@@ -830,6 +924,10 @@
 
       function enable_disable( disable = false ) {
         document.getElementById('file_image_input').disabled = disable;
+        document.getElementById('hlight').disabled = disable;
+        document.getElementById('slight').disabled = disable;
+        document.getElementById('dlight').disabled = disable;
+        document.getElementById('rotate').disabled = disable;
         document.getElementById('rotation_x').disabled = disable;
         document.getElementById('rotation_y').disabled = disable;
         document.getElementById('rotation_z').disabled = disable;
@@ -862,11 +960,6 @@
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.setClearColor( 0xFFFFFF, 0); // Allow setting the background color
       renderer.autoClear = false;
-
-      // The following can be used instead of the canvas but the window mouse
-      // events might be tricky to set due to the presence of the fixed menu.
-      // Possibly use Orbit Controls instead.
-      //document.body.appendChild( renderer.domElement );
 
       ktx2_loader.setTranscoderPath('../static/js/libs/basis/');
       ktx2_loader.detectSupport(renderer);
