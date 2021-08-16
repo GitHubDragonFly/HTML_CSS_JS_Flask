@@ -536,9 +536,9 @@
 
         // Orbit Controls can be used for rotation, zoom and move but are camera related
         //controls = new THREE.OrbitControls(camera, renderer.domElement);
+        //controls.enableDamping = true;
         //controls.enableKeys = false;
         //controls.enableZoom = true;
-        //controls.enableDamping = true;
         //controls.maxPolarAngle = 2.2;
         //controls.minPolarAngle = 1.1;
         //controls.dampingFactor = 0.1;
@@ -624,6 +624,7 @@
                   child.material.transparent = true;
                   child.castShadow = true;
                   child.receiveShadow = true;
+
                   child.name = 'child_' + child_count;
                   edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
                   child_count += 1;
@@ -711,6 +712,7 @@
                 child.material.transparent = true;
                 child.castShadow = true;
                 child.receiveShadow = true;
+
                 child.name = 'child_' + child_count;
                 edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
                 child_count += 1;
@@ -768,15 +770,11 @@
         requestAnimationFrame( render );
 
         // Move the Obj in the scene
-        Obj.position.x = pos_x;
-        Obj.position.y = pos_y;
-        Obj.position.z = pos_z;
+        Obj.position.set( pos_x, pos_y, pos_z );
 
         // Reset Obj rotational values
         if (reset_rotation) {
-          Obj.rotation.x = 0;
-          Obj.rotation.y = 0;
-          Obj.rotation.z = 0;
+          Obj.rotation.set( 0, 0, 0 );
           reset_rotation = false;
         }
 
@@ -785,10 +783,10 @@
           Obj.rotation.x += rot_x;
           Obj.rotation.y += rot_y;
           Obj.rotation.z += rot_z;
+
           if (Math.abs(Obj.rotation.x) > 2 * Math.PI ) { Obj.rotation.x = 0; }
           if (Math.abs(Obj.rotation.y) > 2 * Math.PI ) { Obj.rotation.y = 0; }
           if (Math.abs(Obj.rotation.z) > 2 * Math.PI ) { Obj.rotation.z = 0; }
-
         }
 
         //controls.update();

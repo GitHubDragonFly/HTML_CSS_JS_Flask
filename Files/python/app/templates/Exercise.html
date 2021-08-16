@@ -33,11 +33,11 @@
       li.block { color: green; font-size: 120%; width: 10%; display: block; }
       li.inline { color: green; font-size: 120%; width: 10%; display: inline; }
 
-      blut { color: blue; font-size: 175%; }
-      gnt { color: green; font-size: 150%; }
-      rdt { color: red; font-size: 125%; }
-      dgt { color: darkgrey ; font-size: 100%; }
-      blkt { color: black; font-size: 75%; }
+      blut { color: blue; font-size: 175%; margin-right: 5px; }
+      gnt { color: green; font-size: 150%; margin-right: 5px; }
+      rdt { color: red; font-size: 125%; margin-right: 5px; }
+      dgt { color: darkgrey ; font-size: 100%; margin-right: 5px; }
+      blkt { color: black; font-size: 75%; margin-right: 5px; }
 
       .required label:after { color: red; content: ' *'; display: inline; }
       .fixed-menu { position: fixed; z-index: 1; left: 0px; top: 0px; margin: 0px; width: 99.7%; border: 1px solid navy; -webkit-border-radius: 3px; border-radius: 3px; background-color: whitesmoke; }
@@ -401,25 +401,25 @@
 
     <script>
       $(document).ready(function() {
-        $('.dropdown').mouseenter( function(event){
+        $('.dropdown').mouseenter( function( event ) {
             // Stop rotating the small SVG and start rotating its enlarged dropdown version
-            if (event.target.id == "div_svg1") {
-              $('#svg1').removeClass('rotateZ');
-              $('#svg2').addClass('rotateZ');
-            } else if (event.target.id == "div_svg3") {
-              $('#svg3').removeClass('rotateXYZ');
-              $('#svg4').addClass('rotateXYZ');
+            if (event.target.id === "div_svg1") {
+              $('#svg1').removeClass( 'rotateZ' );
+              $('#svg2').addClass( 'rotateZ' );
+            } else if (event.target.id === "div_svg3") {
+              $('#svg3').removeClass( 'rotateXYZ' );
+              $('#svg4').addClass( 'rotateXYZ' );
             }}
           );
 
-        $('.dropdown').mouseleave( function(event){
+        $('.dropdown').mouseleave( function( event ) {
             // Restore rotation of the small SVG and remove rotation class from its dropdown
-            if (event.target.id == "div_svg1") {
-              $('#svg1').addClass('rotateZ');
-              $('#svg2').removeClass('rotateZ');
-            } else if (event.target.id == "div_svg3") {
-              $('#svg3').addClass('rotateXYZ');
-              $('#svg4').removeClass('rotateXYZ');
+            if (event.target.id === "div_svg1") {
+              $('#svg1').addClass( 'rotateZ' );
+              $('#svg2').removeClass( 'rotateZ' );
+            } else if (event.target.id === "div_svg3") {
+              $('#svg3').addClass( 'rotateXYZ' );
+              $('#svg4').removeClass( 'rotateXYZ' );
             }}
           );
       });
@@ -446,14 +446,14 @@
 
     <br id="P4" /><br />
     <div style="text-align: center;"><p>Mixed color and font-size inline text</p>
-        <blut>Blue &nbsp;</blut>
-        <gnt>Green &nbsp;</gnt>
-        <rdt>Red &nbsp;</rdt>
-        <dgt>DarkGrey &nbsp;</dgt>
-        <blkt>Black &nbsp;</blkt>
-        <dgt>DarkGrey &nbsp;</dgt>
-        <rdt>Red &nbsp;</rdt>
-        <gnt>Green &nbsp;</gnt>
+        <blut>Blue</blut>
+        <gnt>Green</gnt>
+        <rdt>Red</rdt>
+        <dgt>DarkGrey</dgt>
+        <blkt>Black</blkt>
+        <dgt>DarkGrey</dgt>
+        <rdt>Red</rdt>
+        <gnt>Green</gnt>
         <blut>Blue</blut>
     </div>
 
@@ -543,6 +543,8 @@
         let txt = document.getElementById('url').value;
 
         if ( txt != '') {
+          if (!txt.startsWith('http://') && !txt.startsWith('https://')) { txt = 'https://' + txt; }
+
           // Create and use anchor element
           var a = document.createElement('a');
           a.href = txt;

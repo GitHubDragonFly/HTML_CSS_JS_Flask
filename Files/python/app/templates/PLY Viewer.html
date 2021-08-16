@@ -424,6 +424,7 @@
           scene.remove.apply( scene, scene.children );
 
           if (shadowMesh) { shadowMesh = null; }
+          if (texture) { texture.dispose(); }
 
           // Reset all values
           reset_all( true );
@@ -530,9 +531,9 @@
 
         // Orbit Controls can be used for rotation, zoom and move but are camera related
         //controls = new THREE.OrbitControls(camera, renderer.domElement);
+        //controls.enableDamping = true;
         //controls.enableKeys = false;
         //controls.enableZoom = true;
-        //controls.enableDamping = true;
         //controls.maxPolarAngle = 2.2;
         //controls.minPolarAngle = 1.1;
         //controls.dampingFactor = 0.1;
@@ -708,15 +709,11 @@
         requestAnimationFrame( render );
 
         // Move the mesh in the scene
-        mesh.position.x = pos_x;
-        mesh.position.y = pos_y;
-        mesh.position.z = pos_z;
+        mesh.position.set( pos_x, pos_y, pos_z );
 
         // Reset mesh rotational values
         if (reset_rotation) {
-          mesh.rotation.x = 0;
-          mesh.rotation.y = 0;
-          mesh.rotation.z = 0;
+          mesh.rotation.set( 0, 0, 0 );
           reset_rotation = false;
         }
 
@@ -725,6 +722,7 @@
           mesh.rotation.x += rot_x;
           mesh.rotation.y += rot_y;
           mesh.rotation.z += rot_z;
+
           if (Math.abs(mesh.rotation.x) > 2 * Math.PI ) { mesh.rotation.x = 0; }
           if (Math.abs(mesh.rotation.y) > 2 * Math.PI ) { mesh.rotation.y = 0; }
           if (Math.abs(mesh.rotation.z) > 2 * Math.PI ) { mesh.rotation.z = 0; }
