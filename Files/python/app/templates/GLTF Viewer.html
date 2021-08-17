@@ -193,7 +193,7 @@
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation = false, reset_rotation = false, events_initialized = false;
       var rot_x = 0, rot_y = 0, rot_z = 0;
-      var previous_gltf_scale = '1';
+      var previous_gltf_scale = '1', boounding_box = new THREE.Box3();
       var selected_gltf_file, selected_url_file = '', url_displayed, url_loading;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_ktx2, draco_files;
 
@@ -206,6 +206,11 @@
       draco_loader.setDecoderPath( '../static/js/libs/draco/' );
       draco_loader.preload();
       gltf_loader.setDRACOLoader( draco_loader );
+
+      function set_grid_y() {
+        boounding_box.setFromObject( gltf_obj );
+        grid.position.y = boounding_box.min.y;
+      }
 
       function set_back_color() {
         scene.background = null;
@@ -329,6 +334,7 @@
         }
 
         previous_gltf_scale = current_gltf_scale;
+        set_grid_y();
       }
 
       function radio_changed() {
@@ -503,10 +509,7 @@
         if (!events_initialized) { initialize_event_listeners(); events_initialized = true; }
 
         // Create a grid helper for use with Orbit Controls
-        if (grid == undefined) {
-          grid = new THREE.GridHelper( 200, 200, "yellow" );
-          grid.position.y = -0.05;
-        }
+        if (grid == undefined) { grid = new THREE.GridHelper( 200, 200, "yellow" ); }
 
         // Add axes helper
         //scene.add( new THREE.AxesHelper( 50 ) );
@@ -962,6 +965,8 @@
         } else {
           gltf_obj.scale.multiplyScalar( 0.1 );
         }
+
+        set_grid_y();
       }
 
       function reset_only() {
