@@ -126,6 +126,7 @@
         <input type="color" id="ambient_light_color" name="ambient_light_color" onchange="set_ambient_light_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 5px 0 0;" disabled />
         <label for="back_color" style="margin: 2px 0 2px 0;">BG:</label>
         <input type="color" id="back_color" name="back_color" onchange="set_back_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 2px 0 0;" disabled />
+        <button id="btn_grid" onclick="show_grid()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 5px; padding: 0;" disabled>#</button>
       </div>
     </div>
 
@@ -185,8 +186,8 @@
     </script>
 
     <script>
-      var ktx2_loader, animations, animation_mixer, animation_running, current_animation, clock;
-      var renderer, scene, camera, controls, gltf_obj, edges, edges_visible = false;
+      var ktx2_loader, animations, animation_mixer, animation_running, current_animation, render_requested, clock;
+      var renderer, scene, camera, controls, grid, gltf_obj, edges, edges_visible = false, grid_visible = false;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
       var shadowMesh, shadowMaterial, draco_material;
       var ww = window.innerWidth,	wh = window.innerHeight;
@@ -449,6 +450,9 @@
         animation_running = false;
         edges = {};
         edges_visible = false;
+        grid_visible = false;
+        render_requested = false;
+        document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
         document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
         document.getElementById('btn_animate').disabled = true;
 
@@ -498,8 +502,11 @@
         // Canvas mouse events
         if (!events_initialized) { initialize_event_listeners(); events_initialized = true; }
 
-        // Add grid helper for use with Orbit Controls
-        //scene.add(new THREE.GridHelper(200, 200, "yellow"));
+        // Create a grid helper for use with Orbit Controls
+        if (grid == undefined) {
+          grid = new THREE.GridHelper( 200, 200, "yellow" );
+          grid.position.y = -0.05;
+        }
 
         // Add axes helper
         //scene.add( new THREE.AxesHelper( 50 ) );
@@ -561,6 +568,9 @@
         //controls.rotateSpeed = 0.2;
         //controls.minDistance = 2;
         //controls.maxDistance = 500;
+
+        render_requested = true;
+        render();
 
         // Load DRACO or gltf file
         if (selected_gltf_file) {
@@ -650,9 +660,6 @@
               document.getElementById('btn_animate').innerHTML = 'A0';
               animation_running = true;
             }
-
-            render();
-
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -665,6 +672,7 @@
           }, function ( error ) {
             console.log( 'Error loading GLTF!' );
             console.log( error );
+            render_requested = false;
           });
         }
       }
@@ -699,8 +707,6 @@
                   scene.add( gltf_obj );
 
                   camera.lookAt( gltf_obj.position );
-
-                  render();
                 });
               });
             } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0) {
@@ -731,8 +737,6 @@
                   scene.add( gltf_obj );
 
                   camera.lookAt( gltf_obj.position );
-
-                  render();
                 });
               });
             } else {
@@ -753,8 +757,6 @@
               scene.add( gltf_obj );
 
               camera.lookAt( gltf_obj.position );
-
-              render();
             }
           }, function ( xhr ) {
             let today = new Date();
@@ -768,6 +770,7 @@
           }, function ( error ) {
             console.log( 'Error loading DRC!' );
             console.log( error );
+            render_requested = false;
           });
         });
       }
@@ -795,8 +798,6 @@
               scene.add( gltf_obj );
 
               camera.lookAt( gltf_obj.position );
-
-              render();
             }, function ( xhr ) {
               let today = new Date();
               let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -809,6 +810,7 @@
             }, function ( error ) {
               console.log( 'Error loading DRC from URL!' );
               console.log( error );
+              render_requested = false;
             });
           } else {
             gltf_loader.load( selected_url_file, ( gltf ) => {
@@ -856,9 +858,6 @@
                 document.getElementById('btn_animate').innerHTML = 'A0';
                 animation_running = true;
               }
-
-              render();
-
             }, function ( xhr ) {
               let today = new Date();
               let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -871,8 +870,21 @@
             }, function ( error ) {
               console.log( 'Error loading GLTF from URL!' );
               console.log( error );
+              render_requested = false;
             });
           }
+        }
+      }
+
+      function show_grid() {
+        if (grid_visible) {
+          scene.remove( grid );
+          grid_visible = false;
+          document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
+        } else {
+          scene.add( grid );
+          grid_visible = true;
+          document.getElementById('btn_grid').style.backgroundColor = 'lightgreen';
         }
       }
 
@@ -912,28 +924,30 @@
       }
 
       function render() {
-        requestAnimationFrame( render );
+        if (render_requested) { requestAnimationFrame( render ); }
 
-        // Reset object rotational values
-        if (reset_rotation) {
-          gltf_obj.rotation.set( 0, 0, 0 );
-          reset_rotation = false;
-        }
+        if (gltf_obj) {
+          // Reset object rotational values
+          if (reset_rotation) {
+            gltf_obj.rotation.set( 0, 0, 0 );
+            reset_rotation = false;
+          }
 
-        // Rotate the object
-        if (!mouse_rotation) {
-          gltf_obj.rotation.x += rot_x;
-          gltf_obj.rotation.y += rot_y;
-          gltf_obj.rotation.z += rot_z;
+          // Rotate the object
+          if (!mouse_rotation) {
+            gltf_obj.rotation.x += rot_x;
+            gltf_obj.rotation.y += rot_y;
+            gltf_obj.rotation.z += rot_z;
 
-          if (Math.abs(gltf_obj.rotation.x) > 2 * Math.PI ) { gltf_obj.rotation.x = 0; }
-          if (Math.abs(gltf_obj.rotation.y) > 2 * Math.PI ) { gltf_obj.rotation.y = 0; }
-          if (Math.abs(gltf_obj.rotation.z) > 2 * Math.PI ) { gltf_obj.rotation.z = 0; }
-        }
+            if (Math.abs(gltf_obj.rotation.x) > 2 * Math.PI ) { gltf_obj.rotation.x = 0; }
+            if (Math.abs(gltf_obj.rotation.y) > 2 * Math.PI ) { gltf_obj.rotation.y = 0; }
+            if (Math.abs(gltf_obj.rotation.z) > 2 * Math.PI ) { gltf_obj.rotation.z = 0; }
+          }
 
-        if (animation_running) {
-          var delta = clock.getDelta();
-          animation_mixer.update( delta );
+          if (animation_running) {
+            var delta = clock.getDelta();
+            animation_mixer.update( delta );
+          }
         }
 
         controls.update();
@@ -951,6 +965,8 @@
       }
 
       function reset_only() {
+        if (grid_visible) { show_grid(); }
+
         scene.remove( gltf_obj );
 
         reset_all( true );
@@ -1057,6 +1073,7 @@
         document.getElementById('directional_light_intensity').disabled = disable;
         document.getElementById('back_color').disabled = disable;
         document.getElementById('btn_edges').disabled = disable;
+        document.getElementById('btn_grid').disabled = disable;
         document.getElementById('reset').disabled = disable;
       }
     </script>

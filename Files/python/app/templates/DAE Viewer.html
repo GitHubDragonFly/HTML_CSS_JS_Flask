@@ -122,7 +122,8 @@
         <label for="ambient_light_color" style="margin: 2px 0 2px 0;">AL:</label>
         <input type="color" id="ambient_light_color" name="ambient_light_color" onchange="set_ambient_light_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 5px 0 0;" disabled />
         <label for="back_color" style="margin: 2px 0 2px 0;">BG:</label>
-        <input type="color" id="back_color" name="back_color" onchange="set_back_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 2px 0 0;" disabled />
+        <input type="color" id="back_color" name="back_color" onchange="set_back_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 5px 0 0;" disabled />
+        <button id="btn_grid" onclick="show_grid()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 5px; padding: 0;" disabled>#</button>
       </div>
     </div><br />
 
@@ -184,8 +185,8 @@
     </script>
 
     <script>
-      var ktx2_loader, animations, animation_mixer, animation_running, current_animation, clock;
-      var renderer, scene, camera, controls, dae_obj, edges, edges_visible = false, initial_load = false;
+      var ktx2_loader, animations, animation_mixer, animation_running, current_animation, render_requested = false, clock;
+      var renderer, scene, camera, grid, controls, dae_obj, edges, edges_visible = false, grid_visible = false;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
       var shadowMesh, shadowMaterial;
       var ww = window.innerWidth,	wh = window.innerHeight;
@@ -422,9 +423,6 @@
       }
 
       function init(){
-        // Loaded file
-        var fi = document.getElementById('file_input');
-
         if (scene) {
           scene.remove.apply( scene, scene.children );
 
@@ -433,8 +431,6 @@
           // Reset all values
           reset_all( true );
         }
-
-        if (!fi.files) { return; }
 
         enable_disable( true );
 
@@ -449,10 +445,18 @@
         animation_running = false;
         edges = {};
         edges_visible = false;
+        grid_visible = false;
+        render_requested = false;
+        document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
         document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
         document.getElementById('btn_animate').disabled = true;
 
         if (!url_loading) {
+          // Loaded file
+          var fi = document.getElementById('file_input');
+
+          if (!fi.files) { return; }
+
           // Include check for JPG/PNG/BMP, KTX2 and DDS (DirectDraw Surface container file format)
           for (let i = 0; i < fi.files.length; i++) {
             if (fi.files[i].name.toUpperCase().endsWith('.DAE')) { selected_dae_file = fi.files[i]; }
@@ -499,8 +503,11 @@
 
         if (!events_initialized) { initialize_event_listeners(); events_initialized = true; }
 
-        // Add grid helper for use with Orbit Controls
-        //scene.add(new THREE.GridHelper( 200, 200, "yellow" ));
+        // Create a grid helper for use with Orbit Controls
+        if (grid == undefined) {
+          grid = new THREE.GridHelper( 200, 200, "yellow" );
+          grid.position.y = -0.05;
+        }
 
         // Add axes helper
         //scene.add( new THREE.AxesHelper( 50 ) );
@@ -562,6 +569,9 @@
         //controls.rotateSpeed = 0.2;
         //controls.minDistance = 2;
         //controls.maxDistance = 500;
+
+        render_requested = true;
+        render();
 
         // Load the dae file
         if (selected_dae_file) {
@@ -671,12 +681,6 @@
               document.getElementById('btn_animate').innerHTML = 'A0';
               animation_running = true;
             }
-
-            // The re-load will set the Z-axis up for those files that have it set as such
-            if (!initial_load) { initial_load = true; reset_only(); }
-
-            render();
-
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -689,6 +693,7 @@
           }, function ( error ) {
             console.log( 'Error loading DAE!' );
             console.log( error );
+            render_requested = false;
           });
         }
       }
@@ -743,12 +748,6 @@
               document.getElementById('btn_animate').innerHTML = 'A0';
               animation_running = true;
             }
-
-            // The re-load will set the Z-axis up for those files that have it set as such
-            if (!initial_load) { initial_load = true; reset_only(); }
-
-            render();
-
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -761,7 +760,20 @@
           }, function ( error ) {
             console.log( 'Error loading DAE from URL!' );
             console.log( error );
+            render_requested = false;
           });
+        }
+      }
+
+      function show_grid() {
+        if (grid_visible) {
+          scene.remove( grid );
+          grid_visible = false;
+          document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
+        } else {
+          scene.add( grid );
+          grid_visible = true;
+          document.getElementById('btn_grid').style.backgroundColor = 'lightgreen';
         }
       }
 
@@ -799,28 +811,30 @@
       }
 
       function render() {
-        requestAnimationFrame( render );
+        if (render_requested) { requestAnimationFrame( render ); }
 
-        // Reset dae_obj rotational values
-        if (reset_rotation) {
-          dae_obj.rotation.set( 0, 0, 0 );
-          reset_rotation = false;
-        }
+        if (dae_obj) {
+          // Reset dae_obj rotational values
+          if (reset_rotation) {
+            dae_obj.rotation.set( 0, 0, 0 );
+            reset_rotation = false;
+          }
 
-        // Rotate the dae_obj
-        if (!mouse_rotation) {
-          dae_obj.rotation.x += rot_x;
-          dae_obj.rotation.y += rot_y;
-          dae_obj.rotation.z += rot_z;
+          // Rotate the dae_obj
+          if (!mouse_rotation) {
+            dae_obj.rotation.x += rot_x;
+            dae_obj.rotation.y += rot_y;
+            dae_obj.rotation.z += rot_z;
 
-          if (Math.abs(dae_obj.rotation.x) > 2 * Math.PI ) { dae_obj.rotation.x = 0; }
-          if (Math.abs(dae_obj.rotation.y) > 2 * Math.PI ) { dae_obj.rotation.y = 0; }
-          if (Math.abs(dae_obj.rotation.z) > 2 * Math.PI ) { dae_obj.rotation.z = 0; }
-        }
+            if (Math.abs(dae_obj.rotation.x) > 2 * Math.PI ) { dae_obj.rotation.x = 0; }
+            if (Math.abs(dae_obj.rotation.y) > 2 * Math.PI ) { dae_obj.rotation.y = 0; }
+            if (Math.abs(dae_obj.rotation.z) > 2 * Math.PI ) { dae_obj.rotation.z = 0; }
+          }
 
-        if (animation_running) {
-          var delta = clock.getDelta();
-          animation_mixer.update( delta );
+          if (animation_running) {
+            var delta = clock.getDelta();
+            animation_mixer.update( delta );
+          }
         }
 
         controls.update();
@@ -838,7 +852,10 @@
       }
 
       function reset_only() {
+        if (grid_visible) { show_grid(); }
+
         scene.remove( dae_obj );
+
         reset_all( true );
 
         if (selected_dae_file) {
@@ -912,7 +929,6 @@
 
         if (!reset) {
           // Page (re)loading so reset the file input, URL entry, spinner, animate button and disable controls
-          initial_load = false;
           document.getElementById('file_input').value = '';
           document.getElementById('url_entry').value = '';
           document.getElementById('div_spinner').style.display = "block";
@@ -943,6 +959,7 @@
         document.getElementById('directional_light_intensity').disabled = disable;
         document.getElementById('back_color').disabled = disable;
         document.getElementById('btn_edges').disabled = disable;
+        document.getElementById('btn_grid').disabled = disable;
         document.getElementById('reset').disabled = disable;
       }
     </script>
