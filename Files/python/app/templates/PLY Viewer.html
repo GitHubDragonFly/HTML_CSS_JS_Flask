@@ -210,7 +210,7 @@
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation = false, reset_rotation = false, events_initialized = false;
       var rot_x = 0, rot_y = 0, rot_z = 0, pos_x = 0, pos_y = 0, pos_z = 0;
-      var previous_ply_scale = '1';
+      var previous_ply_scale = '1', bounding_box = new THREE.Box3();
       var selected_ply_file, selected_stl_file;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_dds;
 
@@ -659,6 +659,11 @@
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         edges = new THREE.LineSegments( new THREE.EdgesGeometry( mesh.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+
+        // Set the initial scale of the object so it comes to view
+        bounding_box.setFromObject( mesh );
+        let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
+        mesh.scale.multiplyScalar( scale_factor );
 
         resize();
 

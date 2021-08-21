@@ -194,7 +194,7 @@
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation = false, reset_rotation = false, events_initialized = false;
       var rot_x = 0, rot_y = 0, rot_z = 0;
-      var previous_gltf_scale = '1', boounding_box = new THREE.Box3();
+      var previous_gltf_scale = '1', bounding_box = new THREE.Box3();
       var selected_gltf_file, selected_url_file = '', url_displayed, url_loading;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_ktx2, draco_files;
 
@@ -209,8 +209,8 @@
       gltf_loader.setDRACOLoader( draco_loader );
 
       function set_grid_y() {
-        boounding_box.setFromObject( gltf_obj );
-        grid.position.y = boounding_box.min.y;
+        bounding_box.setFromObject( gltf_obj );
+        grid.position.y = bounding_box.min.y;
       }
 
       function set_back_color() {
@@ -641,7 +641,7 @@
             // Go through all children of the loaded object and search for a Mesh
             gltf.scene.traverse( function( child ) {
               // This will allow us to check if the child is an instance of the Mesh constructor
-          	  if (child instanceof THREE.Mesh || child instanceof THREE.SkinnedMesh) {
+          	  if (child instanceof THREE.Mesh) {
                 // Enable transparency for the Opacity control and enable shadows
                 child.material.opacity = 1;
                 child.material.transparent = true;
@@ -689,6 +689,11 @@
             gltf_obj = gltf.scene;
             gltf_obj.name = 'local_model';
 
+            // Set the initial scale of the object so it comes to view
+            bounding_box.setFromObject( gltf_obj );
+            let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
+            gltf_obj.scale.multiplyScalar( scale_factor );
+
             resize();
 
             // Add gltf model to scene
@@ -732,6 +737,7 @@
                   texture.wrapS = THREE.RepeatWrapping;
                   texture.wrapT = THREE.RepeatWrapping;
                   texture.magFilter = THREE.NearestFilter;
+                  texture.flipY = false;
 
                   // Apply texture
                   draco_material = new THREE.MeshStandardMaterial( {map: texture, opacity: 1, transparent: true } );
@@ -743,6 +749,11 @@
 
                   gltf_obj.name = 'child_0';
                   edges[ gltf_obj.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( gltf_obj.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+
+                  // Set the initial scale of the object so it comes to view
+                  bounding_box.setFromObject( gltf_obj );
+                  let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
+                  gltf_obj.scale.multiplyScalar( scale_factor );
 
                   resize();
 
@@ -775,6 +786,11 @@
                   gltf_obj.name = 'child_0';
                   edges[ gltf_obj.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( gltf_obj.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
 
+                  // Set the initial scale of the object so it comes to view
+                  bounding_box.setFromObject( gltf_obj );
+                  let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
+                  gltf_obj.scale.multiplyScalar( scale_factor );
+
                   resize();
 
                   // Add DRACO model to scene
@@ -794,6 +810,11 @@
 
               gltf_obj.name = 'child_0';
               edges[ gltf_obj.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( gltf_obj.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+
+              // Set the initial scale of the object so it comes to view
+              bounding_box.setFromObject( gltf_obj );
+              let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
+              gltf_obj.scale.multiplyScalar( scale_factor );
 
               resize();
 
@@ -835,6 +856,11 @@
 
               gltf_obj.name = 'child_0';
               edges[ gltf_obj.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( gltf_obj.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+
+              // Set the initial scale of the object so it comes to view
+              bounding_box.setFromObject( gltf_obj );
+              let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
+              gltf_obj.scale.multiplyScalar( scale_factor );
 
               resize();
 
@@ -903,6 +929,11 @@
 
               gltf_obj = gltf.scene;
               gltf_obj.name = 'url_model';
+
+              // Set the initial scale of the object so it comes to view
+              bounding_box.setFromObject( gltf_obj );
+              let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
+              gltf_obj.scale.multiplyScalar( scale_factor );
 
               resize();
 

@@ -208,7 +208,7 @@
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation = false, reset_rotation = false, events_initialized = false;
       var rot_x = 0, rot_y = 0, rot_z = 0, pos_x = 0, pos_y = 0, pos_z = 0;
-      var previous_obj_scale = '1';
+      var previous_obj_scale = '1', bounding_box = new THREE.Box3();
       var selected_mtl_file, selected_obj_file;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_dds;
 
@@ -631,6 +631,11 @@
     		        }
     	        });
 
+              // Set the initial scale of the object so it comes to view
+              bounding_box.setFromObject( Obj );
+              let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
+              Obj.scale.multiplyScalar( scale_factor );
+
               resize();
 
               // Add the 3D object in the scene
@@ -718,6 +723,11 @@
                 child_count += 1;
     		      }
     	      });
+
+            // Set the initial scale of the object so it comes to view
+            bounding_box.setFromObject( Obj );
+            let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
+            Obj.scale.multiplyScalar( scale_factor );
 
             resize();
 

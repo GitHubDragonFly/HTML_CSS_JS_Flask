@@ -192,7 +192,7 @@
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation = false, reset_rotation = false, events_initialized = false;
       var rot_x = 0, rot_y = 0, rot_z = 0;
-      var previous_dae_scale = '1', boounding_box = new THREE.Box3();
+      var previous_dae_scale = '1', bounding_box = new THREE.Box3();
       var selected_dae_file, selected_url_file = '', url_displayed, url_loading;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_dds, texture_files_ktx2;
 
@@ -206,8 +206,8 @@
       manager.addHandler( /\.dds$/i, dds_loader );
 
       function set_grid_y() {
-        boounding_box.setFromObject( dae_obj );
-        grid.position.y = boounding_box.min.y;
+        bounding_box.setFromObject( dae_obj );
+        grid.position.y = bounding_box.min.y;
       }
 
       function set_back_color() {
@@ -667,7 +667,11 @@
 
             dae_obj = collada.scene;
             dae_obj.name = 'local_model';
-            dae_obj.position.set( 0, 0, 0 );
+
+            // Set the initial scale of the object so it comes to view
+            bounding_box.setFromObject( dae_obj );
+            let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
+            dae_obj.scale.multiplyScalar( scale_factor );
 
             resize();
 
@@ -734,7 +738,11 @@
 
             dae_obj = collada.scene;
             dae_obj.name = 'url_model';
-            dae_obj.position.set( 0, 0, 0 );
+
+            // Set the initial scale of the object so it comes to view
+            bounding_box.setFromObject( dae_obj );
+            let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
+            dae_obj.scale.multiplyScalar( scale_factor );
 
             resize();
 
@@ -742,7 +750,6 @@
             scene.add( dae_obj );
 
             camera.lookAt( dae_obj.position );
-            camera.updateProjectionMatrix();
 
             if (animations.length > 0) {
               animation_mixer.clipAction( animations[0] ).play();
