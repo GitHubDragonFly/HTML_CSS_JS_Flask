@@ -92,6 +92,7 @@
         <input type="number" id="gltf_scale" name="gltf_scale" onkeydown="return false" oninput="set_gltf_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 2px 2px 0; width: 48px;" disabled />
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="scale_10x" onchange="scale_10x_set();" disabled />10x</label>
         <button id="btn_edges" onclick="show_edges()" style="background-color: #d1cefc; vertical-align: middle; width: 20px; margin: 2px 2px 2px 2px; padding: 0;" disabled>E</button>
+        <button id="btn_materials" onclick="switch_material()" style="background-color: #d1cefc; vertical-align: middle; width: 28px; margin: 2px 2px 2px 2px; padding: 0;" disabled>M</button>
         <button id="btn_animate" onclick="animate_gltf()" style="background-color: #d1cefc; vertical-align: middle; width: 28px; margin: 2px 2px 2px 2px; padding: 0;" disabled>A</button>
         <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 10px;" disabled>Reset</button>
         <button id="btn_full_screen" onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
@@ -189,7 +190,7 @@
       var ktx2_loader, animations, animation_mixer, animation_running, current_animation, render_requested, clock;
       var renderer, scene, camera, controls, grid, gltf_obj, edges, edges_visible = false, grid_visible = false;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
-      var shadowMesh, shadowMaterial, draco_material;
+      var shadowMesh, shadowMaterial, draco_material, materials, current_material, materials_available = false;
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation = false, reset_rotation = false, events_initialized = false;
       var rot_x = 0, rot_y = 0, rot_z = 0;
@@ -411,6 +412,26 @@
         }
       }
 
+      function switch_material() {
+        if (materials_available) {
+          gltf_obj.traverse( function ( child ) {
+      	    if (child instanceof THREE.Mesh) {
+              if (current_material == materials.length - 1) {
+                document.getElementById('btn_materials').style.backgroundColor = '#d1cefc';
+                document.getElementById('btn_materials').innerHTML = 'M0';
+                current_material = 0;
+                child.material = materials[0];
+              } else {
+                current_material += 1;
+                document.getElementById('btn_materials').innerHTML = 'M' + current_material;
+                document.getElementById('btn_materials').style.backgroundColor = 'lightgreen';
+                child.material = materials[current_material];
+              }
+    	  	  }
+    	    });
+        }
+      }
+
       function animate_gltf() {
         if (animation_running) {
           animation_mixer.clipAction( animations[ current_animation ] ).stop();
@@ -458,9 +479,13 @@
         edges_visible = false;
         grid_visible = false;
         render_requested = false;
+        materials = [];
+        materials_available = false;
         document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
         document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
         document.getElementById('btn_animate').disabled = true;
+        document.getElementById('btn_materials').style.backgroundColor = '#d1cefc';
+        document.getElementById('btn_materials').disabled = true;
 
         if (!url_loading) {
           // Loaded file(s)
@@ -596,12 +621,27 @@
               animations.forEach( clip => { animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat; });
             }
 
+            gltf.parser.getDependencies( 'material' ).then( ( mtls ) => {
+              if (mtls.length > 1) {
+                if (mtls[0].name == mtls[1].name) {
+                  mtls.forEach( mtl => {
+                    if (mtl.name == mtls[0].name) { materials.push( mtl ); }
+                  });
+
+                  current_material = 0;
+                  materials_available = true;
+                  document.getElementById('btn_materials').disabled = false;
+                  document.getElementById('btn_materials').innerHTML = 'M0';
+                }
+              }
+            });
+
             let child_count = 1;
 
             // Go through all children of the loaded object and search for a Mesh
             gltf.scene.traverse( function( child ) {
-              // This allow us to check if the children is an instance of the Mesh constructor
-          	  if (child instanceof THREE.Mesh) {
+              // This will allow us to check if the child is an instance of the Mesh constructor
+          	  if (child instanceof THREE.Mesh || child instanceof THREE.SkinnedMesh) {
                 // Enable transparency for the Opacity control and enable shadows
                 child.material.opacity = 1;
                 child.material.transparent = true;
@@ -722,6 +762,7 @@
                   texture.wrapS = THREE.RepeatWrapping;
                   texture.wrapT = THREE.RepeatWrapping;
                   texture.magFilter = THREE.NearestFilter;
+                  texture.flipY = false;
 
                   // Apply texture
                   draco_material = new THREE.MeshStandardMaterial( { map: texture, opacity: 1, transparent: true } );
@@ -825,11 +866,27 @@
                 animations.forEach( clip => { animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat; });
               }
 
+              gltf.parser.getDependencies( 'material' ).then( ( mtls ) => {
+                if (mtls.length > 1) {
+                  materials = [];
+                  if (mtls[0].name == mtls[1].name) {
+                    mtls.forEach( mtl => {
+                      if (mtl.name == mtls[0].name) { materials.push( mtl ); }
+                    });
+
+                    current_material = 0;
+                    materials_available = true;
+                    document.getElementById('btn_materials').disabled = false;
+                    document.getElementById('btn_materials').innerHTML = 'M0';
+                  }
+                }
+              });
+
               let child_count = 1;
 
               // Go through all children of the loaded object and search for a Mesh
               gltf.scene.traverse( function( child ) {
-                // This allow us to check if the children is an instance of the Mesh constructor
+                // This will allow us to check if the child is an instance of the Mesh constructor
             	  if (child instanceof THREE.Mesh) {
                   // Enable transparency for the Opacity control and enable shadows
                   child.material.opacity = 1;
@@ -1016,12 +1073,14 @@
         document.getElementById('shadow').checked = false;
         document.getElementById('scale_10x').checked = false;
 
-        // Reset edges and animation related values
+        // Reset edges, animation and materials related values
         edges_visible = false;
         document.getElementById('btn_edges').style.backgroundColor = '#d1cefc';
         animation_running = false;
         document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
         document.getElementById('btn_animate').innerHTML = 'A';
+        document.getElementById('btn_materials').style.backgroundColor = '#d1cefc';
+        document.getElementById('btn_materials').innerHTML = 'M';
 
         reset_rotation = true;
 
@@ -1043,12 +1102,14 @@
         }
 
         if (!reset) {
-          // Page (re)loading so reset the file input, URL entry, spinner, animate button and disable controls
+          // Page (re)loading so reset the file input, URL entry, spinner, animate and materials buttons and disable controls
           document.getElementById('file_input').value = '';
           document.getElementById('url_entry').value = '';
           document.getElementById('div_spinner').style.display = "block";
           document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
           document.getElementById('btn_animate').disabled = true;
+          document.getElementById('btn_materials').style.backgroundColor = '#d1cefc';
+          document.getElementById('btn_materials').disabled = true;
           enable_disable( true );
         }
       }
