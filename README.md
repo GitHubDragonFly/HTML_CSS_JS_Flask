@@ -10,13 +10,14 @@ The main differences:
    - this seems to work fine when using URL (see the screenshot) so try using it for fetching files both locally and from the Internet
    - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG/BMP` texture file along just to see if and how it changes the object's appearance)
    - you can also open `.drc` file types either alone or together with some texture file
- - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) module was added to GLTF and DAE viewers
 
 Additional Notes:
- - New Collada DAE Viewer, using Orbit Controls which made the code and GUI slightly simpler (see the screenshot)
+ - GLTF and Collada DAE viewers are set to use Orbit Controls which made the code and GUI slightly simpler (see the screenshot)
+ - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) module was added to GLTF and DAE viewers
  - GLTF and DAE viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
    - Xbot.glb is the multi-animation example that can be accessed in the GLTF viewer via URL: `https://raw.githubusercontent.com/GitHubDragonFly/HTML_CSS_JS_Flask/main/Files/python/app/static/Images/gltf/Xbot.glb`
+ - GLTF viewer also includes an experimental material switcher button (with letter "M")
  - PLY viewer also includes STL file loader
  - See GLTF / DRACO / DAE / STL examples in the `Images` folder (most were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out)
 
