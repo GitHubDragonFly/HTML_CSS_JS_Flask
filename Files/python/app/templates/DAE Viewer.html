@@ -58,7 +58,7 @@
       }
 
       div { color: navy; width: 99%; border: 1px solid navy; -webkit-border-radius: 2px; border-radius: 2px; padding: 4px; margin: 1px; }
-      #scene { display: block; position: absolute; margin: 0; width: 100%; height: 100%; }
+      #scene { display: block; position: absolute; margin: 0; width: 100%; }
 
       .fixed-menu {
         position: fixed;
@@ -73,10 +73,12 @@
 
     <!-- Original OBJ source code that inspired this: https://codepen.io/Mamboleoo/pen/PqjGdN -->
     <!-- DAE Examples from: https://github.com/mrdoob/three.js -->
+    <!-- OrbitControlsGizmo from: https://github.com/Fennec-hub/ThreeOrbitControlsGizmo -->
     <title>DAE Viewer (Collada)</title>
   </head>
   <body onload="reset_all()" onresize="resize()">
     <div class="fixed-menu">
+      <div id="axes" style="width: 65px; height: 65px; float: right; background-color: black; margin-right: 3px;"></div>
       <div>
         <label for="file" style="color: #CE8704; margin: 2px 2px 2px 5px;">DAE:</label>
         <button onclick="show_url()" style="margin: 2px 2px 2px 0;">URL</button>
@@ -186,7 +188,8 @@
 
     <script>
       var ktx2_loader, animations, animation_mixer, animation_running, current_animation, render_requested = false, clock;
-      var renderer, scene, camera, grid, controls, dae_obj, edges, edges_visible = false, grid_visible = false;
+      var renderer, scene, camera, grid, dae_obj, edges, edges_visible = false, grid_visible = false;
+      var controls, controlsGizmo, gizmo;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
       var shadowMesh, shadowMaterial;
       var ww = window.innerWidth,	wh = window.innerHeight;
@@ -298,6 +301,22 @@
         directionalLight.intensity = parseFloat( document.getElementById('directional_light_intensity').value );
       }
 
+      function set_initial_scale() {
+        // Set the initial scale of the object so it comes to view
+        bounding_box.setFromObject( dae_obj );
+        let y = (bounding_box.max.y - bounding_box.min.y);
+
+        if (y < 0.001) {
+          dae_obj.scale.multiplyScalar( 1000 );
+        } else if (y < 0.01) {
+          dae_obj.scale.multiplyScalar( 100 );
+        } else if (y < 0.1) {
+          dae_obj.scale.multiplyScalar( 10 );
+        } else {
+          dae_obj.scale.multiplyScalar( 30 / y );
+        }
+      }
+
       function set_dae_scale() {
         let current_dae_scale = document.getElementById('dae_scale').value;
         // There appears to be a pattern and this could possibly be further simplified and range expanded
@@ -329,6 +348,16 @@
         }
 
         previous_dae_scale = current_dae_scale;
+        set_grid_y();
+      }
+
+      function scale_10x_set() {
+        if (document.getElementById('scale_10x').checked) {
+          dae_obj.scale.multiplyScalar( 10 );
+        } else {
+          dae_obj.scale.multiplyScalar( 0.1 );
+        }
+
         set_grid_y();
       }
 
@@ -433,6 +462,7 @@
           scene.remove.apply( scene, scene.children );
 
           if (shadowMesh) { shadowMesh = null; }
+          if (gizmo) { gizmo.dispose(); }
 
           // Reset all values
           reset_all( true );
@@ -495,6 +525,12 @@
           renderer.shadowMap.type = THREE.PCFSoftShadowMap;
           renderer.setClearColor( 0xFFFFFF, 0); // Allow setting the background color
           renderer.autoClear = false;
+        }
+
+        if (ktx2_loader) {
+          ktx2_loader.setTranscoderPath('../static/js/libs/basis/');
+          ktx2_loader.detectSupport(renderer);
+          manager.addHandler(/\.basis$/i, ktx2_loader);
         }
 
         // The following can be used instead of the canvas but the window mouse
@@ -572,6 +608,19 @@
         //controls.rotateSpeed = 0.2;
         //controls.minDistance = 2;
         //controls.maxDistance = 500;
+
+        gizmo = new controlsGizmo( controls, {
+          size: 65,
+          padding: 4,
+          bubbleSizePrimary: 7,
+          bubbleSizeSecondary: 3,
+          lineWidth: 1,
+          fontSize: "8px",
+          fontColor: "black",
+          fontWeight: "bold"
+        });
+
+        document.getElementById('axes').appendChild( gizmo.domElement );
 
         render_requested = true;
         render();
@@ -668,18 +717,13 @@
             dae_obj = collada.scene;
             dae_obj.name = 'local_model';
 
-            // Set the initial scale of the object so it comes to view
-            bounding_box.setFromObject( dae_obj );
-            let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
-            dae_obj.scale.multiplyScalar( scale_factor );
-
+            set_initial_scale();
             resize();
 
             // Add dae model to scene
             scene.add( dae_obj );
 
             camera.lookAt( dae_obj.position );
-            camera.updateProjectionMatrix();
 
             if (animations.length > 0) {
               animation_mixer.clipAction( animations[0] ).play();
@@ -721,7 +765,7 @@
             // Go through all children of the loaded object and search for a Mesh
             collada.scene.traverse( function( child ) {
               // This allow us to check if the children is an instance of the Mesh constructor
-          	  if (child instanceof THREE.Mesh || child instanceof THREE.SkinnedMesh) {
+          	  if (child instanceof THREE.Mesh) {
                 child.geometry.computeVertexNormals();
 
                 // Enable transparency for the Opacity control and enable shadows
@@ -730,6 +774,7 @@
                 child.material.skinning = true;
                 child.castShadow = true;
                 child.receiveShadow = true;
+
                 child.name = 'child_' + child_count;
                 edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
                 child_count += 1;
@@ -739,11 +784,7 @@
             dae_obj = collada.scene;
             dae_obj.name = 'url_model';
 
-            // Set the initial scale of the object so it comes to view
-            bounding_box.setFromObject( dae_obj );
-            let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
-            dae_obj.scale.multiplyScalar( scale_factor );
-
+            set_initial_scale();
             resize();
 
             // Add dae model to scene
@@ -827,7 +868,7 @@
           }
 
           // Rotate the dae_obj
-          if (!mouse_rotation) {
+          if (!mouse_rotation && (rot_x != 0 || rot_y != 0 || rot_z != 0)) {
             dae_obj.rotation.x += rot_x;
             dae_obj.rotation.y += rot_y;
             dae_obj.rotation.z += rot_z;
@@ -844,19 +885,10 @@
         }
 
         controls.update();
+        gizmo.update();
 
         renderer.clear();
       	renderer.render( scene, camera );
-      }
-
-      function scale_10x_set() {
-        if (document.getElementById('scale_10x').checked) {
-          dae_obj.scale.multiplyScalar( 10 );
-        } else {
-          dae_obj.scale.multiplyScalar( 0.1 );
-        }
-
-        set_grid_y();
       }
 
       function reset_only() {
@@ -974,21 +1006,10 @@
 
     <script type="module">
       import { KTX2Loader } from '../static/js/KTX2Loader.js';
+      import { OrbitControlsGizmo } from '../static/js/OrbitControlsGizmo.js';
 
       ktx2_loader = new KTX2Loader( manager );
-
-      let renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
-      renderer.setPixelRatio( window.devicePixelRatio );
-      renderer.setSize( ww, wh );
-      renderer.outputEncoding = THREE.sRGBEncoding;
-      renderer.shadowMap.enabled = true;
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-      renderer.setClearColor( 0xFFFFFF, 0); // Allow setting the background color
-      renderer.autoClear = false;
-
-      ktx2_loader.setTranscoderPath('../static/js/libs/basis/');
-      ktx2_loader.detectSupport(renderer);
-      manager.addHandler(/\.basis$/i, ktx2_loader);
+      controlsGizmo = OrbitControlsGizmo;
     </script>
   </body>
 </html>

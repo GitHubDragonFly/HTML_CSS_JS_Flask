@@ -305,6 +305,22 @@
         directionalLight.intensity = parseFloat( document.getElementById('directional_light_intensity').value );
       }
 
+      function set_initial_scale() {
+        // Set the initial scale of the object so it comes to view
+        bounding_box.setFromObject( mesh );
+        let y = (bounding_box.max.y - bounding_box.min.y);
+
+        if (y < 0.001) {
+          mesh.scale.multiplyScalar( 1000 );
+        } else if (y < 0.01) {
+          mesh.scale.multiplyScalar( 100 );
+        } else if (y < 0.1) {
+          mesh.scale.multiplyScalar( 10 );
+        } else {
+          mesh.scale.multiplyScalar( 30 / y );
+        }
+      }
+
       function set_ply_scale() {
         let current_ply_scale = document.getElementById('ply_scale').value;
 
@@ -336,6 +352,14 @@
         }
 
         previous_ply_scale = current_ply_scale;
+      }
+
+      function scale_10x_set() {
+        if (document.getElementById('scale_10x').checked) {
+          mesh.scale.multiplyScalar( 10 );
+        } else {
+          mesh.scale.multiplyScalar( 0.1 );
+        }
       }
 
       function radio_changed() {
@@ -660,11 +684,7 @@
         mesh.receiveShadow = true;
         edges = new THREE.LineSegments( new THREE.EdgesGeometry( mesh.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
 
-        // Set the initial scale of the object so it comes to view
-        bounding_box.setFromObject( mesh );
-        let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
-        mesh.scale.multiplyScalar( scale_factor );
-
+        set_initial_scale();
         resize();
 
         // Add mesh to the scene
@@ -733,14 +753,6 @@
 
         renderer.clear();
       	renderer.render( scene, camera );
-      }
-
-      function scale_10x_set() {
-        if (document.getElementById('scale_10x').checked) {
-          mesh.scale.multiplyScalar( 10 );
-        } else {
-          mesh.scale.multiplyScalar( 0.1 );
-        }
       }
 
       function reset_only() {

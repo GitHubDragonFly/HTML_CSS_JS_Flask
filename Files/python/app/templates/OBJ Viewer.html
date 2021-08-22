@@ -312,6 +312,22 @@
         directionalLight.intensity = parseFloat( document.getElementById('directional_light_intensity').value );
       }
 
+      function set_initial_scale() {
+        // Set the initial scale of the object so it comes to view
+        bounding_box.setFromObject( Obj );
+        let y = (bounding_box.max.y - bounding_box.min.y);
+
+        if (y < 0.001) {
+          Obj.scale.multiplyScalar( 1000 );
+        } else if (y < 0.01) {
+          Obj.scale.multiplyScalar( 100 );
+        } else if (y < 0.1) {
+          Obj.scale.multiplyScalar( 10 );
+        } else {
+          Obj.scale.multiplyScalar( 30 / y );
+        }
+      }
+
       function set_obj_scale() {
         let current_obj_scale = document.getElementById('obj_scale').value;
 
@@ -343,6 +359,14 @@
         }
 
         previous_obj_scale = current_obj_scale;
+      }
+
+      function scale_10x_set() {
+        if (document.getElementById('scale_10x').checked) {
+          Obj.scale.multiplyScalar( 10 );
+        } else {
+          Obj.scale.multiplyScalar( 0.1 );
+        }
       }
 
       function radio_changed() {
@@ -631,11 +655,7 @@
     		        }
     	        });
 
-              // Set the initial scale of the object so it comes to view
-              bounding_box.setFromObject( Obj );
-              let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
-              Obj.scale.multiplyScalar( scale_factor );
-
+              set_initial_scale();
               resize();
 
               // Add the 3D object in the scene
@@ -724,11 +744,7 @@
     		      }
     	      });
 
-            // Set the initial scale of the object so it comes to view
-            bounding_box.setFromObject( Obj );
-            let scale_factor = 30 / (bounding_box.max.y - bounding_box.min.y);
-            Obj.scale.multiplyScalar( scale_factor );
-
+            set_initial_scale();
             resize();
 
             // Add the 3D object in the scene
@@ -799,14 +815,6 @@
 
         renderer.clear();
       	renderer.render( scene, camera );
-      }
-
-      function scale_10x_set() {
-        if (document.getElementById('scale_10x').checked) {
-          Obj.scale.multiplyScalar( 10 );
-        } else {
-          Obj.scale.multiplyScalar( 0.1 );
-        }
       }
 
       function reset_only() {
