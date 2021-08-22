@@ -17,7 +17,8 @@ Additional Notes:
  - GLTF and DAE viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
    - Xbot.glb is the multi-animation example that can be accessed in the GLTF viewer via URL: `https://raw.githubusercontent.com/GitHubDragonFly/HTML_CSS_JS_Flask/main/Files/python/app/static/Images/gltf/Xbot.glb`
- - GLTF viewer also includes an experimental material switcher button (with letter "M")
+ - GLTF viewer also includes an experimental material switcher button (with letter "M") based on and specifically designed for this example:
+   - https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/MaterialsVariantsShoe/glTF/MaterialsVariantsShoe.gltf
  - PLY viewer also includes STL file loader
  - See GLTF / DRACO / DAE / STL examples in the `Images` folder (most were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out)
 
