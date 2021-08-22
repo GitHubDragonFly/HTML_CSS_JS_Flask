@@ -555,14 +555,6 @@
           renderer.autoClear = false;
         }
 
-        if (ktx2_loader) {
-          ktx2_loader.setTranscoderPath('../static/js/libs/basis/');
-          ktx2_loader.detectSupport(renderer);
-          manager.addHandler(/\.basis$/i, ktx2_loader);
-          gltf_loader.setKTX2Loader( ktx2_loader );
-          gltf_loader.setMeshoptDecoder( MeshoptDecoder );
-        }
-
         clock = new THREE.Clock();
 
         if (scene == undefined) { scene = new THREE.Scene(); }
@@ -635,18 +627,20 @@
         //controls.minDistance = 2;
         //controls.maxDistance = 500;
 
-        gizmo = new controlsGizmo( controls, {
-          size: 65,
-          padding: 4,
-          bubbleSizePrimary: 7,
-          bubbleSizeSecondary: 3,
-          lineWidth: 1,
-          fontSize: "8px",
-          fontColor: "black",
-          fontWeight: "bold"
-        });
+        if (controlsGizmo) {
+          gizmo = new controlsGizmo( controls, {
+            size: 65,
+            padding: 4,
+            bubbleSizePrimary: 7,
+            bubbleSizeSecondary: 3,
+            lineWidth: 1,
+            fontSize: "8px",
+            fontColor: "black",
+            fontWeight: "bold"
+          });
 
-        document.getElementById('axes').appendChild( gizmo.domElement );
+          document.getElementById('axes').appendChild( gizmo.domElement );
+        }
 
         render_requested = true;
         render();
@@ -1065,7 +1059,7 @@
         }
 
         controls.update();
-        gizmo.update();
+        if (gizmo) { gizmo.update(); }
 
         renderer.clear();
       	renderer.render( scene, camera );
@@ -1193,8 +1187,24 @@
       import { KTX2Loader } from '../static/js/KTX2Loader.js';
       import { OrbitControlsGizmo } from '../static/js/OrbitControlsGizmo.js';
 
+      renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
+      renderer.setPixelRatio( window.devicePixelRatio );
+      renderer.setSize( ww, wh );
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.setClearColor( 0xFFFFFF, 0); // Allow setting the background color
+      renderer.autoClear = false;
+
       ktx2_loader = new KTX2Loader( manager );
       controlsGizmo = OrbitControlsGizmo;
+
+      ktx2_loader.setTranscoderPath('../static/js/libs/basis/');
+      ktx2_loader.detectSupport(renderer);
+      manager.addHandler(/\.basis$/i, ktx2_loader);
+
+      gltf_loader.setKTX2Loader( ktx2_loader );
+      gltf_loader.setMeshoptDecoder( MeshoptDecoder );
     </script>
   </body>
 </html>
