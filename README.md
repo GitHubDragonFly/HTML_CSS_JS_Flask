@@ -10,7 +10,7 @@ The main differences:
    - this seems to work fine when using URL (see the screenshot) so try using it for fetching files both locally and from the Internet
    - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG/BMP` texture file along just to see if and how it changes the object's appearance)
    - you can also open `.drc` file types either alone or together with some texture file
-   - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) was added to GLTF and DAE viewers
+ - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) module was added to GLTF and DAE viewers
 
 Additional Notes:
  - New Collada DAE Viewer, using Orbit Controls which made the code and GUI slightly simpler (see the screenshot)
