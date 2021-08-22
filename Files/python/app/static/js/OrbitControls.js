@@ -327,6 +327,10 @@
 
 			}
 
+    // Exposing rotateLeft and rotateUp
+    this.rotateLeft = rotateLeft;
+    this.rotateUp = rotateUp;
+
 			const panLeft = function () {
 
 				const v = new THREE.Vector3();
