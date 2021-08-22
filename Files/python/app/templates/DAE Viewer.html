@@ -208,11 +208,6 @@
       const dds_loader = new THREE.DDSLoader( manager );
       manager.addHandler( /\.dds$/i, dds_loader );
 
-      function set_grid_y() {
-        bounding_box.setFromObject( dae_obj );
-        grid.position.y = bounding_box.min.y;
-      }
-
       function set_back_color() {
         scene.background = null;
         document.getElementById('file_image_input').value = "";
@@ -818,10 +813,16 @@
           grid_visible = false;
           document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
         } else {
+          set_grid_y();
           scene.add( grid );
           grid_visible = true;
           document.getElementById('btn_grid').style.backgroundColor = 'lightgreen';
         }
+      }
+
+      function set_grid_y() {
+        bounding_box.setFromObject( dae_obj );
+        grid.position.y = bounding_box.min.y;
       }
 
       function show_edges() {
