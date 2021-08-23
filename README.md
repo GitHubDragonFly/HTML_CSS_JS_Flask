@@ -19,8 +19,11 @@ Additional Notes:
    - Xbot.glb is the multi-animation example that can be accessed in the GLTF viewer via URL: `https://raw.githubusercontent.com/GitHubDragonFly/HTML_CSS_JS_Flask/main/Files/python/app/static/Images/gltf/Xbot.glb`
  - GLTF viewer also includes an experimental material switcher button (with letter "M") based on and specifically designed for this example:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/MaterialsVariantsShoe/glTF/MaterialsVariantsShoe.gltf`
+ - GLTF viewer also includes an experimental extras / morph targets button (with letter "X") which was tested as working with this example:
+   - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/RobotExpressive/RobotExpressive.glb`
+   - do note that the above example seems to have some faults in it and, even though usable for testing, has shown some disconnects and material issues
  - PLY viewer also includes STL file loader
- - See GLTF / DRACO / DAE / STL examples in the `Images` folder (most were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out)
+ - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in the viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
 
 Notes about showing the edges (button with letter "E"):
  - these are aplied to the still version of the object itself and will not follow the animation in case of GLTF and DAE viewers
@@ -33,7 +36,7 @@ Notes about showing the edges (button with letter "E"):
 All it takes to run this project is to do either of the below listed:
 
 Even though this is all intended to be used with the `Flask` server, thanks to the [GitHub & BitBucket HTML Preview](https://github.com/htmlpreview/htmlpreview.github.com) you can still preview the [Exercise](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/Exercise.html) page online and use its fixed menu to access the rest, with the following limitations:
- - OrbitControlsGizmo will not work in either GLTF or DAE viewer since it's a module
+ - OrbitControlsGizmo will not work in either GLTF or DAE viewer (check the module "import" console error)
  - GLTF Viewer does allow loading DRACO files but does not allow loading KTX2 textures (check the module "import" console error)
  - DAE Viewer will not allow loading KTX2 textures (check the module "import" console error)
  - The Form entries are set to be handled by the server and will not work in the preview
@@ -62,4 +65,4 @@ Any and all trademarks, either directly or indirectly mentioned here, belong to 
 # Resources
 Check the resources mentioned in the original HTML_CSS_JS project.
 
-Here is also a link to another online 3D viewer: https://github.com/kovacsv/Online3DViewer
+Here is also a link to another [Online 3D Viewer](https://github.com/kovacsv/Online3DViewer)
