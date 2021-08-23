@@ -1,19 +1,19 @@
 # HTML_CSS_JS_Flask
 Generally intended for educational purposes.
 
-This is a modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project so check a description of all the features there. It is set to be used with `python3` and `Flask` server. There are several Three.js viewers, not necessarily perfect but functional as they are (preview link is available in the `Usage` section).
+This is a modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project so check a description of all the features there. It is set to be used with `python3` and `Flask` server. There are several Three.js viewers, not necessarily perfect but functional as they are (preview link is available in the `Usage` section but does have some limitations).
 
 The main differences:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
  - uploading any pictures via the `Form` will then have those saved in the new `uploads` folder
  - DRACO and KTX2 support were added to the GLTF Viewer:
-   - this seems to work fine when using URL (see the screenshot) so try using it for fetching files both locally and from the Internet
+   - this seems to work fine when using URL option (see the screenshot) so try using it for fetching files both locally and from the Internet
    - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG/BMP` texture file along just to see if and how it changes the object's appearance)
    - you can also open `.drc` file types either alone or together with some texture file
  - KTX2 support was also added to the DAE Viewer
 
 Additional Notes:
- - GLTF and Collada DAE viewers are set to use Orbit Controls which made the code and GUI slightly simpler (see the screenshot)
+ - GLTF and Collada DAE viewers are set to use Orbit Controls, which made their code and GUI slightly simpler (see the screenshot)
  - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) module was added to GLTF and DAE viewers
  - GLTF and DAE viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
@@ -24,7 +24,7 @@ Additional Notes:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/RobotExpressive/RobotExpressive.glb`
    - subsequent clicks of the button will run any subsequent morph target one at the time
    - do note that the above example seems to have some faults in it and has shown some disconnects and material issues, which are not necessarily visible in all viewers due to coding and design approach (try it in the viewers mentioned in the `Resources` section)
- - PLY viewer also includes STL file loader
+ - PLY viewer now includes STL file loader
  - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in the viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
 
 Notes about showing the edges (button with letter "E"):
@@ -43,13 +43,12 @@ Even though this is all intended to be used with the `Flask` server, thanks to t
  - DAE Viewer will not allow loading KTX2 textures (check the module "import" console error)
  - The Form entries are set to be handled by the server and will not work in the preview
 
-OR with server support:
+OR with the `Flask` server support:
 
  - Download a zip file of this project (or clone the repo), also useful for having the example files available for loading
- - install `python3` and pip install the `flask` package
- - use the command prompt to navigate to the `app` folder and run the following command: `python -m app` or `python3 -m app`
-
-The server will show you the IP address and the port, generally accessible in the Internet browser via `localhost:5000`.
+ - Install `python3` and pip install the `flask` package
+ - Use the command prompt to navigate to the `app` folder and run the following command: `python -m app` or `python3 -m app`
+ - The server will show you the IP address and the port, generally accessible in the Internet browser via `localhost:5000`.
 
 Optionally use VS Code for editing, troubleshooting and running the app, which should be far easier than using the command prompt.
 
