@@ -3,7 +3,7 @@ Generally intended for educational purposes.
 
 This is a modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project so check a description of all the features there. It is set to be used with `python3` and `Flask` server. There are several Three.js viewers, not necessarily perfect but functional as they are (preview link is available in the `Usage` section but does have some limitations).
 
-The main differences:
+The main differences between these 2 projects:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
  - uploading any pictures via the `Form` will then have those saved in the new `uploads` folder
  - DRACO and KTX2 support were added to the GLTF Viewer:
