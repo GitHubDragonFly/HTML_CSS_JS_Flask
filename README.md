@@ -21,7 +21,7 @@ Additional Notes:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/MaterialsVariantsShoe/glTF/MaterialsVariantsShoe.gltf`
  - GLTF viewer also includes an experimental extras / morph targets button (with letter "X") which was tested as working with this example:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/RobotExpressive/RobotExpressive.glb`
-   - do note that the above example seems to have some faults in it and, even though usable for testing, has shown some disconnects and material issues
+   - do note that the above example seems to have some faults in it and has shown some disconnects and material issues, which are not necessarily visible in all viewers due to coding and design approach (try it in the viewers mentioned in the `Resources` section)
  - PLY viewer also includes STL file loader
  - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in the viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
 
@@ -65,4 +65,6 @@ Any and all trademarks, either directly or indirectly mentioned here, belong to 
 # Resources
 Check the resources mentioned in the original HTML_CSS_JS project.
 
-Here is also a link to another [Online 3D Viewer](https://github.com/kovacsv/Online3DViewer)
+Here is also a couple of links to other online viewers:
+- [Online 3D Viewer](https://github.com/kovacsv/Online3DViewer)
+- [GLTF Viewer](https://gltf-viewer.donmccurdy.com/)
