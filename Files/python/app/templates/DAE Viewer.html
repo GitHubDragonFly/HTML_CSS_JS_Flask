@@ -840,7 +840,13 @@
       function show_wireframe() {
         dae_obj.traverse( function ( child ) {
     	    if(child instanceof THREE.Mesh){
-            child.material.wireframe = document.getElementById('wireframe').checked;
+            if (Array.isArray(child.material)) {
+              child.material.forEach( mtl => {
+                mtl.wireframe = document.getElementById('wireframe').checked;
+              });
+            } else {
+              child.material.wireframe = document.getElementById('wireframe').checked;
+            }
     		  }
     	  });
       }

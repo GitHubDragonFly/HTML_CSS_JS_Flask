@@ -774,7 +774,13 @@
         Obj.traverse( function( child ) {
           // This allow us to check if the children is an instance of the Mesh constructor
     	    if (child instanceof THREE.Mesh) {
-            child.material.wireframe = document.getElementById('wireframe').checked;
+            if (Array.isArray(child.material)) {
+              child.material.forEach( mtl => {
+                mtl.wireframe = document.getElementById('wireframe').checked;
+              });
+            } else {
+              child.material.wireframe = document.getElementById('wireframe').checked;
+            }
     		  }
     	  });
       }
