@@ -25,6 +25,7 @@ Additional Notes:
    - subsequent clicks of the button will run any subsequent morph target one at the time
    - the facial expressions of the mentioned example are located at X6-X7-X8 for `Head_4` object, while X0 to X5 contain those same expressions but for Head_2 and Head_3 objects, which are parts of the whole `Head` and I am not really sure why they exist as such
    - do note that the above example seems to have some faults in it and has shown some disconnects and material issues, which are not necessarily visible in all viewers due to coding and design approach (try it in the viewers mentioned in the `Resources` section, with Don McCurdy's `GLTF Viewer` actually showing how many errors were detected)
+   - other examples, like `Horse.glb` or `Parrot.glb`, will be showing those morph targets almost like frames of the animation itself
  - PLY viewer now includes STL file loader
  - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in the viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
 
