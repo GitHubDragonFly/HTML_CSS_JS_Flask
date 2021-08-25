@@ -772,7 +772,7 @@
       function show_wireframe() {
         // Go through all children of the loaded object and search for a Mesh
         Obj.traverse( function( child ) {
-          // This allow us to check if the children is an instance of the Mesh constructor
+          // This will allow us to check if the child is an instance of the Mesh constructor
     	    if (child instanceof THREE.Mesh) {
             if (Array.isArray(child.material)) {
               child.material.forEach( mtl => {
@@ -807,7 +807,7 @@
         }
 
         // Rotate the Obj
-        if (!mouse_rotation) {
+        if (!mouse_rotation && (rot_x != 0 || rot_y != 0 || rot_z != 0)) {
           Obj.rotation.x += rot_x;
           Obj.rotation.y += rot_y;
           Obj.rotation.z += rot_z;

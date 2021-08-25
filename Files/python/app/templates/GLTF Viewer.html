@@ -982,7 +982,6 @@
 
               gltf.parser.getDependencies( 'material' ).then( ( mtls ) => {
                 if (mtls.length > 1) {
-                  materials = [];
                   if (mtls[0].name == mtls[1].name) {
                     mtls.forEach( mtl => {
                       if (mtl.name == mtls[0].name) { materials.push( mtl ); }
@@ -1002,8 +1001,8 @@
               gltf.scene.traverse( function( child ) {
                 // This will allow us to check if the child is an instance of the Mesh constructor
             	  if (child instanceof THREE.Mesh) {
-                // Check for morph targets
-                if (child.material.morphTargets) {
+                  // Check for morph targets
+                  if (child.material.morphTargets) {
                     Object.keys( child.morphTargetDictionary ).forEach( ( key, index ) => {
                       extras.push( [ child.id, key, index ] );
                     });
@@ -1098,13 +1097,7 @@
         gltf_obj.traverse( function ( child ) {
           // This allow us to check if the children is an instance of the Mesh constructor
     	    if (child instanceof THREE.Mesh) {
-            if (Array.isArray(child.material)) {
-              child.material.forEach( mtl => {
-                mtl.wireframe = document.getElementById('wireframe').checked;
-              });
-            } else {
-              child.material.wireframe = document.getElementById('wireframe').checked;
-            }
+            child.material.wireframe = document.getElementById('wireframe').checked;
     		  }
     	  });
       }
