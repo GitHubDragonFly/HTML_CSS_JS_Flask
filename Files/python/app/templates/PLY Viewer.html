@@ -700,7 +700,7 @@
               reflectivity: 0.5
             });
 
-            document.getElementById('directional_light_intensity').value = 0.4;
+            document.getElementById('directional_light_intensity').value = 0.5;
             set_directional_light_intensity();
           }
         }
@@ -708,6 +708,7 @@
         mesh = new THREE.Mesh( smooth, material );
         mesh.castShadow = true;
         mesh.receiveShadow = true;
+
         edges = new THREE.LineSegments( new THREE.EdgesGeometry( mesh.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
 
         set_initial_scale();
@@ -725,13 +726,81 @@
         if (selected_url_file != '') {
           // Launch loading of the selected file, addFileInScene is the callback when it's ready
           if (selected_url_file.toUpperCase().endsWith('.PLY')) {
-            selected_ply_file = selected_url_file;
-            ply_loader.load( selected_ply_file, addFileInScene );
+            ply_loader.load( selected_url_file, addURLFileInScene );
           } else if (selected_url_file.toUpperCase().endsWith('.STL')) {
-            selected_stl_file = selected_url_file;
-            stl_loader.load( selected_stl_file, addFileInScene );
+            stl_loader.load( selected_url_file, addURLFileInScene );
           }
         }
+      }
+
+      function addURLFileInScene( object ){
+        let smooth = object.clone();
+        smooth.computeVertexNormals();
+
+        if (selected_url_file.toUpperCase().endsWith('.PLY')) {
+          smooth.mergeVertices();
+
+          material = new THREE.MeshPhongMaterial( {
+            polygonOffset: true,
+            polygonOffsetFactor: 1,
+            polygonOffsetUnits: 1,
+            color: 0xFFFFFF,
+            specular: 0x111111,
+            shininess: 100,
+            opacity: 1,
+            transparent: true,
+            skinning: true,
+            vertexColors: THREE.VertexColors,
+            flatShading: false
+          });
+        } else {
+          if (object.hasColors) {
+            material = new THREE.MeshPhongMaterial( {
+              polygonOffset: true,
+              polygonOffsetFactor: 1,
+              polygonOffsetUnits: 1,
+              color: 0xFFFFFF,
+              specular: 0x111111,
+              shininess: 100,
+              opacity: 1,
+              transparent: true,
+              skinning: true,
+              vertexColors: THREE.VertexColors,
+              flatShading: false
+            });
+          } else {
+            material = new THREE.MeshPhysicalMaterial( {
+              fog: true,
+              sheen: new THREE.Color( 5, 5, 112 ),
+              roughness: 0.9,
+              metalness: 1,
+              opacity: 1,
+              transparent: true,
+              skinning: true,
+              vertexColors: THREE.VertexColors,
+              reflectivity: 0.5
+            });
+
+            document.getElementById('directional_light_intensity').value = 0.5;
+            set_directional_light_intensity();
+          }
+        }
+
+        mesh = new THREE.Mesh( smooth, material );
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+
+        edges = new THREE.LineSegments( new THREE.EdgesGeometry( mesh.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+
+        set_initial_scale();
+        resize();
+
+        // Add mesh to the scene
+        scene.add( mesh );
+
+        camera.lookAt( mesh.position );
+
+        render();
       }
 
       function show_edges() {
