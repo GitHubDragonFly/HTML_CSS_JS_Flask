@@ -75,6 +75,7 @@
     </style>
 
     <!-- Original OBJ source code that inspired this: https://codepen.io/Mamboleoo/pen/PqjGdN -->
+    <!-- OrbitControlsGizmo from: https://github.com/Fennec-hub/ThreeOrbitControlsGizmo -->
     <!-- OBJ Examples from: https://github.com/mrdoob/three.js -->
     <!-- Also see: https://davidoreilly.itch.io/walt-disney-3d-head , http://www.davidoreilly.com/ -->
     <!-- More OBJ examples: https://people.math.sc.edu/Burkardt/data/data.html -->
@@ -82,6 +83,7 @@
   </head>
   <body onload="reset_all()" onresize="resize()">
     <div class="fixed-menu">
+      <div id="axes" style="width: 65px; height: 65px; float: right; border: 1px solid navy; -webkit-border-radius: 3px; border-radius: 3px; background-color: black; margin-right: 3px;"></div>
       <div>
         <label for="file" style="color: #CE8704; margin: 2px 2px 2px 5px;">OBJ:</label>
         <button onclick="show_url()" style="margin: 2px 2px 2px 0;">URL</button>
@@ -93,8 +95,6 @@
         <label for="obj_scale" style="margin: 2px 2px 2px 0;">Scale:</label>
         <input type="number" id="obj_scale" name="obj_scale" onkeydown="return false" oninput="set_obj_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 5px 2px 0; width: 48px;" disabled />
         <label style="margin: 2px 10px 2px 0;"><input type="checkbox" id="scale_10x" onchange="scale_10x_set();" disabled />10x</label>
-        <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" disabled />Wire</label>
-        <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" disabled />Shadow</label>
         <button id="btn_edges" onclick="show_edges()" style="background-color: #d1cefc; vertical-align: middle; width: 20px; margin: 2px 2px 2px 2px; padding: 0;" disabled>E</button>
         <button id="btn_textures" onclick="set_texture()" style="background-color: #d1cefc; vertical-align: middle; width: 28px; margin: 2px 2px 2px 2px; padding: 0;" disabled>T</button>
         <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 40px;" disabled>Reset</button>
@@ -116,13 +116,8 @@
         <input type="number" id="rotation_y" onchange="rot_y_changed()" min="-50" max="50" value="0" step="1" style="width: 50px; margin: 2px 0 2px 0;" disabled />&nbsp;
         <label for="rotation_z" style="color: blue;">Z</label>
         <input type="number" id="rotation_z" onchange="rot_z_changed()" min="-50" max="50" value="0" step="1" style="width: 50px; margin: 2px 0 2px 0;" disabled />&nbsp; &nbsp;
-        <label style="color: green;">Position : </label>
-        <label for="position_x" style="color: green;">X</label>
-        <input type="number" id="position_x" onchange="pos_x_changed()" min="-1000" max="1000" value="0" step="1" style="width: 55px; margin: 2px 0 2px 0;" disabled />&nbsp;
-        <label for="position_y" style="color: green;">Y</label>
-        <input type="number" id="position_y" onchange="pos_y_changed()" min="-1000" max="1000" value="0" step="1" style="width: 55px; margin: 2px 0 2px 0;" disabled />&nbsp;
-        <label for="position_z" style="color: green;">Z</label>
-        <input type="number" id="position_z" onchange="pos_z_changed()" min="-2000" max="2000" value="0" step="1" style="width: 55px;  margin: 2px 10px 2px 0;" disabled />
+        <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" disabled />Wire</label>
+        <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" disabled />Shadow</label>
         <label for="directional_light_intensity" style="margin: 2px 2px 2px 0;">DLi:</label>
         <input type="number" id="directional_light_intensity" name="directional_light_intensity" min="0" max="2" step="0.05" value="1" onkeydown="return false" onchange="set_directional_light_intensity()" style="width: 50px; margin: 2px 5px 2px 0;" disabled />
         <label for="spot_light_intensity" style="margin: 2px 2px 2px 0;">SLi:</label>
@@ -134,7 +129,8 @@
         <label for="ambient_light_color" style="margin: 2px 0 2px 0;">AL:</label>
         <input type="color" id="ambient_light_color" name="ambient_light_color" onchange="set_ambient_light_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 5px 0 0;" disabled />
         <label for="back_color" style="margin: 2px 0 2px 0;">BG:</label>
-        <input type="color" id="back_color" name="back_color" onchange="set_back_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 2px 0 0;" disabled />
+        <input type="color" id="back_color" name="back_color" onchange="set_back_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 5px 0 0;" disabled />
+        <button id="btn_grid" onclick="show_grid()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 5px; padding: 0;" disabled>#</button>
       </div>
     </div>
 
@@ -168,44 +164,6 @@
         cnvs.addEventListener( 'mouseup', (event) => { mouse_rotation = false; }, false);
       }
 
-      function initialize_event_listeners() {
-        var cnvs = document.getElementById('scene');
-
-        cnvs.addEventListener( 'wheel', (event) => {
-          var pz = document.getElementById('position_z');
-          var val = parseInt(pz.value) - parseInt(event.deltaY * 0.01745)
-          pz.value = val;
-          pz.onchange();
-        }, false);
-
-        cnvs.addEventListener( 'mousedown', (event) => {
-          if (event.button == 0) { mouse_rotation = true; }
-        }, false);
-
-        cnvs.addEventListener( 'mouseup', (event) => {
-          if (event.button == 0) { mouse_rotation = false; }
-        }, false);
-
-        cnvs.addEventListener( 'mousemove', (event) => {
-          if (mouse_rotation) {
-            event.preventDefault();
-            let x = Math.abs(Obj.rotation.x);
-            let y = Math.abs(Obj.rotation.y);
-
-            if (x > 2 * Math.PI ) { Obj.rotation.x = 0; }
-            if (y > 2 * Math.PI ) { Obj.rotation.y = 0; }
-
-            Obj.rotation.x += event.clientX * event.movementY * 0.000008;
-
-            if (x > 1.57 && x < 4.71) {
-              Obj.rotation.y -= event.clientY * event.movementX * 0.00001745;
-            } else {
-              Obj.rotation.y += event.clientY * event.movementX * 0.00001745;
-            }
-          } 
-        }, false);
-      }
-
       function resize() {
         if (camera) {
           renderer.setSize( window.innerWidth, window.innerHeight );
@@ -232,12 +190,13 @@
     </script>
 
     <script>
-      var renderer, scene, camera, controls, Obj, edges, edges_visible;
+      var renderer, scene, camera, grid, Obj, edges, edges_visible, grid_visible, render_requested;
+      var controls, controlsGizmo, gizmo;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
       var shadowMesh, shadowMaterial;
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation, reset_rotation, events_initialized;
-      var rot_x = 0, rot_y = 0, rot_z = 0, pos_x = 0, pos_y = 0, pos_z = 0;
+      var rot_x = 0, rot_y = 0, rot_z = 0;
       var previous_obj_scale = '1', bounding_box = new THREE.Box3();
       var selected_mtl_file, selected_obj_file, selected_url_file = '', url_displayed, url_loading;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_dds;
@@ -388,6 +347,7 @@
         }
 
         previous_obj_scale = current_obj_scale;
+        set_grid_y();
       }
 
       function scale_10x_set() {
@@ -396,6 +356,8 @@
         } else {
           Obj.scale.multiplyScalar( 0.1 );
         }
+
+        set_grid_y();
       }
 
       function radio_changed() {
@@ -472,15 +434,12 @@
         }
       }
 
-      function pos_x_changed() { pos_x = parseInt(document.getElementById('position_x').value); }
-      function pos_y_changed() { pos_y = parseInt(document.getElementById('position_y').value); }
-      function pos_z_changed() { pos_z = parseInt(document.getElementById('position_z').value); }
-
       function init(){
         if (scene) {
           scene.remove.apply( scene, scene.children );
 
           if (shadowMesh) { shadowMesh = null; }
+          if (gizmo) { gizmo.dispose(); }
 
           // Reset all values
           reset_all( true );
@@ -497,8 +456,11 @@
         texture_files_dds = [];
         edges = {};
         edges_visible = false;
+        grid_visible = false;
+        render_requested = false;
         current_texture = -1;
         document.getElementById('btn_textures').disabled = true;
+        document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
 
         if (!url_loading) {
           // Loaded file(s)
@@ -544,12 +506,10 @@
 
         if (scene == undefined) { scene = new THREE.Scene(); }
 
-        // Canvas mouse events, could be replaced with Orbit Controls but some features
-        // might not work as expected, since the camera is being rotated instead of the object
         if (!events_initialized) { initialize_event_listeners(); events_initialized = true; }
 
-        // Add grid helper for use with Orbit Controls
-        //scene.add(new THREE.GridHelper(200, 200, "yellow"));
+        // Create a grid helper for use with Orbit Controls
+        if (grid == undefined) { grid = new THREE.GridHelper( 200, 200, "yellow" ); }
 
         camera = new THREE.PerspectiveCamera( 45, ww/wh, 0.1, 2000 );
         camera.position.set( 0, 0, 250 );
@@ -591,15 +551,14 @@
         scene.add( spotLight );
         scene.add( spotLight.target );
 
-        // Add DirectionalLight to the scene (add it to the camera instead if using Orbit Controls)
+        // Add DirectionalLight to the camera (add it to the scene instead if not using Orbit Controls)
         directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 1 );
         directionalLight.position.set( 0, 0, 250 );
         directionalLight.lookAt( new THREE.Vector3( 0, 0, 0 ) );
-        scene.add( directionalLight );
+        camera.add( directionalLight );
 
-        // Orbit Controls can be used for rotation, zoom and move but are camera related
-        //controls = new THREE.OrbitControls(camera, renderer.domElement);
-        //controls.enableDamping = true;
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
         //controls.enableKeys = false;
         //controls.enableZoom = true;
         //controls.maxPolarAngle = 2.2;
@@ -608,6 +567,24 @@
         //controls.rotateSpeed = 0.2;
         //controls.minDistance = 2;
         //controls.maxDistance = 500;
+
+        if (controlsGizmo) {
+          gizmo = new controlsGizmo( controls, {
+            size: 65,
+            padding: 4,
+            bubbleSizePrimary: 7,
+            bubbleSizeSecondary: 3,
+            lineWidth: 1,
+            fontSize: "8px",
+            fontColor: "black",
+            fontWeight: "bold"
+          });
+
+          document.getElementById('axes').appendChild( gizmo.domElement );
+        }
+
+        render_requested = true;
+        render();
 
         // Load the Obj file
         if (selected_obj_file) {
@@ -705,9 +682,33 @@
               scene.add( Obj );
 
               camera.lookAt( Obj.position );
+            }, function ( xhr ) {
+              let today = new Date();
+              let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
 
-              render();
+              if (xhr.loaded == 0 && xhr.total == 0) {
+                console.log( 'OBJ 0% loaded - ' + time );
+              } else {
+                console.log( 'OBJ ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              }
+            }, function ( error ) {
+              console.log( 'Error loading OBJ!' );
+              console.log( error );
+              render_requested = false;
             });
+          }, function ( xhr ) {
+            let today = new Date();
+            let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+            if (xhr.loaded == 0 && xhr.total == 0) {
+              console.log( 'MTL 0% loaded - ' + time );
+            } else {
+              console.log( 'MTL ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+            }
+          }, function ( error ) {
+            console.log( 'Error loading MTL!' );
+            console.log( error );
+            render_requested = false;
           });
         } else {
           // Launch loading of the selected file
@@ -748,8 +749,19 @@
             scene.add( Obj );
 
             camera.lookAt( Obj.position );
+          }, function ( xhr ) {
+            let today = new Date();
+            let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
 
-            render();
+            if (xhr.loaded == 0 && xhr.total == 0) {
+              console.log( 'OBJ 0% loaded - ' + time );
+            } else {
+              console.log( 'OBJ ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+            }
+          }, function ( error ) {
+            console.log( 'Error loading OBJ!' );
+            console.log( error );
+            render_requested = false;
           });
         }
       }
@@ -785,8 +797,6 @@
             scene.add( Obj );
 
             camera.lookAt( Obj.position );
-
-            render();
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -802,6 +812,24 @@
             render_requested = false;
           });
         }
+      }
+
+      function show_grid() {
+        if (grid_visible) {
+          scene.remove( grid );
+          grid_visible = false;
+          document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
+        } else {
+          set_grid_y();
+          scene.add( grid );
+          grid_visible = true;
+          document.getElementById('btn_grid').style.backgroundColor = 'lightgreen';
+        }
+      }
+
+      function set_grid_y() {
+        bounding_box.setFromObject( Obj );
+        grid.position.y = bounding_box.min.y;
       }
 
       function show_edges() {
@@ -883,36 +911,39 @@
       }
 
       function render() {
-        requestAnimationFrame( render );
+        if (render_requested) { requestAnimationFrame( render ); }
 
-        // Move the Obj in the scene
-        Obj.position.set( pos_x, pos_y, pos_z );
+        if (Obj) {
+          // Reset Obj rotational values
+          if (reset_rotation) {
+            Obj.rotation.set( 0, 0, 0 );
+            reset_rotation = false;
+          }
 
-        // Reset Obj rotational values
-        if (reset_rotation) {
-          Obj.rotation.set( 0, 0, 0 );
-          reset_rotation = false;
+          // Rotate the Obj
+          if (!mouse_rotation && (rot_x != 0 || rot_y != 0 || rot_z != 0)) {
+            Obj.rotation.x += rot_x;
+            Obj.rotation.y += rot_y;
+            Obj.rotation.z += rot_z;
+
+            if (Math.abs(Obj.rotation.x) > 2 * Math.PI ) { Obj.rotation.x = 0; }
+            if (Math.abs(Obj.rotation.y) > 2 * Math.PI ) { Obj.rotation.y = 0; }
+            if (Math.abs(Obj.rotation.z) > 2 * Math.PI ) { Obj.rotation.z = 0; }
+          }
         }
 
-        // Rotate the Obj
-        if (!mouse_rotation && (rot_x != 0 || rot_y != 0 || rot_z != 0)) {
-          Obj.rotation.x += rot_x;
-          Obj.rotation.y += rot_y;
-          Obj.rotation.z += rot_z;
-
-          if (Math.abs(Obj.rotation.x) > 2 * Math.PI ) { Obj.rotation.x = 0; }
-          if (Math.abs(Obj.rotation.y) > 2 * Math.PI ) { Obj.rotation.y = 0; }
-          if (Math.abs(Obj.rotation.z) > 2 * Math.PI ) { Obj.rotation.z = 0; }
-        }
-
-        //controls.update();
+        controls.update();
+        if (gizmo) { gizmo.update(); }
 
         renderer.clear();
       	renderer.render( scene, camera );
       }
 
       function reset_only() {
+        if (grid_visible) { show_grid(); }
+
         scene.remove( Obj );
+
         reset_all( true );
 
         if (selected_obj_file) {
@@ -923,19 +954,13 @@
       }
 
       function reset_all( reset = false ) {
-        // Reset all current positional and rotational values
+        // Reset all current rotational values
         document.getElementById('rotation_x').value = 0;
         document.getElementById('rotation_y').value = 0;
         document.getElementById('rotation_z').value = 0;
-        document.getElementById('position_x').value = 0;
-        document.getElementById('position_y').value = 0;
-        document.getElementById('position_z').value = 0;
         rot_x = 0;
         rot_y = 0;
         rot_z = 0;
-        pos_x = 0;
-        pos_y = 0;
-        pos_z = 0;
 
         // Reset the background and related values
         document.getElementById('file_image_input').value = "";
@@ -1007,9 +1032,6 @@
         document.getElementById('rotation_x').disabled = disable;
         document.getElementById('rotation_y').disabled = disable;
         document.getElementById('rotation_z').disabled = disable;
-        document.getElementById('position_x').disabled = disable;
-        document.getElementById('position_y').disabled = disable;
-        document.getElementById('position_z').disabled = disable;
         document.getElementById('wireframe').disabled = disable;
         document.getElementById('shadow').disabled = disable;
         document.getElementById('scale_10x').disabled = disable;
@@ -1022,8 +1044,14 @@
         document.getElementById('directional_light_intensity').disabled = disable;
         document.getElementById('back_color').disabled = disable;
         document.getElementById('btn_edges').disabled = disable;
+        document.getElementById('btn_grid').disabled = disable;
         document.getElementById('reset').disabled = disable;
       }
+    </script>
+
+    <script type="module">
+      import { OrbitControlsGizmo } from '../static/js/OrbitControlsGizmo.js';
+      controlsGizmo = OrbitControlsGizmo;
     </script>
   </body>
 </html>
