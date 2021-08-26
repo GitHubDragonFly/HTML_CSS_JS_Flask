@@ -46,7 +46,7 @@ Even though this is all intended to be used with the `Flask` server, thanks to t
  - DAE Viewer will not allow loading KTX2 textures (check the module "import" console error)
  - The Form entries are set to be handled by the server and will not work in the preview
 
-And just for convenience, you can access the viewers directly here: [OBJ Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/OBJ Viewer.html) , [PLY / STL Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/PLY Viewer.html) , [DAE Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/DAE Viewer.html) , [GLTF Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/GLTF Viewer.html)
+And just for convenience, you can access the viewers directly here: [OBJ Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/OBJ Viewer.html) , [PLY + STL Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/PLY Viewer.html) , [DAE Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/DAE Viewer.html) , [GLTF Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/GLTF Viewer.html)
 
 OR with the `Flask` server support:
 
