@@ -6,6 +6,7 @@ This is a modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonF
 The main differences between these 2 projects:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
  - uploading any pictures via the `Form` will then have those saved in the new `uploads` folder
+ - all viewers in this project support URL loading
  - DRACO and KTX2 support were added to the GLTF Viewer:
    - this seems to work fine when using URL option (see the screenshot) so try using it for fetching files both locally and from the Internet
    - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG/BMP` texture file along just to see if and how it changes the object's appearance)
@@ -30,7 +31,7 @@ Additional Notes:
  - OBJ viewer also includes an experimental texture switching button (with letter "T") which was tested as working with local version of this example:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus.obj`
    - this is only functional when loading local OBJ file together with texture files (without MTL file)
- - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in the GLTF / DAE viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
+ - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in all viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
 
 Notes about showing the edges (button with letter "E"):
  - these are aplied to the still version of the object itself and will not follow the animation in case of GLTF and DAE viewers
