@@ -84,6 +84,7 @@
     <div class="fixed-menu">
       <div>
         <label for="file" style="color: #CE8704; margin: 2px 2px 2px 5px;">OBJ:</label>
+        <button onclick="show_url()" style="margin: 2px 2px 2px 0;">URL</button>
         <input type="file" id="file_input" name="file" onchange="init()" style="margin: 2px 5px 2px 0;" multiple />
         <label for="file_image_input" style="color: #CE8704; margin: 2px 2px 2px 0;">BG Image:</label>
         <input type="file" id="file_image_input" name="file_image_input" accept="image/png, image/jpeg, image/bmp, image/gif, image/svg+xml" onchange="set_scene_image()" style="margin: 2px 5px 2px 0;" disabled />
@@ -98,6 +99,11 @@
         <button id="btn_textures" onclick="set_texture()" style="background-color: #d1cefc; vertical-align: middle; width: 28px; margin: 2px 2px 2px 2px; padding: 0;" disabled>T</button>
         <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 40px;" disabled>Reset</button>
         <button id="btn_full_screen" onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
+      </div>
+      <div id="url" style="display: none;">
+        <label for="url_entry" style="margin: 2px 2px 2px 5px;">URL:</label>
+        <input type="text" id="url_entry" name="url_entry" size="90" value="" style="margin: 2px 5px 2px 0;" />
+        <button id="btn_load_url" onclick="load_url_file()" style="-webkit-border-radius: 2px; border-radius: 2px; width: 50px; margin: 2px 0 2px 0; padding: 2px;">Load</button>
       </div>
       <div>
         <label style="color: blue; margin: 2px 0 2px 0;"><input type="radio" id="hlight" name="mode" value="HL" onchange="radio_changed()" disabled />HL</label>
@@ -139,6 +145,29 @@
     </canvas>
 
     <script>
+      function show_url() {
+        if (url_displayed) {
+          document.getElementById('url').style.display = 'none';
+          url_displayed = false;
+        } else {
+          document.getElementById('url').style.display = 'block';
+          url_displayed = true;
+        }
+      }
+
+      function load_url_file() {
+        let url = document.getElementById('url_entry').value.trim();
+
+        if (url != '') { selected_url_file = url; url_loading = true; init(); }
+      }
+
+      function initialize_event_listeners() {
+        var cnvs = document.getElementById('scene');
+
+        cnvs.addEventListener( 'mousedown', (event) => { mouse_rotation = true; }, false);
+        cnvs.addEventListener( 'mouseup', (event) => { mouse_rotation = false; }, false);
+      }
+
       function initialize_event_listeners() {
         var cnvs = document.getElementById('scene');
 
@@ -210,7 +239,7 @@
       var mouse_rotation, reset_rotation, events_initialized;
       var rot_x = 0, rot_y = 0, rot_z = 0, pos_x = 0, pos_y = 0, pos_z = 0;
       var previous_obj_scale = '1', bounding_box = new THREE.Box3();
-      var selected_mtl_file, selected_obj_file;
+      var selected_mtl_file, selected_obj_file, selected_url_file = '', url_displayed, url_loading;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_dds;
 
       // Manager from ThreeJs to track a loader and its status
@@ -239,7 +268,7 @@
               child.material.opacity = opacity_value;
               if (document.getElementById('shadow').checked) {
                 shadowMaterial.opacity = opacity_value * document.getElementById('spot_light_intensity').value;
-          }
+              }
     		    }
     	    });
         }
@@ -448,9 +477,6 @@
       function pos_z_changed() { pos_z = parseInt(document.getElementById('position_z').value); }
 
       function init(){
-        // Loaded file(s)
-        var fi = document.getElementById('file_input');
-
         if (scene) {
           scene.remove.apply( scene, scene.children );
 
@@ -474,17 +500,28 @@
         current_texture = -1;
         document.getElementById('btn_textures').disabled = true;
 
-        // Include check for JPG/PNG/BMP and DDS (DirectDraw Surface container file format)
-        for (let i = 0; i < fi.files.length; i++) {
-          if (fi.files[i].name.toUpperCase().endsWith('.OBJ')) { selected_obj_file = fi.files[i]; }
-          else if (fi.files[i].name.toUpperCase().endsWith('.MTL')) { selected_mtl_file = fi.files[i]; }
-          else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
-          else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
-          else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
-          else if (fi.files[i].name.toUpperCase().endsWith('.DDS')) { texture_files_dds.push( fi.files[i] ); }
-        };
+        if (!url_loading) {
+          // Loaded file(s)
+          var fi = document.getElementById('file_input');
 
-        if (!selected_obj_file) { return; }
+          // Include check for JPG/PNG/BMP and DDS (DirectDraw Surface container file format)
+          for (let i = 0; i < fi.files.length; i++) {
+            if (fi.files[i].name.toUpperCase().endsWith('.OBJ')) { selected_obj_file = fi.files[i]; }
+            else if (fi.files[i].name.toUpperCase().endsWith('.MTL')) { selected_mtl_file = fi.files[i]; }
+            else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.DDS')) { texture_files_dds.push( fi.files[i] ); }
+          };
+
+          if (!selected_obj_file) { return; }
+
+          selected_url_file = '';
+        } else {
+          // Reset the file input
+          document.getElementById('file_input').value = '';
+          url_loading = false;
+        }
 
         document.body.style.backgroundImage = "none";
         document.getElementById('div_spinner').style.display = "none";
@@ -573,7 +610,11 @@
         //controls.maxDistance = 500;
 
         // Load the Obj file
-        loadFile();
+        if (selected_obj_file) {
+          loadFile();
+        } else {
+          loadURLFile();
+        }
       }
 
       function loadFile() {
@@ -709,6 +750,56 @@
             camera.lookAt( Obj.position );
 
             render();
+          });
+        }
+      }
+
+      function loadURLFile() {
+        if (selected_url_file != '') {
+          obj_loader.load( selected_url_file, function ( object ) {
+            Obj = object.clone();
+
+            let child_count = 1;
+
+            // Go through all children of the loaded object and search for a Mesh
+            Obj.traverse( function( child ) {
+              // This will allow us to check if the child is an instance of the Mesh constructor
+        	    if (child instanceof THREE.Mesh) {
+                // Enable transparency for the Opacity control and enable shadows
+                child.material.skinning = true;
+                child.material.opacity = 1;
+                child.material.transparent = true;
+                child.castShadow = true;
+                child.receiveShadow = true;
+
+                child.name = 'child_' + child_count;
+                edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+                child_count += 1;
+    		      }
+    	      });
+
+            set_initial_scale();
+            resize();
+
+            // Add the 3D object in the scene
+            scene.add( Obj );
+
+            camera.lookAt( Obj.position );
+
+            render();
+          }, function ( xhr ) {
+            let today = new Date();
+            let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+            if (xhr.loaded == 0 && xhr.total == 0) {
+              console.log( 'OBJ from URL 0% loaded - ' + time );
+            } else {
+              console.log( 'OBJ from URL ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+            }
+          }, function ( error ) {
+            console.log( 'Error loading OBJ from URL!' );
+            console.log( error );
+            render_requested = false;
           });
         }
       }

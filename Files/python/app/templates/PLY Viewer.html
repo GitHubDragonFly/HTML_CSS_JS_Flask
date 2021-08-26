@@ -80,6 +80,7 @@
     <div class="fixed-menu">
       <div>
         <label for="file" style="color: #CE8704; margin: 2px 2px 2px 5px;">PLY/STL:</label>
+        <button onclick="show_url()" style="margin: 2px 2px 2px 0;">URL</button>
         <input type="file" id="file_input" name="file" onchange="init()" style="margin: 2px 5px 2px 0;" multiple />
         <label for="file_image_input" style="color: #CE8704; margin: 2px 2px 2px 0;">BG Image:</label>
         <input type="file" id="file_image_input" name="file_image_input" accept="image/png, image/jpeg, image/bmp, image/gif, image/svg+xml" onchange="set_scene_image()" style="margin: 2px 5px 2px 0;" disabled />
@@ -93,6 +94,11 @@
         <button id="btn_edges" onclick="show_edges()" style="background-color: #d1cefc; vertical-align: middle; width: 20px; margin: 2px 2px 2px 2px; padding: 0;" disabled>E</button>
         <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 40px;" disabled>Reset</button>
         <button id="btn_full_screen" onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
+      </div>
+      <div id="url" style="display: none;">
+        <label for="url_entry" style="margin: 2px 2px 2px 5px;">URL:</label>
+        <input type="text" id="url_entry" name="url_entry" size="90" value="" style="margin: 2px 5px 2px 0;" />
+        <button id="btn_load_url" onclick="load_url_file()" style="-webkit-border-radius: 2px; border-radius: 2px; width: 50px; margin: 2px 0 2px 0; padding: 2px;">Load</button>
       </div>
       <div>
         <label style="color: blue; margin: 2px 0 2px 0;"><input type="radio" id="hlight" name="mode" value="HL" onchange="radio_changed()" disabled />HL</label>
@@ -136,6 +142,22 @@
     </div>
 
     <script>
+      function show_url() {
+        if (url_displayed) {
+          document.getElementById('url').style.display = 'none';
+          url_displayed = false;
+        } else {
+          document.getElementById('url').style.display = 'block';
+          url_displayed = true;
+        }
+      }
+
+      function load_url_file() {
+        let url = document.getElementById('url_entry').value.trim();
+
+        if (url != '') { selected_url_file = url; url_loading = true; init(); }
+      }
+
       function initialize_event_listeners() {
         var cnvs = document.getElementById('scene');
 
@@ -211,7 +233,7 @@
       var mouse_rotation = false, reset_rotation = false, events_initialized = false;
       var rot_x = 0, rot_y = 0, rot_z = 0, pos_x = 0, pos_y = 0, pos_z = 0;
       var previous_ply_scale = '1', bounding_box = new THREE.Box3();
-      var selected_ply_file, selected_stl_file;
+      var selected_ply_file, selected_stl_file, selected_url_file = '', url_displayed, url_loading;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_dds;
 
       // Manager from ThreeJs to track a loader and its status
@@ -219,7 +241,7 @@
       // Loader for selected file from Three.js
       const ply_loader = new THREE.PLYLoader( manager );
       const stl_loader = new THREE.STLLoader( manager );
-
+      const texture_loader = new THREE.TextureLoader();
       const dds_loader = new THREE.DDSLoader( manager );
       manager.addHandler( /\.dds$/i, dds_loader );
 
@@ -246,8 +268,7 @@
           document.body.style.backgroundColor = document.getElementById('back_color').value;
 
           if (fii.files[0].type.startsWith('image/')) {
-            const loader = new THREE.TextureLoader();
-            loader.load( URL.createObjectURL( fii.files[0] ) , function(texture) {
+            texture_loader.load( URL.createObjectURL( fii.files[0] ) , function(texture) {
               scene.background = texture;
             });
           } else {
@@ -441,9 +462,6 @@
       function pos_z_changed() { pos_z = parseInt(document.getElementById('position_z').value); }
 
       function init(){
-        // Loaded file
-        var fi = document.getElementById('file_input');
-
         if (scene != null) {
           scene.remove.apply( scene, scene.children );
 
@@ -453,8 +471,6 @@
           // Reset all values
           reset_all( true );
         }
-
-        if (!fi.files) { return; }
 
         enable_disable( true );
 
@@ -467,17 +483,28 @@
         edges = null;
         edges_visible = false;
 
-        // Include check for JPG/PNG/BMP and DDS (DirectDraw Surface container file format)
-        for (let i = 0; i < fi.files.length; i++) {
-          if (fi.files[i].name.toUpperCase().endsWith('.PLY')) { selected_ply_file = fi.files[i]; }
-          else if (fi.files[i].name.toUpperCase().endsWith('.STL')) { selected_stl_file = fi.files[i]; }
-          else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
-          else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
-          else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
-          else if (fi.files[i].name.toUpperCase().endsWith('.DDS')) { texture_files_dds.push( fi.files[i] ); }
-        };
+        if (!url_loading) {
+          // Loaded file
+          var fi = document.getElementById('file_input');
 
-        if (!selected_ply_file && !selected_stl_file) { return; }
+          // Include check for JPG/PNG/BMP and DDS (DirectDraw Surface container file format)
+          for (let i = 0; i < fi.files.length; i++) {
+            if (fi.files[i].name.toUpperCase().endsWith('.PLY')) { selected_ply_file = fi.files[i]; }
+            else if (fi.files[i].name.toUpperCase().endsWith('.STL')) { selected_stl_file = fi.files[i]; }
+            else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.DDS')) { texture_files_dds.push( fi.files[i] ); }
+          };
+
+          if (!selected_ply_file && !selected_stl_file) { return; }
+
+          selected_url_file = '';
+        } else {
+          // Reset the file input
+          document.getElementById('file_input').value = '';
+          url_loading = false;
+        }
 
         document.body.style.backgroundImage = "none";
         document.getElementById('div_spinner').style.display = "none";
@@ -573,8 +600,10 @@
         // Launch loading of the selected file, addFileInScene is the callback when it's ready
         if (selected_ply_file) {
           ply_loader.load( URL.createObjectURL( selected_ply_file ), addFileInScene );
-        } else {
+        } else if (selected_stl_file) {
           stl_loader.load( URL.createObjectURL( selected_stl_file ), addFileInScene );
+        } else {
+          loadURLFile();
         }
       }
 
@@ -586,8 +615,7 @@
           smooth.mergeVertices();
 
           if (texture_files_jpg.length > 0) {
-            const loader = new THREE.TextureLoader();
-            texture = loader.load( URL.createObjectURL( texture_files_jpg[0] ));
+            texture = texture_loader.load( URL.createObjectURL( texture_files_jpg[0] ));
             material = new THREE.MeshLambertMaterial( {
               map: texture,
               fog: true,
@@ -598,8 +626,7 @@
               reflectivity: 1
             });
           } else if (texture_files_png.length > 0) {
-            const loader = new THREE.TextureLoader();
-            texture = loader.load( URL.createObjectURL( texture_files_png[0] ));
+            texture = texture_loader.load( URL.createObjectURL( texture_files_png[0] ));
             material = new THREE.MeshLambertMaterial( {
               map: texture,
               fog: true,
@@ -610,8 +637,7 @@
               reflectivity: 1
             });
           } else if (texture_files_bmp.length > 0) {
-            const loader = new THREE.TextureLoader();
-            texture = loader.load( URL.createObjectURL( texture_files_bmp[0] ));
+            texture = texture_loader.load( URL.createObjectURL( texture_files_bmp[0] ));
             material = new THREE.MeshLambertMaterial( {
               map: texture,
               fog: true,
@@ -695,6 +721,19 @@
         render();
       }
 
+      function loadURLFile() {
+        if (selected_url_file != '') {
+          // Launch loading of the selected file, addFileInScene is the callback when it's ready
+          if (selected_url_file.toUpperCase().endsWith('.PLY')) {
+            selected_ply_file = selected_url_file;
+            ply_loader.load( selected_ply_file, addFileInScene );
+          } else if (selected_url_file.toUpperCase().endsWith('.STL')) {
+            selected_stl_file = selected_url_file;
+            stl_loader.load( selected_stl_file, addFileInScene );
+          }
+        }
+      }
+
       function show_edges() {
         if (edges_visible) {
           mesh.remove( edges );
@@ -739,7 +778,7 @@
         }
 
         // Rotate the mesh
-        if (!mouse_rotation) {
+        if (!mouse_rotation && (rot_x != 0 || rot_y != 0 || rot_z != 0)) {
           mesh.rotation.x += rot_x;
           mesh.rotation.y += rot_y;
           mesh.rotation.z += rot_z;

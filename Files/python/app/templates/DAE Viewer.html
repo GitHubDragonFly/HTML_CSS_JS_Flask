@@ -204,7 +204,7 @@
 
       // Loader for selected file from Three.js
       const dae_loader = new THREE.ColladaLoader( manager );
-
+      const texture_loader = new THREE.TextureLoader();
       const dds_loader = new THREE.DDSLoader( manager );
       manager.addHandler( /\.dds$/i, dds_loader );
 
@@ -247,8 +247,7 @@
           document.body.style.backgroundColor = document.getElementById('back_color').value;
 
           if (fii.files[0].type.startsWith('image/')) {
-            const loader = new THREE.TextureLoader();
-            loader.load( URL.createObjectURL( fii.files[0] ) , function ( texture ) {
+            texture_loader.load( URL.createObjectURL( fii.files[0] ) , function ( texture ) {
               scene.background = texture;
             });
           } else {
@@ -701,8 +700,7 @@
                   let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : texture_files_bmp);
 
                   files.forEach( file => {
-                    let loader = new THREE.TextureLoader();
-                    loader.load( URL.createObjectURL( file ) , function( texture ) {
+                    texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
                       texture.encoding = THREE.sRGBEncoding;
                       texture.wrapS = THREE.RepeatWrapping;
                       texture.wrapT = THREE.RepeatWrapping;
