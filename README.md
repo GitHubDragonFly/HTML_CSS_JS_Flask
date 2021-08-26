@@ -28,9 +28,10 @@ Additional Notes:
    - do note that the above example seems to have some faults in it and has shown some disconnects and material issues, which are not necessarily visible in all viewers due to coding and design approach (try it in the viewers mentioned in the `Resources` section, with Don McCurdy's `GLTF Viewer` actually showing how many errors were detected)
    - other examples, like `Horse.glb` or `Parrot.glb`, will be showing those morph targets almost like frames of the animation itself
  - PLY viewer now includes STL file loader
- - OBJ viewer also includes an experimental texture switching button (with letter "T") which was tested as working with local version of this example:
+ - OBJ viewer also includes an experimental texture switching button, with letter "T", which was tested as working with local version of this example:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus.obj`
-   - this is only functional when loading local OBJ file together with texture files (without MTL file)
+   - this is only functional when loading local OBJ file together with texture files (and without MTL file)
+   - URL loading of the above example will not pull in any other resources
  - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in all viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
 
 Notes about showing the edges (button with letter "E"):
