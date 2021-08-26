@@ -31,7 +31,7 @@ Additional Notes:
  - OBJ viewer also includes an experimental texture switching button, with letter "T", which was tested as working with local version of this example:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus.obj`
    - this is only functional when loading local OBJ file together with texture files (and without MTL file)
-   - URL loading of the above example will not pull in any other resources
+   - Note: URL loading of the above example will not pull in any other resources
  - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in all viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
 
 Notes about showing the edges (button with letter "E"):
