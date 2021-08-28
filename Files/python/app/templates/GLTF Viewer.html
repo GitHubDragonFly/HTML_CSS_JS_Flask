@@ -5,9 +5,10 @@
     <link rel="shortcut icon" href="../static/favicon.ico" type="image/x-icon"/>
 
     <script src="../static/js/three.js"></script>
-    <script src="../static/js/OrbitControls.js"></script>
     <script src="../static/js/DRACOLoader.js"></script>
     <script src="../static/js/GLTFLoader.js"></script>
+    <script src="../static/js/OrbitControls.js"></script>
+    <script src="../static/js/OrbitControlsGizmo.js"></script>
     <script src="../static/js/libs/meshopt_decoder.js"></script>
 
     <style>
@@ -192,7 +193,7 @@
     <script>
       var ktx2_loader, animations, animation_mixer, current_animation, extras, current_extra, clock;
       var renderer, scene, camera, grid, gltf_obj, edges, edges_visible, grid_visible;
-      var controls, controlsGizmo, gizmo;
+      var controls, gizmo;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
       var shadowMesh, shadowMaterial, materials, current_material, materials_available, draco_material;
       var ww = window.innerWidth,	wh = window.innerHeight;
@@ -206,8 +207,8 @@
       var manager = new THREE.LoadingManager();
       // Loader for selected file from Three.js
       const gltf_loader = new THREE.GLTFLoader( manager );
-      const draco_loader = new THREE.DRACOLoader( manager );
 
+      const draco_loader = new THREE.DRACOLoader( manager );
       draco_loader.setDecoderPath( '../static/js/libs/draco/' );
       draco_loader.preload();
       gltf_loader.setDRACOLoader( draco_loader );
@@ -678,20 +679,18 @@
         //controls.minDistance = 2;
         //controls.maxDistance = 500;
 
-        if (controlsGizmo) {
-          gizmo = new controlsGizmo( controls, {
-            size: 65,
-            padding: 4,
-            bubbleSizePrimary: 7,
-            bubbleSizeSecondary: 3,
-            lineWidth: 1,
-            fontSize: "8px",
-            fontColor: "black",
-            fontWeight: "bold"
-          });
+        gizmo = new OrbitControlsGizmo( controls, {
+          size: 65,
+          padding: 4,
+          bubbleSizePrimary: 7,
+          bubbleSizeSecondary: 3,
+          lineWidth: 1,
+          fontSize: "8px",
+          fontColor: "black",
+          fontWeight: "bold"
+        });
 
-          document.getElementById('axes').appendChild( gizmo.domElement );
-        }
+        document.getElementById('axes').appendChild( gizmo.domElement );
 
         render_requested = true;
         render();
@@ -809,9 +808,9 @@
             }
 
             if (extras.length > 0) {
-                document.getElementById('btn_extras').disabled = false;
-                current_extra = 0;
-              }
+              document.getElementById('btn_extras').disabled = false;
+              current_extra = 0;
+            }
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1270,7 +1269,6 @@
 
     <script type="module">
       import { KTX2Loader } from '../static/js/KTX2Loader.js';
-      import { OrbitControlsGizmo } from '../static/js/OrbitControlsGizmo.js';
 
       renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
       renderer.setPixelRatio( window.devicePixelRatio );
@@ -1282,7 +1280,6 @@
       renderer.autoClear = false;
 
       ktx2_loader = new KTX2Loader( manager );
-      controlsGizmo = OrbitControlsGizmo;
 
       ktx2_loader.setTranscoderPath('../static/js/libs/basis/');
       ktx2_loader.detectSupport(renderer);
