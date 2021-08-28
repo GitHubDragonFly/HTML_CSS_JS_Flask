@@ -1,7 +1,7 @@
 # HTML_CSS_JS_Flask
 Generally intended for educational purposes.
 
-This is a modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project so check a description of all the features there. It is set to be used with `python3` and `Flask` server. There are several Three.js viewers, not necessarily perfect but functional as they are (preview link is available in the `Usage` section but does have some limitations).
+This is a modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project so check a description of all the features there. It is set to be used with `python3` and `Flask` server. There are several Three.js viewers, not necessarily perfect but functional as they are (preview links are available in the `Usage` section but do have some limitations).
 
 The main differences between these 2 projects:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
@@ -14,7 +14,7 @@ The main differences between these 2 projects:
  - KTX2 support was also added to the DAE Viewer
 
 Additional Notes:
- - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) module was added to all viewers
+ - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) non-module version was added to all viewers
  - GLTF and DAE viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
    - Xbot.glb is the multi-animation example that can be accessed in the GLTF viewer via the following URL:
@@ -46,7 +46,6 @@ Notes about showing the edges (button with letter "E"):
 All it takes to run this project is to do either of the below listed:
 
 a) Even though this is all intended to be used with the `Flask` server, thanks to the [GitHub & BitBucket HTML Preview](https://github.com/htmlpreview/htmlpreview.github.com) you can still preview the [Exercise](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/Exercise.html) page online and use its fixed menu to access the rest, with the following limitations:
- - OrbitControlsGizmo will not work in either GLTF or DAE viewer (check the module "import" console error)
  - GLTF Viewer does allow loading DRACO files but does not allow loading KTX2 textures (check the module "import" console error)
  - DAE Viewer will not allow loading KTX2 textures (check the module "import" console error)
  - The Form entries are set to be handled by the server and will not work in the preview
