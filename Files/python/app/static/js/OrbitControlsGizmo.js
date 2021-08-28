@@ -1,9 +1,3 @@
-import {
-  Vector2,
-  Vector3,
-  Matrix4
-} from "../build/three.module.js";
-
 class OrbitControlsGizmo {
 	constructor(orbitControls, options) {
 
@@ -65,12 +59,12 @@ class OrbitControlsGizmo {
     const scoped = this;
     const orbit = orbitControls;
     const camera = orbitControls.object;
-		const invRotMat = new Matrix4();
-    const mouse = new Vector3();
-    const rotateStart = new Vector2();
-    const rotateEnd = new Vector2();
-    const rotateDelta = new Vector2();
-    const center = new Vector3(options.size / 2, options.size / 2, 0);
+    const invRotMat = new THREE.Matrix4();
+    const mouse = new THREE.Vector3();
+    const rotateStart = new THREE.Vector2();
+    const rotateEnd = new THREE.Vector2();
+    const rotateDelta = new THREE.Vector2();
+    const center = new THREE.Vector3(options.size / 2, options.size / 2, 0);
     const axes = createAxes();
 		let selectedAxis = null;
     let isDragging = false;
@@ -91,12 +85,12 @@ class OrbitControlsGizmo {
         secondary: options.bubbleSizeSecondary,
       }
       return [
-        { axis: "x", direction: new Vector3(1, 0, 0), size: size.primary, color: colors.x, line, label: "X", position: new Vector3(0, 0, 0)  },
-        { axis: "y", direction: new Vector3(0, 1, 0), size: size.primary, color: colors.y, line, label: "Y", position: new Vector3(0, 0, 0)  },
-        { axis: "z", direction: new Vector3(0, 0, 1), size: size.primary, color: colors.z, line, label: "Z", position: new Vector3(0, 0, 0)  },
-        { axis: "-x", direction: new Vector3(-1, 0, 0), size: size.secondary, color: colors.x, position: new Vector3(0, 0, 0) },
-        { axis: "-y", direction: new Vector3(0, -1, 0), size: size.secondary, color: colors.y, position: new Vector3(0, 0, 0) },
-        { axis: "-z", direction: new Vector3(0, 0, -1), size: size.secondary, color: colors.z, position: new Vector3(0, 0, 0) },
+        { axis: "x", direction: new THREE.Vector3(1, 0, 0), size: size.primary, color: colors.x, line, label: "X", position: new THREE.Vector3(0, 0, 0)  },
+        { axis: "y", direction: new THREE.Vector3(0, 1, 0), size: size.primary, color: colors.y, line, label: "Y", position: new THREE.Vector3(0, 0, 0)  },
+        { axis: "z", direction: new THREE.Vector3(0, 0, 1), size: size.primary, color: colors.z, line, label: "Z", position: new THREE.Vector3(0, 0, 0)  },
+        { axis: "-x", direction: new THREE.Vector3(-1, 0, 0), size: size.secondary, color: colors.x, position: new THREE.Vector3(0, 0, 0) },
+        { axis: "-y", direction: new THREE.Vector3(0, -1, 0), size: size.secondary, color: colors.y, position: new THREE.Vector3(0, 0, 0) },
+        { axis: "-z", direction: new THREE.Vector3(0, 0, -1), size: size.secondary, color: colors.z, position: new THREE.Vector3(0, 0, 0) },
       ];
     }
     
@@ -282,5 +276,3 @@ class OrbitControlsGizmo {
   }
 	
 }
-
-export { OrbitControlsGizmo }
