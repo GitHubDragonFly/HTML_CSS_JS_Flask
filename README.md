@@ -60,6 +60,8 @@ b) OR with the `Flask` server support:
  - Use the command prompt to navigate to the `app` folder and run the following command: `python -m app` or `python3 -m app`
  - The server will show you the IP address and the port, generally accessible in the Internet browser via `localhost:5000`.
 
+Note: Opening any of the Three.js viewers `HTML` files directly from your hard drive in the browser will probably have some limitations due to the CORS restrictions that your browser might have enabled. This is why the `Flask` server should be used.
+
 Optionally use VS Code for editing, troubleshooting and running the app, which should be far easier than using the command prompt.
 
 # Licensing
