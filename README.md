@@ -14,6 +14,7 @@ The main differences between these 2 projects:
  - KTX2 support was also added to the DAE Viewer
 
 Additional Notes:
+ - Single letter buttons, where applicable: `E` - edges, `A` - animations, `X`- extras, `M` - materials, `T` - textures
  - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) non-module version was added to all viewers
  - GLTF and DAE viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
