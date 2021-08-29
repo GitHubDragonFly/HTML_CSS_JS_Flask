@@ -1268,9 +1268,7 @@
     </script>
 
     <script type="module">
-      //import { KTX2Loader } from '../static/js/KTX2Loader.js';
-      // Uncomment the line above and comment out the line below if you don't have a working Internet connection
-      import { KTX2Loader } from 'https://cdn.skypack.dev/three@0.131.1/examples/jsm/loaders/KTX2Loader.js';
+      import { KTX2Loader } from '../static/js/KTX2Loader.js';
 
       renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
       renderer.setPixelRatio( window.devicePixelRatio );
