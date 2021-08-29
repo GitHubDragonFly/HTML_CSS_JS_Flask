@@ -21,6 +21,7 @@ Additional Notes:
    - tested only with three.js examples and has audio delayTime set for those (with current value of 3.5)
    - observe the LICENSES of that and any other content you want to use
    - mainly designed to be used with local files, which should all be in the same folder (PMD, PMX, VMD, VPD, MP3)
+   - try all the different combinations of the mentioned files to see what works
    - URL option is set for 1 file, like this: `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd`
    - there is also a polar grid button available
  - GLTF and DAE viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
