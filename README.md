@@ -6,6 +6,7 @@ This is a modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonF
 The main differences between these 2 projects:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
  - uploading any pictures via the `Form` will then have those saved in the new `uploads` folder
+ - new addition is the MMD viewer (Miku Miku Dance)
  - all viewers in this project support URL loading, use Orbit Controls and have a gizmo and grid present
  - DRACO and KTX2 support were added to the GLTF Viewer:
    - this seems to work fine when using URL option (see the screenshot) so try using it for fetching files both locally and from the Internet
@@ -14,8 +15,14 @@ The main differences between these 2 projects:
  - KTX2 support was also added to the DAE Viewer
 
 Additional Notes:
- - Single character buttons, where applicable: `E` - edges, `A` - animations, `X`- extras, `M` - materials, `T` - textures, `#` - grid
+ - Single character buttons, where applicable: `E` - edges, `A` - animations, `X`- extras, `M` - materials, `T` - textures, `P` - poses, `#` - grid
  - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) non-module version was added to all viewers
+ - MMD viewer supports animation, changing pose, extras and audio:
+   - tested only with three.js examples and has audio delayTime set for those (with current value of 3.5)
+   - observe the LICENSES of that and any other content you want to use
+   - mainly designed to be used with local files, which should all be in the same folder (PMD, PMX, VMD, VPD, MP3)
+   - URL option is set for 1 file, like this: `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd`
+   - there is also a polar grid button available
  - GLTF and DAE viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
    - Xbot.glb is the multi-animation example that can be accessed in the GLTF viewer via the following URL:
@@ -51,7 +58,7 @@ a) Even though this is all intended to be used with the `Flask` server, thanks t
  - DAE Viewer will not allow loading KTX2 textures (check the module "import" console error)
  - The Form entries are set to be handled by the server and will not work in the preview
 
-And just for the convenience, you can access the viewers directly here: [OBJ Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/OBJ%20Viewer.html) / [PLY + STL Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/PLY%20Viewer.html) / [DAE Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/DAE%20Viewer.html) / [GLTF Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/GLTF%20Viewer.html)
+And just for the convenience, you can access the viewers directly here: [OBJ Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/OBJ%20Viewer.html) / [PLY + STL Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/PLY%20Viewer.html) / [DAE Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/DAE%20Viewer.html) / [GLTF Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/GLTF%20Viewer.html) / [MMD Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/MMD%20Viewer.html)
 
 b) OR with the `Flask` server support:
 
