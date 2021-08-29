@@ -534,7 +534,7 @@
             if (helper.audio) { helper.remove( sound ) };
           }
 
-          if (helper.meshes) { helper.remove( mmd_obj ); }
+          if (helper.meshes.length > 0) { helper.remove( mmd_obj ); }
 
           scene.remove.apply( scene, scene.children );
 
