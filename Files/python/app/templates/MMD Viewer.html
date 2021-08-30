@@ -128,7 +128,7 @@
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" disabled />Wire</label>
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" disabled />Shadow</label>
         <label for="directional_light_intensity" style="margin: 2px 2px 2px 0;">DLi:</label>
-        <input type="number" id="directional_light_intensity" name="directional_light_intensity" min="0" max="2" step="0.05" value="1" onkeydown="return false" onchange="set_directional_light_intensity()" style="width: 50px; margin: 2px 5px 2px 0;" disabled />
+        <input type="number" id="directional_light_intensity" name="directional_light_intensity" min="0" max="2" step="0.05" value="0.6" onkeydown="return false" onchange="set_directional_light_intensity()" style="width: 50px; margin: 2px 5px 2px 0;" disabled />
         <label for="spot_light_intensity" style="margin: 2px 2px 2px 0;">SLi:</label>
         <input type="number" id="spot_light_intensity" name="spot_light_intensity" min="0" max="2" step="0.05" value="0" onkeydown="return false" onchange="set_spot_light_intensity()" style="width: 50px; margin: 2px 5px 2px 0;" disabled />
         <label for="spot_light_color" style="margin: 2px 0 2px 0;">SL:</label>
@@ -685,7 +685,7 @@
           scene.add( spotLight.target );
 
           // Add DirectionalLight to the camera (add it to the scene instead if not using Orbit Controls)
-          directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 1 );
+          directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 0.6 );
           directionalLight.position.set( 0, 0, 250 );
           directionalLight.lookAt( new THREE.Vector3( 0, 0, 0 ) );
           camera.add( directionalLight );
@@ -853,7 +853,6 @@
 
           scene.add( mmd_obj );
           camera.lookAt( mmd_obj.position );
-          ready = true;
         }, function ( xhr ) {
           let today = new Date();
           let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -869,6 +868,8 @@
           render_requested = false;
           ready = false;
         });
+
+        ready = true;
       }
 
       function loadMotionFiles(){
@@ -975,8 +976,6 @@
 
             scene.add( mmd_obj );
             camera.lookAt( mmd_obj.position );
-
-            ready = true;
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1077,8 +1076,6 @@
 
             scene.add( mmd_obj );
             camera.lookAt( mmd_obj.position );
-
-            ready = true;
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1095,6 +1092,8 @@
             ready = false;
           });
         }
+
+        ready = true;
       }
 
       function loadAudioFile(){
@@ -1456,7 +1455,6 @@
 
           scene.add( mmd_obj );
           camera.lookAt( mmd_obj.position );
-          ready = true;
         }, function ( xhr ) {
           let today = new Date();
           let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1472,6 +1470,8 @@
           render_requested = false;
           ready = false;
         });
+
+        ready = true;
       }
 
       function loadURLMotionFiles(){
@@ -1554,8 +1554,6 @@
 
             scene.add( mmd_obj );
             camera.lookAt( mmd_obj.position );
-
-            ready = true;
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1571,6 +1569,8 @@
             render_requested = false;
             ready = false;
           });
+
+          ready = true;
         } else {
           mmd_loader.loadWithAnimation( selected_mmd_url_file, selected_vmd_url_file, ext, mmd => {
             helper.add( mmd.mesh, { animation: mmd.animation,	physics: true	});
@@ -1632,8 +1632,6 @@
 
             scene.add( mmd_obj );
             camera.lookAt( mmd_obj.position );
-
-            ready = true;
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1649,6 +1647,8 @@
             render_requested = false;
             ready = false;
           });
+
+          ready = true;
         }
       }
 
@@ -1753,6 +1753,15 @@
 
         reset_all( true );
 
+        if (selected_audio_file || selected_audio_url_file) {
+          sound.stop();
+          if (helper.audio) { helper.remove( sound ) };
+        }
+
+        if (helper.meshes.length > 0) { helper.remove( mmd_obj ); }
+
+        ready = false;
+
         if (selected_mmd_file && selected_vpd_files.length > 0) {
           loadPoseFiles();
         } else if (selected_mmd_file && selected_vmd_file) {
@@ -1780,7 +1789,7 @@
         document.getElementById('hemisphere_light_color').value = "0x000000";
         document.getElementById('spot_light_color').value = "0x000000";
         document.getElementById('spot_light_intensity').value = 0;
-        document.getElementById('directional_light_intensity').value = 1;
+        document.getElementById('directional_light_intensity').value = 0.6;
 
         // Reset the radio inputs
         document.getElementById('rotate').checked = true;
