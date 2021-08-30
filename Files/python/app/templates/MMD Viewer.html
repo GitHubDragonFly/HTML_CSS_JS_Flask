@@ -213,6 +213,7 @@
       var previous_mmd_scale = '1', bounding_box = new THREE.Box3();
       var selected_mmd_file, selected_vmd_file, selected_vmd_camera_file, selected_vpd_files, selected_audio_file;
       var selected_url_file = '', url_displayed, url_loading;
+      var selected_mmd_url_file, selected_vmd_url_file, selected_vmd_camera_url_file, selected_vpd_url_files, selected_audio_url_file;
       var texture_files_png, texture_files_jpg, texture_files_bmp;
 
       // Manager from ThreeJs to track a loader and its status
@@ -552,6 +553,11 @@
         selected_vmd_camera_file = null;
         selected_audio_file = null;
         selected_vpd_files = [];
+        selected_mmd_url_file = null;
+        selected_vmd_url_file = null;
+        selected_vmd_camera_url_file = null;
+        selected_audio_url_file = null;
+        selected_vpd_url_files = [];
         texture_files_png = [];
         texture_files_jpg = [];
         texture_files_bmp = [];
@@ -576,7 +582,7 @@
           for (let i = 0; i < fi.files.length; i++) {
             if (fi.files[i].name.toUpperCase().endsWith('.PMD') || fi.files[i].name.toUpperCase().endsWith('.PMX')) { selected_mmd_file = fi.files[i]; }
             else if (fi.files[i].name.toUpperCase().endsWith('.VMD')) {
-              if (fi.files[i].name.includes('camera')) {
+              if (fi.files[i].name.toUpperCase().includes('CAMERA')) {
                 selected_vmd_camera_file = fi.files[i];
               } else {
                 selected_vmd_file = fi.files[i]; }
@@ -1233,81 +1239,194 @@
 
       function loadURLFile() {
         if (selected_url_file != '') {
-          if (selected_url_file.toUpperCase().endsWith('.PMD') || selected_url_file.toUpperCase().endsWith('.PMX')) {
-            mmd_loader.load( selected_url_file, '', ( mesh ) => {
-              // Go through all children of the loaded object and search for a Mesh
-              mesh.traverse( function( child ) {
-                // This will allow us to check if the child is an instance of the Mesh constructor
-            	  if (child instanceof THREE.Mesh) {
-                  child.geometry.computeVertexNormals();
+          if (selected_url_file.indexOf(',')) {
+            let urls = selected_url_file.split(',');
 
-                  // Check for morph targets
-                  if (child.morphTargetDictionary) {
-                    Object.keys( child.morphTargetDictionary ).forEach( ( key, index ) => {
-                      extras.push( [ child.id, key, index ] );
-                    });
-                  }
+            for (let i = 0; i < urls.length; i++) {
+              if (urls[i].toUpperCase().endsWith('.PMD') || urls[i].toUpperCase().endsWith('.PMX')) { selected_mmd_url_file = urls[i].trim(); }
+              else if (urls[i].toUpperCase().endsWith('.VMD')) {
+                if (urls[i].toUpperCase().includes('CAMERA')) {
+                  selected_vmd_camera_url_file = urls[i].trim();
+                } else {
+                  selected_vmd_url_file = urls[i].trim(); }
+              }
+              else if (urls[i].toUpperCase().endsWith('.VPD')) { selected_vpd_url_files.push( urls[i].trim() ); }
+              else if (urls[i].toUpperCase().endsWith('.MP3') || urls[i].toUpperCase().endsWith('.OGG')) { selected_audio_url_file = urls[i].trim(); }
+            };
 
-                  if (Array.isArray( child.material )) {
-                    child.material.forEach( mtl => {
+            if (selected_mmd_url_file && selected_vpd_url_files.length > 0) {
+              loadURLPoseFiles();
+            } else if (selected_mmd_url_file && selected_vmd_url_file) {
+              loadURLMotionFiles();
+            }
+          } else {
+            if (selected_url_file.toUpperCase().endsWith('.PMD') || selected_url_file.toUpperCase().endsWith('.PMX')) {
+              mmd_loader.load( selected_url_file, '', ( mesh ) => {
+                // Go through all children of the loaded object and search for a Mesh
+                mesh.traverse( function( child ) {
+                  // This will allow us to check if the child is an instance of the Mesh constructor
+              	  if (child instanceof THREE.Mesh) {
+                    child.geometry.computeVertexNormals();
+
+                    // Check for morph targets
+                    if (child.morphTargetDictionary) {
+                      Object.keys( child.morphTargetDictionary ).forEach( ( key, index ) => {
+                        extras.push( [ child.id, key, index ] );
+                      });
+                    }
+
+                    if (Array.isArray( child.material )) {
+                      child.material.forEach( mtl => {
+                        // Enable transparency for the Opacity control
+                        mtl.opacity = 1;
+                        mtl.transparent = true;
+                        mtl.skinning = true;
+                      });
+                    } else {
                       // Enable transparency for the Opacity control
-                      mtl.opacity = 1;
-                      mtl.transparent = true;
-                      mtl.skinning = true;
-                    });
-                  } else {
-                    // Enable transparency for the Opacity control
-                    child.material.opacity = 1;
-                    child.material.transparent = true;
-                    child.material.skinning = true;
-                  }
+                      child.material.opacity = 1;
+                      child.material.transparent = true;
+                      child.material.skinning = true;
+                    }
 
-                  // Enable shadows
-                  child.castShadow = true;
-                  child.receiveShadow = true;
-    	  	      }
-    	        });
+                    // Enable shadows
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+    	    	      }
+    	          });
 
-              mmd_obj = mesh;
-              mmd_obj.name = 'url_model';
+                mmd_obj = mesh;
+                mmd_obj.name = 'url_model';
 
-              set_initial_scale();
-              resize();
+                set_initial_scale();
+                resize();
 
-              // Add mmd model to scene
-              scene.add( mmd_obj );
-              camera.lookAt( mmd_obj.position );
+                // Add mmd model to scene
+                scene.add( mmd_obj );
+                camera.lookAt( mmd_obj.position );
 
-              if (extras.length > 0) {
-                document.getElementById('btn_extras').disabled = false;
-                current_extra = 0;
+                if (extras.length > 0) {
+                  document.getElementById('btn_extras').disabled = false;
+                  current_extra = 0;
+                }
+
+                ready = true;
+              }, function ( xhr ) {
+                let today = new Date();
+                let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+                if (xhr.loaded == 0 && xhr.total == 0) {
+                  console.log( 'MMD from URL 0% loaded - ' + time );
+                } else {
+                  console.log( 'MMD from URL ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                }
+              }, function ( error ) {
+                console.log( 'Error loading MMD from URL!' );
+                console.log( error );
+                render_requested = false;
+                ready = false;
+              });
+            } else if (selected_url_file.toUpperCase().endsWith('.MP3') || selected_url_file.toUpperCase().endsWith('.OGG')) {
+              audio_loader.load( selected_url_file, function( buffer ) {
+                sound.setBuffer( buffer );
+                sound.setLoop(true);
+                sound.setVolume(0.3);
+                sound.play();
+
+                render_requested = false;
+                ready = false;
+              }, function ( xhr ) {
+                let today = new Date();
+                let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+                if (xhr.loaded == 0 && xhr.total == 0) {
+                  console.log( 'URL Audio File 0% loaded - ' + time );
+                } else {
+                  console.log( 'URL Audio File ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                }
+              }, function ( error ) {
+                console.log( 'Error loading URL Audio File!' );
+                console.log( error );
+                render_requested = false;
+                ready = false;
+              });
+            }
+          }
+        }
+      }
+
+      function loadURLPoseFiles(){
+        current_pose = -1;
+
+        let ext = 'pmd';
+        if (selected_mmd_url_file.toUpperCase().endsWith('.PMX')) { ext = 'pmx'; }
+
+        mmd_loader.load( selected_mmd_url_file, ext, mesh => {
+          mesh.traverse( function( child ) {
+            // Check for morph targets
+            if (child.morphTargetDictionary) {
+              Object.keys( child.morphTargetDictionary ).forEach( ( key, index ) => {
+                extras.push( [ child.id, key, index ] );
+              });
+            }
+
+            // This will allow us to check if the child is an instance of the Mesh constructor
+            if (child instanceof THREE.Mesh) {
+              child.geometry.computeVertexNormals();
+
+              if (Array.isArray( child.material )) {
+                child.material.forEach( mtl => {
+                  // Enable transparency for the Opacity control
+                  mtl.opacity = 1;
+                  mtl.transparent = true;
+                  mtl.skinning = true;
+                });
+              } else {
+                // Enable transparency for the Opacity control
+                child.material.opacity = 1;
+                child.material.transparent = true;
+                child.material.skinning = true;
               }
 
-              ready = true;
+              // Enable shadows
+              child.castShadow = true;
+              child.receiveShadow = true;
+    	  	  }
+          });
+
+          selected_vpd_url_files.forEach( file => {
+            mmd_loader.loadVPD( file, false, vpd => {
+              poses.push( vpd );
             }, function ( xhr ) {
               let today = new Date();
               let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
 
               if (xhr.loaded == 0 && xhr.total == 0) {
-                console.log( 'MMD from URL 0% loaded - ' + time );
+                console.log( 'VPD 0% loaded - ' + time );
               } else {
-                console.log( 'MMD from URL ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                console.log( 'VPD ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
               }
             }, function ( error ) {
-              console.log( 'Error loading MMD from URL!' );
+              console.log( 'Error loading URL VPD!' );
               console.log( error );
               render_requested = false;
               ready = false;
             });
-          } else if (selected_url_file.toUpperCase().endsWith('.MP3') || selected_url_file.toUpperCase().endsWith('.OGG')) {
-            audio_loader.load( selected_url_file, function( buffer ) {
-              sound.setBuffer( buffer );
-              sound.setLoop(true);
-              sound.setVolume(0.3);
-              sound.play();
+          });
 
-              render_requested = false;
-              ready = false;
+          document.getElementById('btn_poses').disabled = false;
+
+          if (extras.length > 0) {
+            document.getElementById('btn_extras').disabled = false;
+            current_extra = 0;
+          }
+
+          if (selected_audio_url_file) {
+            audio_loader.load( selected_audio_file, function( buffer ) {
+            	sound.setBuffer( buffer );
+            	sound.setLoop(true);
+            	sound.setVolume(0.3);
+              sound.play();
             }, function ( xhr ) {
               let today = new Date();
               let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1324,6 +1443,208 @@
               ready = false;
             });
           }
+
+          mmd_obj = mesh;
+          mmd_obj.name = 'url_pose_model';
+
+          set_initial_scale();
+          resize();
+
+          scene.add( mmd_obj );
+          camera.lookAt( mmd_obj.position );
+          ready = true;
+        }, function ( xhr ) {
+          let today = new Date();
+          let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+          if (xhr.loaded == 0 && xhr.total == 0) {
+            console.log( 'URL MMD 0% loaded - ' + time );
+          } else {
+            console.log( 'URL MMD ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+          }
+        }, function ( error ) {
+          console.log( 'Error loading URL MMD!' );
+          console.log( error );
+          render_requested = false;
+          ready = false;
+        });
+      }
+
+      function loadURLMotionFiles(){
+        let ext = 'pmd';
+        if (selected_mmd_url_file.toUpperCase().endsWith('.PMX')) { ext = 'pmx'; }
+
+        if (selected_vmd_camera_url_file) {
+          mmd_loader.loadWithAnimation( selected_mmd_url_file, selected_vmd_url_file, ext, mmd => {
+            helper.add( mmd.mesh, { animation: mmd.animation,	physics: true	});
+
+            // Go through all children of the loaded object and search for a Mesh
+            mmd.mesh.traverse( function( child ) {
+              // This will allow us to check if the child is an instance of the Mesh constructor
+              if (child instanceof THREE.Mesh) {
+                child.geometry.computeVertexNormals();
+
+                if (Array.isArray( child.material )) {
+                  child.material.forEach( mtl => {
+                    // Enable transparency for the Opacity control
+                    mtl.opacity = 1;
+                    mtl.transparent = true;
+                    mtl.skinning = true;
+                  });
+                } else {
+                  // Enable transparency for the Opacity control
+                  child.material.opacity = 1;
+                  child.material.transparent = true;
+                  child.material.skinning = true;
+                }
+
+                // Enable shadows
+                child.castShadow = true;
+                child.receiveShadow = true;
+    	    	  }
+            });
+
+            mmd_loader.loadAnimation( selected_vmd_camera_url_file, camera, function ( cameraAnimation ) {
+              helper.add( camera, {	animation: cameraAnimation });
+            }, function ( xhr ) {
+              let today = new Date();
+              let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+              if (xhr.loaded == 0 && xhr.total == 0) {
+                console.log( 'URL VMD 0% loaded - ' + time );
+              } else {
+                console.log( 'URL VMD ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              }
+            }, function ( error ) {
+              console.log( 'Error loading URL VMD!' );
+              console.log( error );
+              render_requested = false;
+              ready = false;
+            });
+
+            if (selected_audio_url_file) {
+              audio_loader.load( selected_audio_url_file, function( buffer ) {
+              	sound.setBuffer( buffer );
+              	sound.setLoop(true);
+              	sound.setVolume(0.3);
+                helper.add(sound, { delayTime: 3.5 } );
+              }, function ( xhr ) {
+                let today = new Date();
+                let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+                if (xhr.loaded == 0 && xhr.total == 0) {
+                  console.log( 'URL Audio File 0% loaded - ' + time );
+                } else {
+                  console.log( 'URL Audio File ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                }
+              }, function ( error ) {
+                console.log( 'Error loading URL Audio File!' );
+                console.log( error );
+                render_requested = false;
+                ready = false;
+              });
+            }
+
+            mmd_obj = mmd.mesh;
+            mmd_obj.name = 'url_motion_model';
+
+            scene.add( mmd_obj );
+            camera.lookAt( mmd_obj.position );
+
+            ready = true;
+          }, function ( xhr ) {
+            let today = new Date();
+            let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+            if (xhr.loaded == 0 && xhr.total == 0) {
+              console.log( 'URL MMD 0% loaded - ' + time );
+            } else {
+              console.log( 'URL MMD ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+            }
+          }, function ( error ) {
+            console.log( 'Error loading URL MMD!' );
+            console.log( error );
+            render_requested = false;
+            ready = false;
+          });
+        } else {
+          mmd_loader.loadWithAnimation( selected_mmd_url_file, selected_vmd_url_file, ext, mmd => {
+            helper.add( mmd.mesh, { animation: mmd.animation,	physics: true	});
+
+            // Go through all children of the loaded object and search for a Mesh
+            mmd.mesh.traverse( function( child ) {
+              // This will allow us to check if the child is an instance of the Mesh constructor
+              if (child instanceof THREE.Mesh) {
+                child.geometry.computeVertexNormals();
+
+                if (Array.isArray( child.material )) {
+                  child.material.forEach( mtl => {
+                    // Enable transparency for the Opacity control
+                    mtl.opacity = 1;
+                    mtl.transparent = true;
+                    mtl.skinning = true;
+                  });
+                } else {
+                  // Enable transparency for the Opacity control
+                  child.material.opacity = 1;
+                  child.material.transparent = true;
+                  child.material.skinning = true;
+                }
+
+                // Enable shadows
+                child.castShadow = true;
+                child.receiveShadow = true;
+    	    	  }
+            });
+
+            if (selected_audio_url_file) {
+              audio_loader.load( selected_audio_url_file, function( buffer ) {
+              	sound.setBuffer( buffer );
+              	sound.setLoop(true);
+              	sound.setVolume(0.3);
+                helper.add(sound, { delayTime: 3.5 } );
+              }, function ( xhr ) {
+                let today = new Date();
+                let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+                if (xhr.loaded == 0 && xhr.total == 0) {
+                  console.log( 'URL Audio File 0% loaded - ' + time );
+                } else {
+                  console.log( 'URL Audio File ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                }
+              }, function ( error ) {
+                console.log( 'Error loading URL Audio File!' );
+                console.log( error );
+                render_requested = false;
+                ready = false;
+              });
+            }
+
+            mmd_obj = mmd.mesh;
+            mmd_obj.name = 'url_motion_model';
+
+            set_initial_scale();
+            resize();
+
+            scene.add( mmd_obj );
+            camera.lookAt( mmd_obj.position );
+
+            ready = true;
+          }, function ( xhr ) {
+            let today = new Date();
+            let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+            if (xhr.loaded == 0 && xhr.total == 0) {
+              console.log( 'URL MMD 0% loaded - ' + time );
+            } else {
+              console.log( 'URL MMD ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+            }
+          }, function ( error ) {
+            console.log( 'Error loading URL MMD!' );
+            console.log( error );
+            render_requested = false;
+            ready = false;
+          });
         }
       }
 
