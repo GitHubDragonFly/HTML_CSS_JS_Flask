@@ -8,17 +8,17 @@ import os
 from flask import Flask, send_from_directory, send_file, render_template, request, make_response
 from flask_cors import CORS, cross_origin
 
-app = Flask(__name__)
-cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
+app = Flask( __name__ )
+cors = CORS( app )
+app.config[ 'CORS_HEADERS' ] = 'Content-Type'
 
 fname, lname, gender, vehicle1, vehicle2, vehicle3, favcolor, pictures, img = [], [], [], [], [], [], [], [], None
 
-uploads_dir = os.path.join(app.root_path, 'uploads')
-os.makedirs(uploads_dir, mode=0o777, exist_ok=True)
+uploads_dir = os.path.join( app.root_path, 'uploads' )
+os.makedirs( uploads_dir, mode=0o777, exist_ok=True )
 
 def page_not_found(e):
-    return render_template('404.html'), 404
+    return render_template( '404.html' ), 404
 
 @app.route('/favicon.ico')
 def favicon():
@@ -46,11 +46,21 @@ def handle_form_data():
     else:
         pictures.append('None')
 
-    return make_response('Form Data Processed')
+    return make_response( 'Form Data Processed' )
 
 @app.route('/display_form_data', methods=['GET'])
 def display_form_data():
-    return render_template('FormData.html', fname=fname, lname=lname, gender=gender, vehicle1=vehicle1, vehicle2=vehicle2, vehicle3=vehicle3, favcolor=favcolor, pictures=pictures)
+    return render_template( 'FormData.html', fname=fname, lname=lname, gender=gender, vehicle1=vehicle1, vehicle2=vehicle2, vehicle3=vehicle3, favcolor=favcolor, pictures=pictures )
+
+@app.route('/static/js/libs/draco/draco_decoder.wasm')
+def send_draco_wasm():
+    file_path = app.root_path + '\\static\\js\\libs\\draco\\draco_decoder.wasm'
+    return send_file( file_path , mimetype = 'application/wasm')
+
+@app.route('/static/js/libs/ammo.wasm.wasm')
+def send_ammo_wasm():
+    file_path = app.root_path + '\\static\\js\\libs\\ammo.wasm.wasm'
+    return send_file( file_path , mimetype = 'application/wasm')
 
 @app.route('/<path:path>', methods=['GET'])
 @cross_origin()
@@ -58,13 +68,13 @@ def get_path(path):
     if path != 'undefined':
         try:
             if path.startswith('uploads/'):
-                return send_file(path)
+                return send_file( path )
             else:
-                return render_template(path)
+                return render_template( path )
         except Exception as e:
-            return page_not_found(e)
+            return page_not_found( e )
     else:
-        return make_response('Path is undefined')
+        return make_response( 'Path is undefined' )
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=False)
