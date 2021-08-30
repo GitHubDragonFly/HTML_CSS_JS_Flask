@@ -8,3 +8,7 @@ I have not tried it but another way of running this project could be within a vi
  - pip install virtualenv
  - python3 -m venv env
  - pip install flask
+
+
+Use preview links, from the 'Usage' section of the main page, to see and test most of the pages online.
+Most of the features of Three.js viewers are also functional online.
