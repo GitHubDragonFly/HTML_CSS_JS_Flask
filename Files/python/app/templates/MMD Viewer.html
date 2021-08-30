@@ -1239,7 +1239,7 @@
 
       function loadURLFile() {
         if (selected_url_file != '') {
-          if (selected_url_file.indexOf(',')) {
+          if (selected_url_file.indexOf(',') > -1) {
             let urls = selected_url_file.split(',');
 
             for (let i = 0; i < urls.length; i++) {
