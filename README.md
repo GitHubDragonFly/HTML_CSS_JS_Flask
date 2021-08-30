@@ -22,7 +22,9 @@ Additional Notes:
    - observe the LICENSES of that and any other content you want to use
    - mainly designed to be used with local files, which should all be in the same folder (PMD, PMX, VMD, VPD, MP3)
    - try all the different combinations of the mentioned files to see what works
-   - URL option is set for 1 file, like this: `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd`
+   - URL option is set for either 1 or more comma separated URLs, like the following:
+   - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd`
+   - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
    - there is also a polar grid button available
  - GLTF and DAE viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
@@ -55,7 +57,7 @@ Notes about showing the edges (button with letter "E"):
 All it takes to run this project is to do either of the below listed:
 
 a) Even though this is all intended to be used with the `Flask` server, thanks to the [GitHub & BitBucket HTML Preview](https://github.com/htmlpreview/htmlpreview.github.com) you can still preview the [Exercise](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/Exercise.html) page online and use its fixed menu to access the rest, with the following limitations:
- - MMD Viewer should work for its URL option but everything else is questionable (check the module "import" console error)
+ - MMD Viewer should work for its single file URL option but everything else is questionable (check the console error related to `ammo` module)
  - GLTF Viewer does allow loading DRACO files but does not allow loading KTX2 textures (check the module "import" console error)
  - DAE Viewer will not allow loading KTX2 textures (check the module "import" console error)
  - The Form entries are set to be handled by the server and will not work in the preview
