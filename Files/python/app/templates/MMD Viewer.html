@@ -153,6 +153,10 @@
     </div>
 
     <script>
+      async function load_ammo() {
+        ammo = await Ammo();
+      }
+
       function show_url() {
         if (url_displayed) {
           document.getElementById('url').style.display = 'none';
@@ -628,6 +632,7 @@
 
           if (scene == undefined) { scene = new THREE.Scene(); }
           if (mmd_obj == undefined) { mmd_obj = new THREE.Object3D(); }
+          if (ammo == undefined) { load_ammo(); }
 
           if (!events_initialized) { initialize_event_listeners(); events_initialized = true; }
 
@@ -1861,8 +1866,8 @@
       }
     </script>
 
-    <script type="module">
-      ammo = await Ammo();
+    <script>
+      load_ammo();
     </script>
   </body>
 </html>
