@@ -18,6 +18,7 @@ Additional Notes:
  - Single character buttons, where applicable: `E` - edges, `A` - animations, `X`- extras, `M` - materials, `T` - textures, `P` - poses, `#` - grid
  - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) non-module version was added to all viewers
  - MMD viewer supports animation, changing pose, extras and audio:
+   - appears to be fully functional in online preview, see the `Usage` section for the link (`ammo.wasm.wasm` file needed to be added to the `templates` folder so the loading of local files would work - whatever the reason behind this is)
    - tested only with three.js examples and has audio delayTime set for those (with current value of 3.5)
    - observe the LICENSES of that and any other content you want to use
    - mainly designed to be used with local files, which should all be in the same folder (PMD, PMX, VMD, VPD, MP3)
@@ -57,7 +58,6 @@ Notes about showing the edges (button with letter "E"):
 All it takes to run this project is to do either of the below listed:
 
 a) Even though this is all intended to be used with the `Flask` server, thanks to the [GitHub & BitBucket HTML Preview](https://github.com/htmlpreview/htmlpreview.github.com) you can still preview the [Exercise](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/Exercise.html) page online and use its fixed menu to access the rest, with the following limitations:
- - MMD Viewer should work for its single file URL option but everything else is questionable (check the console error related to `ammo` module)
  - GLTF Viewer does allow loading DRACO files but does not allow loading KTX2 textures (check the module "import" console error)
  - DAE Viewer will not allow loading KTX2 textures (check the module "import" console error)
  - The Form entries are set to be handled by the server and will not work in the preview
