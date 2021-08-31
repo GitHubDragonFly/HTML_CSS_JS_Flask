@@ -6,7 +6,7 @@ This is a modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonF
 The main differences between these 2 projects:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
  - uploading any pictures via the `Form` will then have those saved in the new `uploads` folder
- - new addition is the MMD viewer (Miku Miku Dance)
+ - new additions are FBX and MMD viewers (Miku Miku Dance)
  - all viewers in this project support URL loading, use Orbit Controls and have a gizmo and grid present
  - DRACO and KTX2 support were added to the GLTF Viewer:
    - this seems to work fine when using URL option (see the screenshot) so try using it for fetching files both locally and from the Internet
@@ -27,7 +27,7 @@ Additional Notes:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd`
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
    - there is also a polar grid button available
- - GLTF and DAE viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
+ - GLTF / DAE / FBX viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
    - Xbot.glb is the multi-animation example that can be accessed in the GLTF viewer via the following URL:
    - `https://raw.githubusercontent.com/GitHubDragonFly/HTML_CSS_JS_Flask/main/Files/python/app/static/Images/gltf/Xbot.glb`
@@ -40,9 +40,9 @@ Additional Notes:
    - do note that the above example seems to have some faults in it and has shown some disconnects and material issues, which are not necessarily visible in all viewers due to coding and design approach (try it in the viewers mentioned in the `Resources` section, with Don McCurdy's `GLTF Viewer` actually showing how many errors were detected)
    - other examples, like `Horse.glb` or `Parrot.glb`, will be showing those morph targets almost like frames of the animation itself
  - PLY viewer now includes STL file loader
- - OBJ viewer also includes an experimental texture switching button, with letter "T", which was tested as working with local version of this example:
+ - FBX / OBJ viewers also include an experimental texture switching button, with letter "T", which was tested as working with local version of this OBJ example:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus.obj`
-   - this is only functional when loading local OBJ file together with texture files (and without MTL file)
+   - this is only functional when loading local FBX / OBJ file together with texture files (and without MTL file in case of OBJ viewer)
    - Note: URL loading of the above example will not pull in any other resources
  - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in all viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
 
@@ -62,7 +62,7 @@ a) Even though this is all intended to be used with the `Flask` server, thanks t
  - DAE Viewer will not allow loading KTX2 textures (check the module "import" console error)
  - The Form entries are set to be handled by the server and will not work in the preview
 
-And just for the convenience, you can access the viewers directly here: [OBJ Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/OBJ%20Viewer.html) / [PLY + STL Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/PLY%20Viewer.html) / [DAE Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/DAE%20Viewer.html) / [GLTF Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/GLTF%20Viewer.html) / [MMD Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/MMD%20Viewer.html)
+And just for the convenience, you can access the viewers directly here: [OBJ Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/OBJ%20Viewer.html) / [PLY + STL Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/PLY%20Viewer.html) / [FBX Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/FBX%20Viewer.html) / [DAE Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/DAE%20Viewer.html) / [GLTF Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/GLTF%20Viewer.html) / [MMD Viewer](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/MMD%20Viewer.html)
 
 b) OR with the `Flask` server support:
 
