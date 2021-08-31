@@ -662,12 +662,14 @@
                 mtl.opacity = 1;
                 mtl.transparent = true;
                 mtl.skinning = true;
+                mtl.side = THREE.DoubleSide;
               });
             } else {
               // Enable transparency for the Opacity control
               child.material.opacity = 1;
               child.material.transparent = true;
               child.material.skinning = true;
+              child.material.side = THREE.DoubleSide;
             }
 
             // Enable shadows
@@ -789,12 +791,14 @@
                     mtl.opacity = 1;
                     mtl.transparent = true;
                     mtl.skinning = true;
+                    mtl.side = THREE.DoubleSide;
                   });
                 } else {
                   // Enable transparency for the Opacity control
                   child.material.opacity = 1;
                   child.material.transparent = true;
                   child.material.skinning = true;
+                  child.material.side = THREE.DoubleSide;
                 }
 
                 // Enable shadows
