@@ -17,6 +17,7 @@ The main differences between these 2 projects:
 Additional Notes:
  - Single character buttons, where applicable: `E` - edges, `A` - animations, `X`- extras, `M` - materials, `T` - textures, `P` - poses, `#` - grid
  - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) non-module version was added to all viewers
+ - FBX viewer appears to be fully functional in online preview, see the `Usage` section for the link
  - MMD viewer supports animation, changing pose, extras and audio:
    - appears to be fully functional in online preview, see the `Usage` section for the link (`ammo.wasm.wasm` file needed to be added to the `templates` folder so the loading of local files would work - whatever the reason behind this is)
    - tested only with three.js examples and has audio delayTime set for those (with current value of 3.5)
