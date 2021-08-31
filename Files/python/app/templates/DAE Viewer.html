@@ -672,7 +672,7 @@
 
             // Enable shadows
             child.castShadow = true;
-            child.receiveShadow = true;
+            child.receiveShadow = false;
 
             if (texture_files_ktx2.length > 0) {
               texture_files_ktx2.forEach( file => {
@@ -799,7 +799,7 @@
 
                 // Enable shadows
                 child.castShadow = true;
-                child.receiveShadow = true;
+                child.receiveShadow = false;
 
                 child.name = 'child_' + child_count;
                 edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );

@@ -5,14 +5,17 @@
     <link rel="shortcut icon" href="../static/favicon.ico" type="image/x-icon"/>
 
     <script src="../static/js/three.js"></script>
-    <script src="../static/js/MTLLoader.js"></script>
-    <script src="../static/js/OBJLoader.js"></script>
+    <script src="../static/js/FBXLoader.js"></script>
     <script src="../static/js/DDSLoader.js"></script>
     <script src="../static/js/OrbitControls.js"></script>
     <script src="../static/js/OrbitControlsGizmo.js"></script>
+    <script src="../static/js/libs/fflate.min.js"></script>
+    <script src="../static/js/curves/NURBSCurve.js"></script>
+    <script src="../static/js/curves/NURBSSurface.js"></script>
+    <script src="../static/js/curves/NURBSUtils.js"></script>
 
     <style>
-      body,html {
+      body,html{
         position: relative;
         display: block;
         background-color: black;
@@ -58,47 +61,42 @@
         height: 15px;
       }
 
-      div { color: whitesmoke; width: 99%; padding: 4px; margin: 1px; }
-      #scene { display: block; position: absolute; margin: 0; width: 100%; height: 100%; }
+      div { color: navy; width: 99%; border: 1px solid navy; -webkit-border-radius: 2px; border-radius: 2px; padding: 4px; margin: 1px; }
+      #scene { display: block; position: absolute; margin: 0; width: 100%; }
 
       .fixed-menu {
         position: fixed;
         z-index: 1;
         display: inline-block;
-        background-color: transparent!important;
-        border: 1px solid navy;
-        -webkit-border-radius: 3px;
-        border-radius: 3px;
-        margin: 1px 2px 0 2px;
-        padding: 2px;
-        width: 99.3%;
+        background-color: whitesmoke;
+        margin: 0px;
+        padding: 1px;
+        width: 100%;
       }
     </style>
 
     <!-- Original OBJ source code that inspired this: https://codepen.io/Mamboleoo/pen/PqjGdN -->
     <!-- OrbitControlsGizmo from: https://github.com/Fennec-hub/ThreeOrbitControlsGizmo -->
-    <!-- OBJ Examples from: https://github.com/mrdoob/three.js -->
-    <!-- Also see: https://davidoreilly.itch.io/walt-disney-3d-head , http://www.davidoreilly.com/ -->
-    <!-- More OBJ examples: https://people.math.sc.edu/Burkardt/data/data.html -->
-    <title>OBJ Viewer</title>
+    <title>FBX Viewer</title>
   </head>
   <body onload="reset_all()" onresize="resize()">
     <div class="fixed-menu">
-      <div id="axes" style="width: 65px; height: 65px; float: right; border: 1px solid navy; -webkit-border-radius: 3px; border-radius: 3px; background-color: black; margin-right: 3px;"></div>
+      <div id="axes" style="width: 65px; height: 65px; float: right; background-color: black; margin-right: 3px;"></div>
       <div>
-        <label for="file" style="color: #CE8704; margin: 2px 2px 2px 5px;">OBJ:</label>
+        <label for="file" style="color: #CE8704; margin: 2px 2px 2px 5px;">FBX:</label>
         <button onclick="show_url()" style="margin: 2px 2px 2px 0;">URL</button>
         <input type="file" id="file_input" name="file" onchange="init()" style="margin: 2px 5px 2px 0;" multiple />
         <label for="file_image_input" style="color: #CE8704; margin: 2px 2px 2px 0;">BG Image:</label>
         <input type="file" id="file_image_input" name="file_image_input" accept="image/png, image/jpeg, image/bmp, image/gif, image/svg+xml" onchange="set_scene_image()" style="margin: 2px 5px 2px 0;" disabled />
-        <label for="obj_opacity" style="margin: 2px 2px 2px 0;">Opacity:</label>
-        <input type="number" id="obj_opacity" name="obj_opacity" min="0" max="1" step="0.05" value="1" onkeydown="return false" onchange="set_obj_opacity()" style="width: 48px; margin: 2px 5px 2px 0;" disabled />
-        <label for="obj_scale" style="margin: 2px 2px 2px 0;">Scale:</label>
-        <input type="number" id="obj_scale" name="obj_scale" onkeydown="return false" oninput="set_obj_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 5px 2px 0; width: 48px;" disabled />
-        <label style="margin: 2px 10px 2px 0;"><input type="checkbox" id="scale_10x" onchange="scale_10x_set();" disabled />10x</label>
+        <label for="fbx_opacity" style="margin: 2px 2px 2px 0;">Opacity:</label>
+        <input type="number" id="fbx_opacity" name="fbx_opacity" min="0" max="1" step="0.05" value="1" onkeydown="return false" onchange="set_fbx_opacity()" style="width: 48px; margin: 2px 5px 2px 0;" disabled />
+        <label for="fbx_scale" style="margin: 2px 2px 2px 0;">Scale:</label>
+        <input type="number" id="fbx_scale" name="fbx_scale" onkeydown="return false" oninput="set_fbx_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 2px 2px 0; width: 48px;" disabled />
+        <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="scale_10x" onchange="scale_10x_set();" disabled />10x</label>
         <button id="btn_edges" onclick="show_edges()" style="background-color: #d1cefc; vertical-align: middle; width: 20px; margin: 2px 2px 2px 2px; padding: 0;" disabled>E</button>
+        <button id="btn_animate" onclick="animate_fbx()" style="background-color: #d1cefc; vertical-align: middle; width: 28px; margin: 2px 2px 2px 2px; padding: 0;" disabled>A</button>
         <button id="btn_textures" onclick="set_texture()" style="background-color: #d1cefc; vertical-align: middle; width: 28px; margin: 2px 2px 2px 2px; padding: 0;" disabled>T</button>
-        <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 40px;" disabled>Reset</button>
+        <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 15px;" disabled>Reset</button>
         <button id="btn_full_screen" onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
       </div>
       <div id="url" style="display: none;">
@@ -110,13 +108,13 @@
         <label style="color: blue; margin: 2px 0 2px 0;"><input type="radio" id="hlight" name="mode" value="HL" onchange="radio_changed()" disabled />HL</label>
         <label style="color: blue; margin: 2px 0 2px 0;"><input type="radio" id="slight" name="mode" value="SL" onchange="radio_changed()" disabled />SL</label>
         <label style="color: blue; margin: 2px 0 2px 0;"><input type="radio" id="dlight" name="mode" value="DL" onchange="radio_changed()" disabled />DL</label>
-        <label style="color: blue; margin: 2px 0 2px 0;"><input type="radio" id="rotate" name="mode" value="Rotate" onchange="radio_changed()" checked disabled />Rotate :</label>
+        <label style="color: blue; margin: 2px 5px 2px 0;"><input type="radio" id="rotate" name="mode" value="Rotate" onchange="radio_changed()" checked disabled />Rotate :</label>
         <label for="rotation_x" style="color: blue;">X</label>
-        <input type="number" id="rotation_x" onchange="rot_x_changed()" min="-50" max="50" value="0" step="1" style="width: 50px; margin: 2px 0 2px 0;" disabled />&nbsp;
+        <input type="number" id="rotation_x" onchange="rot_x_changed()" min="-20" max="20" value="0" step="1" style="width: 50px; margin: 2px 5px 2px 0;" disabled />
         <label for="rotation_y" style="color: blue;">Y</label>
-        <input type="number" id="rotation_y" onchange="rot_y_changed()" min="-50" max="50" value="0" step="1" style="width: 50px; margin: 2px 0 2px 0;" disabled />&nbsp;
+        <input type="number" id="rotation_y" onchange="rot_y_changed()" min="-20" max="20" value="0" step="1" style="width: 50px; margin: 2px 5px 2px 0;" disabled />
         <label for="rotation_z" style="color: blue;">Z</label>
-        <input type="number" id="rotation_z" onchange="rot_z_changed()" min="-50" max="50" value="0" step="1" style="width: 50px; margin: 2px 0 2px 0;" disabled />&nbsp; &nbsp;
+        <input type="number" id="rotation_z" onchange="rot_z_changed()" min="-20" max="20" value="0" step="1" style="width: 50px; margin: 2px 10px 2px 0;" disabled />
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" disabled />Wire</label>
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="shadow" name="shadow" onchange="show_shadow()" disabled />Shadow</label>
         <label for="directional_light_intensity" style="margin: 2px 2px 2px 0;">DLi:</label>
@@ -133,13 +131,15 @@
         <input type="color" id="back_color" name="back_color" onchange="set_back_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 5px 0 0;" disabled />
         <button id="btn_grid" onclick="show_grid()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 5px; padding: 0;" disabled>#</button>
       </div>
-    </div>
+    </div><br />
 
     <div id="div_spinner" class="spinner"></div>
 
-    <canvas id="scene">
-      Your browser does not support HTML5 canvas tag
-    </canvas>
+    <div style="border: 0; margin: 0; padding: 0;">
+      <canvas id="scene">
+        Your browser does not support HTML5 canvas tag
+      </canvas>
+    </div>
 
     <script>
       function show_url() {
@@ -191,22 +191,23 @@
     </script>
 
     <script>
-      var renderer, scene, camera, grid, Obj, edges, edges_visible, grid_visible, render_requested;
+      var animations, animation_mixer, animation_running, current_animation, render_requested, clock;
+      var renderer, scene, camera, grid, fbx_obj, edges, edges_visible, grid_visible;
       var controls, gizmo;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
       var shadowMesh, shadowMaterial;
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation, reset_rotation, events_initialized;
       var rot_x = 0, rot_y = 0, rot_z = 0;
-      var previous_obj_scale = '1', bounding_box = new THREE.Box3();
-      var selected_mtl_file, selected_obj_file, selected_url_file = '', url_displayed, url_loading;
+      var previous_fbx_scale = '1', bounding_box = new THREE.Box3();
+      var selected_fbx_file, selected_url_file = '', url_displayed, url_loading;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_dds, current_texture, textures;
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
+
       // Loader for selected file from Three.js
-      const mtl_loader = new THREE.MTLLoader( manager );
-      const obj_loader = new THREE.OBJLoader( manager );
+      const fbx_loader = new THREE.FBXLoader( manager );
 
       const texture_loader = new THREE.TextureLoader( manager );
       const dds_loader = new THREE.DDSLoader( manager );
@@ -218,20 +219,28 @@
         document.body.style.backgroundColor = document.getElementById('back_color').value;
       }
 
-      function set_obj_opacity() {
-        if (Obj) {
-          let opacity_value = document.getElementById('obj_opacity').value;
+      function set_fbx_opacity() {
+        if (fbx_obj) {
+          let opacity_value = document.getElementById('fbx_opacity').value;
 
-          // Go through all children of the loaded object and search for a Mesh
-          Obj.traverse( function ( child ) {
-            // This will allow us to check if the child is an instance of the Mesh constructor
-    	      if (child instanceof THREE.Mesh) {
-              child.material.opacity = opacity_value;
-              if (document.getElementById('shadow').checked) {
-                shadowMaterial.opacity = opacity_value * document.getElementById('spot_light_intensity').value;
+          fbx_obj.traverse( function( child ) {
+            // This allow us to check if the children is an instance of the Mesh constructor
+          	if (child instanceof THREE.Mesh) {
+              if (Array.isArray( child.material )) {
+                child.material.forEach( mtl => {
+                  mtl.opacity = opacity_value;
+                  if (document.getElementById('shadow').checked) {
+                    shadowMaterial.opacity = opacity_value * document.getElementById('spot_light_intensity').value;
+                  }
+                });
+              } else {
+                child.material.opacity = opacity_value;
+                if (document.getElementById('shadow').checked) {
+                  shadowMaterial.opacity = opacity_value * document.getElementById('spot_light_intensity').value;
+                }
               }
     		    }
-    	    });
+          });
         }
       }
 
@@ -295,7 +304,7 @@
 
       function set_spot_light_intensity() {
         spotLight.intensity = parseFloat( document.getElementById('spot_light_intensity').value );
-        if (document.getElementById('shadow').checked) { shadowMaterial.opacity = spotLight.intensity * document.getElementById('obj_opacity').value; }
+        if (document.getElementById('shadow').checked) { shadowMaterial.opacity = spotLight.intensity * document.getElementById('fbx_opacity').value; }
       }
 
       function set_directional_light_intensity() {
@@ -304,59 +313,59 @@
 
       function set_initial_scale() {
         // Set the initial scale of the object so it comes to view
-        bounding_box.setFromObject( Obj );
+        bounding_box.setFromObject( fbx_obj );
         let y = (bounding_box.max.y - bounding_box.min.y);
 
         if (y < 0.001) {
-          Obj.scale.multiplyScalar( 1000 );
+          fbx_obj.scale.multiplyScalar( 1000 );
         } else if (y < 0.01) {
-          Obj.scale.multiplyScalar( 100 );
+          fbx_obj.scale.multiplyScalar( 100 );
         } else if (y < 0.1) {
-          Obj.scale.multiplyScalar( 10 );
+          fbx_obj.scale.multiplyScalar( 10 );
         } else {
-          Obj.scale.multiplyScalar( 30 / y );
+          fbx_obj.scale.multiplyScalar( 30 / y );
         }
       }
 
-      function set_obj_scale() {
-        let current_obj_scale = document.getElementById('obj_scale').value;
-
-        switch (previous_obj_scale) {
+      function set_fbx_scale() {
+        let current_fbx_scale = document.getElementById('fbx_scale').value;
+        // There appears to be a pattern and this could possibly be further simplified and range expanded
+        switch (previous_fbx_scale) {
           case '0.25':
-            Obj.scale.multiplyScalar( 2 );
+            fbx_obj.scale.multiplyScalar( 2 );
             break;
           case '0.5':
-            Obj.scale.multiplyScalar( (current_obj_scale == '0.75') ? 3/2 : 1/2 );
+            fbx_obj.scale.multiplyScalar( (current_fbx_scale == '0.75') ? 3/2 : 1/2 );
             break;
           case '0.75':
-            Obj.scale.multiplyScalar( (current_obj_scale == '1') ? 4/3 : 2/3 );
+            fbx_obj.scale.multiplyScalar( (current_fbx_scale == '1') ? 4/3 : 2/3 );
             break;
           case '1':
-            Obj.scale.multiplyScalar( (current_obj_scale == '1.25') ? 5/4 : 3/4 );
+            fbx_obj.scale.multiplyScalar( (current_fbx_scale == '1.25') ? 5/4 : 3/4 );
             break;
           case '1.25':
-            Obj.scale.multiplyScalar( (current_obj_scale == '1.5') ? 6/5 : 4/5 );
+            fbx_obj.scale.multiplyScalar( (current_fbx_scale == '1.5') ? 6/5 : 4/5 );
             break;
           case '1.5':
-            Obj.scale.multiplyScalar( (current_obj_scale == '1.75') ? 7/6 : 5/6 );
+            fbx_obj.scale.multiplyScalar( (current_fbx_scale == '1.75') ? 7/6 : 5/6 );
             break;
           case '1.75':
-            Obj.scale.multiplyScalar( (current_obj_scale == '2') ? 8/7 : 6/7 );
+            fbx_obj.scale.multiplyScalar( (current_fbx_scale == '2') ? 8/7 : 6/7 );
             break;
           default:
-            Obj.scale.multiplyScalar( 7/8 );
+            fbx_obj.scale.multiplyScalar( 7/8 );
             break;
         }
 
-        previous_obj_scale = current_obj_scale;
+        previous_fbx_scale = current_fbx_scale;
         set_grid_y();
       }
 
       function scale_10x_set() {
         if (document.getElementById('scale_10x').checked) {
-          Obj.scale.multiplyScalar( 10 );
+          fbx_obj.scale.multiplyScalar( 10 );
         } else {
-          Obj.scale.multiplyScalar( 0.1 );
+          fbx_obj.scale.multiplyScalar( 0.1 );
         }
 
         set_grid_y();
@@ -383,13 +392,13 @@
           document.getElementById('rotation_z').value = hemisphereLight.position.z;
           document.getElementById('rotation_x').min = document.getElementById('rotation_y').min = document.getElementById('rotation_z').min = -100;
           document.getElementById('rotation_x').max = document.getElementById('rotation_y').max = document.getElementById('rotation_z').max = 100;
-          document.getElementById('rotation_x').step = document.getElementById('rotation_y').step = document.getElementById('rotation_z').step = 5;
+          document.getElementById('rotation_x').step = document.getElementById('rotation_y').step = document.getElementById('rotation_z').step = 1;
         } else {
           document.getElementById('rotation_x').value = parseInt(rot_x * 1000);
           document.getElementById('rotation_y').value = parseInt(rot_y * 1000);
           document.getElementById('rotation_z').value = parseInt(rot_z * 1000);
-          document.getElementById('rotation_x').min = document.getElementById('rotation_y').min = document.getElementById('rotation_z').min = -50;
-          document.getElementById('rotation_x').max = document.getElementById('rotation_y').max = document.getElementById('rotation_z').max = 50;
+          document.getElementById('rotation_x').min = document.getElementById('rotation_y').min = document.getElementById('rotation_z').min = -20;
+          document.getElementById('rotation_x').max = document.getElementById('rotation_y').max = document.getElementById('rotation_z').max = 20;
           document.getElementById('rotation_x').step = document.getElementById('rotation_y').step = document.getElementById('rotation_z').step = 1;
         }
       }
@@ -436,6 +445,28 @@
         }
       }
 
+      function animate_fbx() {
+        if (animation_running) {
+          animation_mixer.clipAction( animations[ current_animation ] ).stop();
+
+          if (current_animation == animations.length - 1) {
+            document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
+            document.getElementById('btn_animate').innerHTML = 'A';
+            current_animation = 0;
+            animation_running = false;
+          } else {
+            current_animation += 1;
+            animation_mixer.clipAction( animations[ current_animation ] ).play();
+            document.getElementById('btn_animate').innerHTML = 'A' + current_animation;
+          }
+        } else {
+          animation_mixer.clipAction( animations[ current_animation ] ).play();
+          document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
+          document.getElementById('btn_animate').innerHTML = 'A0';
+          animation_running = true;
+        }
+      }
+
       function init(){
         if (scene) {
           scene.remove.apply( scene, scene.children );
@@ -449,13 +480,14 @@
 
         enable_disable( true );
 
-        obj_loader.setMaterials( null );
-        selected_obj_file = null;
-        selected_mtl_file = null;
-        texture_files_jpg = [];
+        selected_fbx_file = null;
         texture_files_png = [];
+        texture_files_jpg = [];
         texture_files_bmp = [];
         texture_files_dds = [];
+        animations = [];
+        animation_mixer = null;
+        animation_running = false;
         edges = {};
         edges_visible = false;
         grid_visible = false;
@@ -463,22 +495,25 @@
         current_texture = -1;
         document.getElementById('btn_textures').disabled = true;
         document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
+        document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
+        document.getElementById('btn_animate').disabled = true;
 
         if (!url_loading) {
-          // Loaded file(s)
+          // Loaded file
           var fi = document.getElementById('file_input');
+
+          if (!fi.files) { return; }
 
           // Include check for JPG/PNG/BMP and DDS (DirectDraw Surface container file format)
           for (let i = 0; i < fi.files.length; i++) {
-            if (fi.files[i].name.toUpperCase().endsWith('.OBJ')) { selected_obj_file = fi.files[i]; }
-            else if (fi.files[i].name.toUpperCase().endsWith('.MTL')) { selected_mtl_file = fi.files[i]; }
+            if (fi.files[i].name.toUpperCase().endsWith('.FBX')) { selected_fbx_file = fi.files[i]; }
             else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.DDS')) { texture_files_dds.push( fi.files[i] ); }
           };
 
-          if (!selected_obj_file) { return; }
+          if (!selected_fbx_file) { return; }
 
           selected_url_file = '';
         } else {
@@ -495,6 +530,7 @@
           renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
           renderer.setPixelRatio( window.devicePixelRatio );
           renderer.setSize( ww, wh );
+          renderer.outputEncoding = THREE.sRGBEncoding;
           renderer.shadowMap.enabled = true;
           renderer.shadowMap.type = THREE.PCFSoftShadowMap;
           renderer.setClearColor( 0xFFFFFF, 0); // Allow setting the background color
@@ -506,14 +542,21 @@
         // Possibly use Orbit Controls instead.
         //document.body.appendChild( renderer.domElement );
 
+        clock = new THREE.Clock();
+
         if (scene == undefined) { scene = new THREE.Scene(); }
+        if (fbx_obj == undefined) { fbx_obj = new THREE.Object3D(); }
 
         if (!events_initialized) { initialize_event_listeners(); events_initialized = true; }
 
         // Create a grid helper for use with Orbit Controls
         if (grid == undefined) { grid = new THREE.GridHelper( 200, 200, "yellow" ); }
 
+        // Add axes helper
+        //scene.add( new THREE.AxesHelper( 50 ) );
+
         camera = new THREE.PerspectiveCamera( 45, ww/wh, 0.1, 2000 );
+        camera.aspect = window.innerWidth / window.innerHeight;
         camera.position.set( 0, 0, 250 );
         scene.add( camera );
 
@@ -528,7 +571,7 @@
         scene.add( hemisphereLight );
 
         // The following provides a plane that can receive a shadow but is also a sort of
-        // a "liquid background" that an object will go through at a certain distance.
+        // "liquid background" that an object will go through at a certain distance.
         // This plane is set in the background.
         shadowMaterial = new THREE.ShadowMaterial();
         shadowMaterial.opacity = 0.1;
@@ -539,7 +582,7 @@
 
         // Add SpotLight to the scene
         spotLight = new THREE.SpotLight( 0xFFFFFF, 0, 0, Math.PI/4 );
-        spotLight.position.set( 150, -50, 350 );
+        spotLight.position.set( 150, 0, 350 );
         spotLight.target.position.set( 0, 0, -1500 );
         spotLight.castShadow = true;
 
@@ -556,7 +599,7 @@
         // Add DirectionalLight to the camera (add it to the scene instead if not using Orbit Controls)
         directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 1 );
         directionalLight.position.set( 0, 0, 250 );
-        directionalLight.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+        directionalLight.lookAt(new THREE.Vector3( 0, 0, 0 ));
         camera.add( directionalLight );
 
         controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -586,204 +629,126 @@
         render_requested = true;
         render();
 
-        // Load the Obj file
-        if (selected_obj_file) {
+        // Load the fbx file
+        if (selected_fbx_file) {
           loadFile();
         } else {
           loadURLFile();
         }
       }
 
-      function loadFile() {
-        if (selected_mtl_file) {
-          mtl_loader.load( URL.createObjectURL( selected_mtl_file ), ( mtl ) => {
-            if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_dds.length > 0) {
-              if (texture_files_png.length > 0) {
-                for (const [ key, value ] of Object.entries( mtl.materialsInfo )) {
-                  texture_files_png.forEach( file => {
-                    if (file.name === value.map_kd) {
-                      mtl.materials[ key ] = URL.createObjectURL( file );
-                      mtl.materialsInfo[ key ].map_kd = mtl.materials[ key ].substring(10);
-                    }
-                  });
-                }
-              }
+      function loadFile(){
+        // Launch loading of the selected file, addFileInScene is the callback when it's ready
+        fbx_loader.load( URL.createObjectURL( selected_fbx_file ), addFileInScene );
+      }
 
-              if (texture_files_jpg.length > 0) {
-                for (const [ key, value ] of Object.entries( mtl.materialsInfo )) {
-                  texture_files_jpg.forEach( file => {
-                    if (file.name === value.map_kd) {
-                      mtl.materials[ key ] = URL.createObjectURL( file );
-                      mtl.materialsInfo[ key ].map_kd = mtl.materials[ key ].substring(10);
-                    }
-                  });
-                }
-              }
+      function addFileInScene( fbx_scene ){
+        animations = fbx_scene.animations;
 
-              if (texture_files_bmp.length > 0) {
-                for (const [ key, value ] of Object.entries( mtl.materialsInfo )) {
-                  texture_files_bmp.forEach( file => {
-                    if (file.name === value.map_kd) {
-                      mtl.materials[ key ] = URL.createObjectURL( file );
-                      mtl.materialsInfo[ key ].map_kd = mtl.materials[ key ].substring(10);
-                    }
-                  });
-                }
-              }
+        if (animations.length > 0) {
+          animation_mixer = new THREE.AnimationMixer( fbx_scene );
+          current_animation = 0;
+          animations.forEach( clip => { animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat; });
+        }
 
-              if (texture_files_dds.length > 0) {
-                for (const [ key, value ] of Object.entries( mtl.materialsInfo )) {
-                  texture_files_dds.forEach( file => {
-                    if (file.name === value.map_kd) {
-                      mtl.materials[ key ] = URL.createObjectURL( file );
-                      mtl.materialsInfo[ key ].map_kd = mtl.materials[ key ].substring(10);
-                    }
-                  });
-                }
-              }
-            } else {
-              mtl.preload();
-              obj_loader.setMaterials( mtl );
-            }
-
-            // Launch loading of the selected file
-            obj_loader.load( URL.createObjectURL( selected_obj_file ), function ( object ) {
-              Obj = object.clone();
-
-              let child_count = 1;
-
-              // Go through all children of the loaded object and search for a Mesh
-              Obj.traverse( function ( child ) {
-                // This will allow us to check if the child is an instance of the Mesh constructor
-        	      if (child instanceof THREE.Mesh) {
-                  if (texture_files_dds.length > 0) {
-                    child.material.map = dds_loader.load( mtl.materials[ child.material.name ] );
-                  } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0) {
-                    child.material.map = mtl.loadTexture( mtl.materials[ child.material.name ] );
-                  }
-
-                  // Enable transparency for the Opacity control and enable shadows
-                  child.material.side = THREE.DoubleSide;
-                  child.material.skinning = true;
-                  child.material.opacity = 1;
-                  child.material.transparent = true;
-                  child.castShadow = true;
-                  child.receiveShadow = false;
-
-                  child.name = 'child_' + child_count;
-                  edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
-                  child_count += 1;
-    		        }
-    	        });
-
-              set_initial_scale();
-              resize();
-
-              // Add the 3D object in the scene
-              scene.add( Obj );
-
-              camera.lookAt( Obj.position );
-            }, function ( xhr ) {
-              let today = new Date();
-              let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
-
-              if (xhr.loaded == 0 && xhr.total == 0) {
-                console.log( 'OBJ 0% loaded - ' + time );
-              } else {
-                console.log( 'OBJ ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
-              }
-            }, function ( error ) {
-              console.log( 'Error loading OBJ!' );
-              console.log( error );
-              render_requested = false;
-            });
-          }, function ( xhr ) {
-            let today = new Date();
-            let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
-
-            if (xhr.loaded == 0 && xhr.total == 0) {
-              console.log( 'MTL 0% loaded - ' + time );
-            } else {
-              console.log( 'MTL ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
-            }
-          }, function ( error ) {
-            console.log( 'Error loading MTL!' );
-            console.log( error );
-            render_requested = false;
-          });
-        } else {
-          // Launch loading of the selected file
-          obj_loader.load( URL.createObjectURL( selected_obj_file ), function ( object ) {
-            Obj = object.clone();
-
-            textures = [];
-            if (texture_files_png.length > 0) { texture_files_png.forEach( file => { textures.push( file ); }); }
-            if (texture_files_jpg.length > 0) { texture_files_jpg.forEach( file => { textures.push( file ); }); }
-            if (texture_files_bmp.length > 0) { texture_files_bmp.forEach( file => { textures.push( file ); }); }
-            if (texture_files_dds.length > 0) { texture_files_dds.forEach( file => { textures.push( file ); }); }
+        textures = [];
+        if (texture_files_png.length > 0) { texture_files_png.forEach( file => { textures.push( file ); }); }
+        if (texture_files_jpg.length > 0) { texture_files_jpg.forEach( file => { textures.push( file ); }); }
+        if (texture_files_bmp.length > 0) { texture_files_bmp.forEach( file => { textures.push( file ); }); }
+        if (texture_files_dds.length > 0) { texture_files_dds.forEach( file => { textures.push( file ); }); }
                 
-            if (textures.length > 0) { document.getElementById('btn_textures').disabled = false; }
+        if (textures.length > 0) { document.getElementById('btn_textures').disabled = false; }
 
-            let child_count = 1;
+        let child_count = 1;
 
-            // Go through all children of the loaded object and search for a Mesh
-            Obj.traverse( function( child ) {
-              // This will allow us to check if the child is an instance of the Mesh constructor
-        	    if (child instanceof THREE.Mesh) {
-                // Enable transparency for the Opacity control and enable shadows
-                child.material.side = THREE.DoubleSide;
-                child.material.skinning = true;
-                child.material.opacity = 1;
-                child.material.transparent = true;
-                child.castShadow = true;
-                child.receiveShadow = false;
+        // Go through all children of the loaded object and search for a Mesh
+        fbx_scene.traverse( function( child ) {
+          // This allow us to check if the children is an instance of the Mesh constructor
+          if (child instanceof THREE.Mesh) {
+            child.geometry.computeVertexNormals();
 
-                child.name = 'child_' + child_count;
-                edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
-                child_count += 1;
-    		      }
-    	      });
-
-            set_initial_scale();
-            resize();
-
-            // Add the 3D object in the scene
-            scene.add( Obj );
-
-            camera.lookAt( Obj.position );
-          }, function ( xhr ) {
-            let today = new Date();
-            let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
-
-            if (xhr.loaded == 0 && xhr.total == 0) {
-              console.log( 'OBJ 0% loaded - ' + time );
+            if (Array.isArray( child.material )) {
+              child.material.forEach( mtl => {
+                // Enable transparency for the Opacity control
+                mtl.opacity = 1;
+                mtl.transparent = true;
+                mtl.skinning = true;
+                mtl.side = THREE.DoubleSide;
+              });
             } else {
-              console.log( 'OBJ ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              // Enable transparency for the Opacity control
+              child.material.opacity = 1;
+              child.material.transparent = true;
+              child.material.skinning = true;
+              child.material.side = THREE.DoubleSide;
             }
-          }, function ( error ) {
-            console.log( 'Error loading OBJ!' );
-            console.log( error );
-            render_requested = false;
-          });
+
+            // Enable shadows
+            child.castShadow = true;
+            child.receiveShadow = false;
+
+            child.name = 'child_' + child_count;
+            edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+            child_count += 1;
+          }
+        });
+
+        fbx_obj = fbx_scene;
+        fbx_obj.name = 'local_model';
+
+        set_initial_scale();
+        resize();
+
+        // Add fbx model to scene
+        scene.add( fbx_obj );
+
+        camera.lookAt( fbx_obj.position );
+
+        if (animations.length > 0) {
+          animation_mixer.clipAction( animations[0] ).play();
+          document.getElementById('btn_animate').disabled = false;
+          document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
+          document.getElementById('btn_animate').innerHTML = 'A0';
+          animation_running = true;
         }
       }
 
       function loadURLFile() {
         if (selected_url_file != '') {
-          obj_loader.load( selected_url_file, function ( object ) {
-            Obj = object.clone();
+          fbx_loader.load( selected_url_file, ( fbx_scene ) => {
+            animations = fbx_scene.animations;
+
+            if (animations.length > 0) {
+              animation_mixer = new THREE.AnimationMixer( fbx_scene );
+              current_animation = 0;
+              animations.forEach( clip => { animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat; });
+            }
 
             let child_count = 1;
 
             // Go through all children of the loaded object and search for a Mesh
-            Obj.traverse( function( child ) {
-              // This will allow us to check if the child is an instance of the Mesh constructor
-        	    if (child instanceof THREE.Mesh) {
-                // Enable transparency for the Opacity control and enable shadows
-                child.material.side = THREE.DoubleSide;
-                child.material.skinning = true;
-                child.material.opacity = 1;
-                child.material.transparent = true;
+            fbx_scene.traverse( function( child ) {
+              // This allow us to check if the children is an instance of the Mesh constructor
+          	  if (child instanceof THREE.Mesh) {
+                child.geometry.computeVertexNormals();
+
+                if (Array.isArray( child.material )) {
+                  child.material.forEach( mtl => {
+                    // Enable transparency for the Opacity control
+                    mtl.opacity = 1;
+                    mtl.transparent = true;
+                    mtl.skinning = true;
+                    mtl.side = THREE.DoubleSide;
+                  });
+                } else {
+                  // Enable transparency for the Opacity control
+                  child.material.opacity = 1;
+                  child.material.transparent = true;
+                  child.material.skinning = true;
+                  child.material.side = THREE.DoubleSide;
+                }
+
+                // Enable shadows
                 child.castShadow = true;
                 child.receiveShadow = false;
 
@@ -793,24 +758,35 @@
     		      }
     	      });
 
+            fbx_obj = fbx_scene;
+            fbx_obj.name = 'url_model';
+
             set_initial_scale();
             resize();
 
-            // Add the 3D object in the scene
-            scene.add( Obj );
+            // Add fbx model to scene
+            scene.add( fbx_obj );
 
-            camera.lookAt( Obj.position );
+            camera.lookAt( fbx_obj.position );
+
+            if (animations.length > 0) {
+              animation_mixer.clipAction( animations[0] ).play();
+              document.getElementById('btn_animate').disabled = false;
+              document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
+              document.getElementById('btn_animate').innerHTML = 'A0';
+              animation_running = true;
+            }
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
 
             if (xhr.loaded == 0 && xhr.total == 0) {
-              console.log( 'OBJ from URL 0% loaded - ' + time );
+              console.log( 'FBX from URL 0% loaded - ' + time );
             } else {
-              console.log( 'OBJ from URL ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              console.log( 'FBX from URL ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
             }
           }, function ( error ) {
-            console.log( 'Error loading OBJ from URL!' );
+            console.log( 'Error loading FBX from URL!' );
             console.log( error );
             render_requested = false;
           });
@@ -831,28 +807,32 @@
       }
 
       function set_grid_y() {
-        bounding_box.setFromObject( Obj );
+        bounding_box.setFromObject( fbx_obj );
         grid.position.y = bounding_box.min.y;
       }
 
       function show_edges() {
         if (edges_visible) {
-          Obj.traverse( function( child ) { if (child instanceof THREE.Mesh) { child.remove( edges[ child.name ] ); } });
+          fbx_obj.traverse( function( child ) { if (child instanceof THREE.Mesh) { child.remove( edges[ child.name ] ); } });
           edges_visible = false;
           document.getElementById('btn_edges').style.backgroundColor = '#d1cefc';
         } else {
-          Obj.traverse( function( child ) { if (child instanceof THREE.Mesh) { child.add( edges[ child.name ] ); } });
+          fbx_obj.traverse( function( child ) { if (child instanceof THREE.Mesh) { child.add( edges[ child.name ] ); } });
           edges_visible = true;
           document.getElementById('btn_edges').style.backgroundColor = 'lightgreen';
         }
       }
 
       function show_wireframe() {
-        // Go through all children of the loaded object and search for a Mesh
-        Obj.traverse( function( child ) {
-          // This will allow us to check if the child is an instance of the Mesh constructor
-    	    if (child instanceof THREE.Mesh) {
-            child.material.wireframe = document.getElementById('wireframe').checked;
+        fbx_obj.traverse( function ( child ) {
+    	    if(child instanceof THREE.Mesh){
+            if (Array.isArray(child.material)) {
+              child.material.forEach( mtl => {
+                mtl.wireframe = document.getElementById('wireframe').checked;
+              });
+            } else {
+              child.material.wireframe = document.getElementById('wireframe').checked;
+            }
     		  }
     	  });
       }
@@ -860,7 +840,7 @@
       function show_shadow() {
         if (document.getElementById('shadow').checked) {
           scene.add( shadowMesh );
-          shadowMaterial.opacity = document.getElementById('obj_opacity').value * document.getElementById('spot_light_intensity').value;
+          shadowMaterial.opacity = document.getElementById('fbx_opacity').value * document.getElementById('spot_light_intensity').value;
         } else {
           scene.remove( shadowMesh );
         }
@@ -877,7 +857,7 @@
           document.getElementById('btn_textures').innerHTML = 'T' + current_texture;
         }
 
-        Obj.traverse( function( child ) {
+        fbx_obj.traverse( function( child ) {
           // This will allow us to check if the child is an instance of the Mesh constructor
         	if (child instanceof THREE.Mesh) {
             if (current_texture == -1) {
@@ -916,22 +896,27 @@
       function render() {
         if (render_requested) { requestAnimationFrame( render ); }
 
-        if (Obj) {
-          // Reset Obj rotational values
+        if (fbx_obj) {
+          // Reset fbx_obj rotational values
           if (reset_rotation) {
-            Obj.rotation.set( 0, 0, 0 );
+            fbx_obj.rotation.set( 0, 0, 0 );
             reset_rotation = false;
           }
 
-          // Rotate the Obj
+          // Rotate the fbx_obj
           if (!mouse_rotation && (rot_x != 0 || rot_y != 0 || rot_z != 0)) {
-            Obj.rotation.x += rot_x;
-            Obj.rotation.y += rot_y;
-            Obj.rotation.z += rot_z;
+            fbx_obj.rotation.x += rot_x;
+            fbx_obj.rotation.y += rot_y;
+            fbx_obj.rotation.z += rot_z;
 
-            if (Math.abs(Obj.rotation.x) > 2 * Math.PI ) { Obj.rotation.x = 0; }
-            if (Math.abs(Obj.rotation.y) > 2 * Math.PI ) { Obj.rotation.y = 0; }
-            if (Math.abs(Obj.rotation.z) > 2 * Math.PI ) { Obj.rotation.z = 0; }
+            if (Math.abs(fbx_obj.rotation.x) > 2 * Math.PI ) { fbx_obj.rotation.x = 0; }
+            if (Math.abs(fbx_obj.rotation.y) > 2 * Math.PI ) { fbx_obj.rotation.y = 0; }
+            if (Math.abs(fbx_obj.rotation.z) > 2 * Math.PI ) { fbx_obj.rotation.z = 0; }
+          }
+
+          if (animation_running) {
+            var delta = clock.getDelta();
+            animation_mixer.update( delta );
           }
         }
 
@@ -945,11 +930,11 @@
       function reset_only() {
         if (grid_visible) { show_grid(); }
 
-        scene.remove( Obj );
+        scene.remove( fbx_obj );
 
         reset_all( true );
 
-        if (selected_obj_file) {
+        if (selected_fbx_file) {
           loadFile();
         } else {
           loadURLFile();
@@ -957,7 +942,7 @@
       }
 
       function reset_all( reset = false ) {
-        // Reset all current rotational values
+        // Reset all current positional and rotational values
         document.getElementById('rotation_x').value = 0;
         document.getElementById('rotation_y').value = 0;
         document.getElementById('rotation_z').value = 0;
@@ -981,19 +966,22 @@
         document.getElementById('hlight').checked = false;
         radio_changed();
 
-        // Reset the Obj opacity and scale values
-        document.getElementById('obj_opacity').value = 1;
-        document.getElementById('obj_scale').value = 1;
-        previous_obj_scale = '1';
+        // Reset the fbx opacity and scale values
+        document.getElementById('fbx_opacity').value = 1;
+        document.getElementById('fbx_scale').value = 1;
+        previous_fbx_scale = '1';
 
         // Reset the wireframe, shadow and scale_10x checkboxes
         document.getElementById('wireframe').checked = false;
         document.getElementById('shadow').checked = false;
         document.getElementById('scale_10x').checked = false;
 
-        // Reset edges and textures related values
+        // Reset edges, animation and textures related values
         edges_visible = false;
         document.getElementById('btn_edges').style.backgroundColor = '#d1cefc';
+        animation_running = false;
+        document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
+        document.getElementById('btn_animate').innerHTML = 'A';
         current_texture = -1;
         document.getElementById('btn_textures').style.backgroundColor = '#d1cefc';
         document.getElementById('btn_textures').innerHTML = 'T';
@@ -1002,9 +990,10 @@
 
         // Reset the view
         if (reset) {
-          Obj.position.set( 0, 0, 0 );
+          controls.reset();
+          fbx_obj.position.set( 0, 0, 0 );
           hemisphereLight.position.set( 0, 10, 0 );
-          spotLight.position.set( 150, -50, 350 );
+          spotLight.position.set( 150, 0, 350 );
           directionalLight.position.set( 0, 0, 250 );
           set_scene_image();
           show_wireframe();
@@ -1018,10 +1007,12 @@
         }
 
         if (!reset) {
-          // Page (re)loading so reset the file input, spinner, textures button and disable controls
-          document.getElementById('file_input').value = "";
+          // Page (re)loading so reset the file input, URL entry, spinner, animate button and disable controls
+          document.getElementById('file_input').value = '';
+          document.getElementById('url_entry').value = '';
           document.getElementById('div_spinner').style.display = "block";
-          document.getElementById('btn_textures').disabled = true;
+          document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
+          document.getElementById('btn_animate').disabled = true;
           enable_disable( true );
         }
       }
@@ -1038,8 +1029,8 @@
         document.getElementById('wireframe').disabled = disable;
         document.getElementById('shadow').disabled = disable;
         document.getElementById('scale_10x').disabled = disable;
-        document.getElementById('obj_scale').disabled = disable;
-        document.getElementById('obj_opacity').disabled = disable;
+        document.getElementById('fbx_scale').disabled = disable;
+        document.getElementById('fbx_opacity').disabled = disable;
         document.getElementById('ambient_light_color').disabled = disable;
         document.getElementById('hemisphere_light_color').disabled = disable;
         document.getElementById('spot_light_color').disabled = disable;

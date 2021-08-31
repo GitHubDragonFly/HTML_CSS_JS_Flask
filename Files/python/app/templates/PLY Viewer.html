@@ -596,6 +596,7 @@
           if (texture_files_jpg.length > 0) {
             texture = texture_loader.load( URL.createObjectURL( texture_files_jpg[0] ));
             material = new THREE.MeshLambertMaterial( {
+              side: THREE.DoubleSide,
               map: texture,
               fog: true,
               opacity: 1,
@@ -607,6 +608,7 @@
           } else if (texture_files_png.length > 0) {
             texture = texture_loader.load( URL.createObjectURL( texture_files_png[0] ));
             material = new THREE.MeshLambertMaterial( {
+              side: THREE.DoubleSide,
               map: texture,
               fog: true,
               opacity: 1,
@@ -618,6 +620,7 @@
           } else if (texture_files_bmp.length > 0) {
             texture = texture_loader.load( URL.createObjectURL( texture_files_bmp[0] ));
             material = new THREE.MeshLambertMaterial( {
+              side: THREE.DoubleSide,
               map: texture,
               fog: true,
               opacity: 1,
@@ -629,6 +632,7 @@
           } else if (texture_files_dds.length > 0) {
             texture = dds_loader.load( URL.createObjectURL( texture_files_dds[0] ));
             material = new THREE.MeshStandardMaterial( {
+              side: THREE.DoubleSide,
               map: texture,
               fog: false,
               opacity: 1,
@@ -638,6 +642,7 @@
             });
           } else {
             material = new THREE.MeshPhongMaterial( {
+              side: THREE.DoubleSide,
               polygonOffset: true,
               polygonOffsetFactor: 1,
               polygonOffsetUnits: 1,
@@ -654,6 +659,7 @@
         } else {
           if (object.hasColors) {
             material = new THREE.MeshPhongMaterial( {
+              side: THREE.DoubleSide,
               polygonOffset: true,
               polygonOffsetFactor: 1,
               polygonOffsetUnits: 1,
@@ -668,6 +674,7 @@
             });
           } else {
             material = new THREE.MeshPhysicalMaterial( {
+              side: THREE.DoubleSide,
               fog: true,
               sheen: new THREE.Color( 5, 5, 112 ),
               roughness: 0.9,
@@ -686,7 +693,7 @@
 
         mesh = new THREE.Mesh( smooth, material );
         mesh.castShadow = true;
-        mesh.receiveShadow = true;
+        mesh.receiveShadow = false;
 
         edges = new THREE.LineSegments( new THREE.EdgesGeometry( mesh.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
 
@@ -718,6 +725,7 @@
           smooth.mergeVertices();
 
           material = new THREE.MeshPhongMaterial( {
+            side: THREE.DoubleSide,
             polygonOffset: true,
             polygonOffsetFactor: 1,
             polygonOffsetUnits: 1,
@@ -733,6 +741,7 @@
         } else {
           if (object.hasColors) {
             material = new THREE.MeshPhongMaterial( {
+              side: THREE.DoubleSide,
               polygonOffset: true,
               polygonOffsetFactor: 1,
               polygonOffsetUnits: 1,
@@ -747,6 +756,7 @@
             });
           } else {
             material = new THREE.MeshPhysicalMaterial( {
+              side: THREE.DoubleSide,
               fog: true,
               sheen: new THREE.Color( 5, 5, 112 ),
               roughness: 0.9,
@@ -765,7 +775,7 @@
 
         mesh = new THREE.Mesh( smooth, material );
         mesh.castShadow = true;
-        mesh.receiveShadow = true;
+        mesh.receiveShadow = false;
 
         edges = new THREE.LineSegments( new THREE.EdgesGeometry( mesh.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
 
