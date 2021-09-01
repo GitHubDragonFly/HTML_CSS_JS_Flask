@@ -55,7 +55,16 @@
       p.full_screen {
         text-align: center;
         content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAf0lEQVRIie1VQQ6AMAjb/x9M4IRePICoK7GLB5eQbElpCTAY7j6YRiUPAvvxbNMkN76XIDhSRKCdjhmB494hzzwngcoBIa/eASgisMgTBo4ODqCTAiSFrW6Biv8LfL/I1DbtfDRV9VLgjVFhZp59A4g+7JaM6yULh7IyWUYX2AAPDxz26GjX+gAAAABJRU5ErkJggg==);
-        margin: 1px 1px 1px 1px;
+        margin: 1px 1px 1px 2px;
+        padding: 0;
+        width: 15px;
+        height: 15px;
+      }
+
+      p.polar {
+        text-align: center;
+        content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAv0lEQVRIic2V6wqFIBCEe3PfWhDEjYIDtc7s5VjQDwkvO9/uaLqJyPZmCy0qpQhqywBPKAK6d85uLJCBfhq0Ar0gYxGKnYT0Qs+iqziEZgMQRCfUe5cJcEzUWoUF0k0EidwSRYO6EkvcjbcmtZB1WlgVIYAWZFUhnRDgn7FvAV63aHmTLcgjx5Rl8OiPhjLPXhWttSkGAnTp7MQgK02AlXnkNTOv6zHGWerxRZl4NoUfHMuG7LwLYPZkntQQYKXtSAJKMrYucd0AAAAASUVORK5CYII=);
+        margin: 1px 1px 1px 2px;
         padding: 0;
         width: 15px;
         height: 15px;
@@ -130,6 +139,7 @@
         <label for="back_color" style="margin: 2px 0 2px 0;">BG:</label>
         <input type="color" id="back_color" name="back_color" onchange="set_back_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 5px 0 0;" disabled />
         <button id="btn_grid" onclick="show_grid()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 5px; padding: 0;" disabled>#</button>
+        <button id="btn_polar_grid" onclick="show_polar_grid()" style="font-size: 18px; background-color: #d1cefc; vertical-align: middle; width: 24px; margin: 2px 2px 2px 5px; padding: 0;" disabled><p class="polar"></p></button>
       </div>
     </div><br />
 
@@ -192,8 +202,8 @@
 
     <script>
       var animations, animation_mixer, animation_running, current_animation, render_requested, clock;
-      var renderer, scene, camera, grid, fbx_obj, edges, edges_visible, grid_visible;
-      var controls, gizmo;
+      var renderer, scene, camera, fbx_obj, edges, edges_visible;
+      var controls, gizmo, grid, polar_grid, grid_visible, polar_grid_visible;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
       var shadowMesh, shadowMaterial;
       var ww = window.innerWidth,	wh = window.innerHeight;
@@ -358,6 +368,7 @@
         }
 
         previous_fbx_scale = current_fbx_scale;
+        set_polar_grid_y();
         set_grid_y();
       }
 
@@ -368,6 +379,7 @@
           fbx_obj.scale.multiplyScalar( 0.1 );
         }
 
+        set_polar_grid_y();
         set_grid_y();
       }
 
@@ -491,6 +503,7 @@
         edges = {};
         edges_visible = false;
         grid_visible = false;
+        polar_grid_visible = false;
         render_requested = false;
         current_texture = -1;
         document.getElementById('btn_textures').disabled = true;
@@ -550,6 +563,7 @@
         if (!events_initialized) { initialize_event_listeners(); events_initialized = true; }
 
         // Create a grid helper for use with Orbit Controls
+        if (polar_grid == undefined) { polar_grid = new THREE.PolarGridHelper( 40, 10 ); }
         if (grid == undefined) { grid = new THREE.GridHelper( 200, 200, "yellow" ); }
 
         // Add axes helper
@@ -781,15 +795,30 @@
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
 
             if (xhr.loaded == 0 && xhr.total == 0) {
-              console.log( 'FBX from URL 0% loaded - ' + time );
+              console.log( 'URL FBX 0% loaded - ' + time );
             } else {
-              console.log( 'FBX from URL ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              console.log( 'URL FBX ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
             }
           }, function ( error ) {
-            console.log( 'Error loading FBX from URL!' );
+            console.log( 'Error loading URL FBX!' );
             console.log( error );
             render_requested = false;
           });
+        }
+      }
+
+      function show_polar_grid() {
+        if (polar_grid_visible) {
+          scene.remove( polar_grid );
+          polar_grid_visible = false;
+          document.getElementById('btn_polar_grid').style.backgroundColor = '#d1cefc';
+          document.getElementById('btn_grid').disabled = false;
+        } else {
+          set_polar_grid_y();
+          scene.add( polar_grid );
+          polar_grid_visible = true;
+          document.getElementById('btn_polar_grid').style.backgroundColor = 'lightgreen';
+          document.getElementById('btn_grid').disabled = true;
         }
       }
 
@@ -798,12 +827,19 @@
           scene.remove( grid );
           grid_visible = false;
           document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
+          document.getElementById('btn_polar_grid').disabled = false;
         } else {
           set_grid_y();
           scene.add( grid );
           grid_visible = true;
           document.getElementById('btn_grid').style.backgroundColor = 'lightgreen';
+          document.getElementById('btn_polar_grid').disabled = true;
         }
+      }
+
+      function set_polar_grid_y() {
+        bounding_box.setFromObject( fbx_obj );
+        polar_grid.position.y = bounding_box.min.y;
       }
 
       function set_grid_y() {
@@ -928,6 +964,7 @@
       }
 
       function reset_only() {
+        if (polar_grid_visible) {show_polar_grid(); }
         if (grid_visible) { show_grid(); }
 
         scene.remove( fbx_obj );
@@ -1011,8 +1048,8 @@
           document.getElementById('file_input').value = '';
           document.getElementById('url_entry').value = '';
           document.getElementById('div_spinner').style.display = "block";
-          document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
           document.getElementById('btn_animate').disabled = true;
+          document.getElementById('btn_textures').disabled = true;
           enable_disable( true );
         }
       }
@@ -1038,6 +1075,7 @@
         document.getElementById('directional_light_intensity').disabled = disable;
         document.getElementById('back_color').disabled = disable;
         document.getElementById('btn_edges').disabled = disable;
+        document.getElementById('btn_polar_grid').disabled = disable;
         document.getElementById('btn_grid').disabled = disable;
         document.getElementById('reset').disabled = disable;
       }
