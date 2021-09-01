@@ -7,7 +7,7 @@ The main differences between these 2 projects:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
  - uploading any pictures via the `Form` will then have those saved in the new `uploads` folder
  - new additions are FBX and MMD viewers (Miku Miku Dance)
- - all viewers in this project support URL loading, use Orbit Controls and have a gizmo and grid / polar grid button present
+ - viewers in this project support URL loading, use Orbit Controls, have a gizmo and a grid / polar grid button present
  - DRACO and KTX2 support were added to the GLTF Viewer:
    - this seems to work fine when using URL option (see the screenshot) so try using it for fetching files both locally and from the Internet
    - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG/BMP` texture file along just to see if and how it changes the object's appearance)
