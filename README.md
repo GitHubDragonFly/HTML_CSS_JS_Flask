@@ -7,7 +7,7 @@ The main differences between these 2 projects:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
  - uploading any pictures via the `Form` will then have those saved in the new `uploads` folder
  - new additions are FBX and MMD viewers (Miku Miku Dance)
- - all viewers in this project support URL loading, use Orbit Controls and have a gizmo and grid present
+ - all viewers in this project support URL loading, use Orbit Controls and have a gizmo and grid / polar grid button present
  - DRACO and KTX2 support were added to the GLTF Viewer:
    - this seems to work fine when using URL option (see the screenshot) so try using it for fetching files both locally and from the Internet
    - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG/BMP` texture file along just to see if and how it changes the object's appearance)
@@ -27,7 +27,6 @@ Additional Notes:
    - URL option is set for either 1 or more comma separated URLs, like the following:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd`
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
-   - there is also a polar grid button available
  - GLTF / DAE / FBX viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
    - Xbot.glb is the multi-animation example that can be accessed in the GLTF viewer via the following URL:
