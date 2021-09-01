@@ -26,7 +26,7 @@ def favicon():
 
 @app.route('/', methods=['GET'])
 def get_exercise():
-    return render_template('Exercise.html')
+    return render_template( 'Exercise.html' )
 
 @app.route('/handle_form_data', methods=['POST'])
 def handle_form_data():
@@ -41,10 +41,10 @@ def handle_form_data():
     img = request.files.get('file')
 
     if img:
-        img.save(os.path.join(uploads_dir, img.filename))
-        pictures.append('uploads/' + img.filename)
+        img.save( os.path.join( uploads_dir, img.filename ) )
+        pictures.append( 'uploads/' + img.filename )
     else:
-        pictures.append('None')
+        pictures.append( 'None' )
 
     return make_response( 'Form Data Processed' )
 
@@ -54,12 +54,17 @@ def display_form_data():
 
 @app.route('/static/js/libs/draco/draco_decoder.wasm')
 def send_draco_wasm():
-    file_path = app.root_path + '\\static\\js\\libs\\draco\\draco_decoder.wasm'
+    file_path = app.root_path + os.path.normpath( '/static/js/libs/draco/draco_decoder.wasm' )
+    return send_file( file_path , mimetype = 'application/wasm')
+
+@app.route('/static/js/libs/basis/basis_transcoder.wasm')
+def send_basis_wasm():
+    file_path = app.root_path + os.path.normpath( '/static/js/libs/basis/basis_transcoder.wasm' )
     return send_file( file_path , mimetype = 'application/wasm')
 
 @app.route('/static/js/libs/ammo.wasm.wasm')
 def send_ammo_wasm():
-    file_path = app.root_path + '\\static\\js\\libs\\ammo.wasm.wasm'
+    file_path = app.root_path + os.path.normpath( '/static/js/libs/ammo.wasm.wasm' )
     return send_file( file_path , mimetype = 'application/wasm')
 
 @app.route('/<path:path>', methods=['GET'])
