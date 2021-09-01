@@ -214,6 +214,7 @@
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
+
       // Loader for selected file from Three.js
       const mtl_loader = new THREE.MTLLoader( manager );
       const obj_loader = new THREE.OBJLoader( manager );
@@ -476,6 +477,7 @@
         current_texture = -1;
         document.getElementById('btn_textures').disabled = true;
         document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
+        document.getElementById('btn_polar_grid').style.backgroundColor = '#d1cefc';
 
         if (!url_loading) {
           // Loaded file(s)

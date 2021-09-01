@@ -215,6 +215,7 @@
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
+
       // Loader for selected file from Three.js
       const gltf_loader = new THREE.GLTFLoader( manager );
 
@@ -575,6 +576,7 @@
         materials = [];
         materials_available = false;
         document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
+        document.getElementById('btn_polar_grid').style.backgroundColor = '#d1cefc';
         document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
         document.getElementById('btn_animate').disabled = true;
         document.getElementById('btn_extras').style.backgroundColor = '#d1cefc';

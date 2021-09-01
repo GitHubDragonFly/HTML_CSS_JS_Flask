@@ -211,9 +211,11 @@
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
+
       // Loader for selected file from Three.js
       const ply_loader = new THREE.PLYLoader( manager );
       const stl_loader = new THREE.STLLoader( manager );
+
       const texture_loader = new THREE.TextureLoader();
       const dds_loader = new THREE.DDSLoader( manager );
       manager.addHandler( /\.dds$/i, dds_loader );
@@ -461,6 +463,7 @@
         polar_grid_visible = false;
         render_requested = false;
         document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
+        document.getElementById('btn_polar_grid').style.backgroundColor = '#d1cefc';
 
         if (!url_loading) {
           // Loaded file

@@ -504,6 +504,7 @@
         polar_grid_visible = false;
         render_requested = false;
         document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
+        document.getElementById('btn_polar_grid').style.backgroundColor = '#d1cefc';
         document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
         document.getElementById('btn_animate').disabled = true;
 
@@ -956,10 +957,7 @@
             if (Math.abs(dae_obj.rotation.z) > 2 * Math.PI ) { dae_obj.rotation.z = 0; }
           }
 
-          if (animation_running) {
-            var delta = clock.getDelta();
-            animation_mixer.update( delta );
-          }
+          if (animation_running) { animation_mixer.update( clock.getDelta() ); }
         }
 
         controls.update();
