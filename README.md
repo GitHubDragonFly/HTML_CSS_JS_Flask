@@ -89,6 +89,9 @@ Any and all trademarks, either directly or indirectly mentioned here, belong to 
 # Resources
 Check the resources mentioned in the original HTML_CSS_JS project.
 
-Here is also a couple of links to other online viewers:
+Here are links to other online viewers:
 - [Online 3D Viewer](https://github.com/kovacsv/Online3DViewer)
 - [GLTF Viewer](https://gltf-viewer.donmccurdy.com/)
+
+The following viewer is a Windows application, useful to a degree but the project appears to have been abandoned:
+- [Open 3D Model Viewer](https://github.com/acgessler/open3mod)
