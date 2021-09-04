@@ -106,7 +106,7 @@
         <label style="margin: 2px 5px 2px 0;"><input type="checkbox" id="scale_10x" onchange="scale_10x_set();" disabled />10x</label>
         <button id="btn_extras" onclick="animate_extra()" style="background-color: #d1cefc; vertical-align: middle; width: 28px; margin: 2px 2px 2px 2px; padding: 0;" disabled>X</button>
         <button id="btn_poses" onclick="change_pose()" style="background-color: #d1cefc; vertical-align: middle; width: 28px; margin: 2px 2px 2px 2px; padding: 0;" disabled>P</button>
-        <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 15px;" disabled>Reset</button>
+        <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 10px;" disabled>Reset</button>
         <button id="btn_full_screen" onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
       </div>
       <div id="url" style="display: none;">
@@ -218,7 +218,7 @@
       var selected_mmd_file, selected_vmd_file, selected_vmd_camera_file, selected_vpd_files, selected_audio_file;
       var selected_url_file = '', url_displayed, url_loading;
       var selected_mmd_url_file, selected_vmd_url_file, selected_vmd_camera_url_file, selected_vpd_url_files, selected_audio_url_file;
-      var texture_files_png, texture_files_jpg, texture_files_bmp;
+      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_tga;
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
@@ -230,6 +230,9 @@
       const listener = new THREE.AudioListener();
       const sound = new THREE.Audio( listener );
       const audio_loader = new THREE.AudioLoader();
+
+      const tga_loader = new THREE.TGALoader( manager );
+      manager.addHandler( /\.tga$/i, tga_loader );
 
       const texture_loader = new THREE.TextureLoader( manager );
 
@@ -565,6 +568,7 @@
         texture_files_png = [];
         texture_files_jpg = [];
         texture_files_bmp = [];
+        texture_files_tga = [];
         extras = [];
         extra_running = false;
         poses = [];
@@ -597,6 +601,7 @@
             else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.TGA')) { texture_files_tga.push( fi.files[i] ); }
           };
 
           if (!selected_mmd_file && !selected_audio_file) { return; }
@@ -781,6 +786,7 @@
                     texture.wrapS = THREE.RepeatWrapping;
                     texture.wrapT = THREE.RepeatWrapping;
                     texture.magFilter = THREE.NearestFilter;
+                    texture.flipY = false;
 
                     // Apply texture
                     if (Array.isArray( child.material )) {
@@ -792,6 +798,31 @@
                       child.material.map = texture;
                       child.material.needsUpdate = true;
                     }
+
+                    URL.revokeObjectURL( file );
+                  });
+                });
+              } else if (texture_files_tga.length > 0) {
+                texture_files_tga.forEach( file => {
+                  tga_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                    texture.encoding = THREE.sRGBEncoding;
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.magFilter = THREE.NearestFilter;
+                    texture.flipY = false;
+
+                    // Apply texture
+                    if (Array.isArray( child.material )) {
+                      child.material.forEach( mtl => {
+                        mtl.map = texture;
+                        mtl.needsUpdate = true;
+                      });
+                    } else {
+                      child.material.map = texture;
+                      child.material.needsUpdate = true;
+                    }
+
+                    URL.revokeObjectURL( file );
                   });
                 });
               }
@@ -801,6 +832,7 @@
           selected_vpd_files.forEach( file => {
             mmd_loader.loadVPD( URL.createObjectURL( file ), false, vpd => {
               poses.push( vpd );
+              URL.revokeObjectURL( file );
             }, function ( xhr ) {
               let today = new Date();
               let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -815,6 +847,7 @@
               console.log( error );
               render_requested = false;
               ready = false;
+              URL.revokeObjectURL( file );
             });
           });
 
@@ -831,6 +864,7 @@
             	sound.setLoop(true);
             	sound.setVolume(0.3);
               sound.play();
+              URL.revokeObjectURL( selected_audio_file );
             }, function ( xhr ) {
               let today = new Date();
               let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -845,6 +879,7 @@
               console.log( error );
               render_requested = false;
               ready = false;
+              URL.revokeObjectURL( selected_audio_file );
             });
           }
 
@@ -856,6 +891,7 @@
 
           scene.add( mmd_obj );
           camera.lookAt( mmd_obj.position );
+          URL.revokeObjectURL( selected_mmd_file );
         }, function ( xhr ) {
           let today = new Date();
           let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -870,6 +906,7 @@
           console.log( error );
           render_requested = false;
           ready = false;
+          URL.revokeObjectURL( selected_mmd_file );
         });
 
         ready = true;
@@ -918,6 +955,7 @@
                       texture.wrapS = THREE.RepeatWrapping;
                       texture.wrapT = THREE.RepeatWrapping;
                       texture.magFilter = THREE.NearestFilter;
+                      texture.flipY = false;
 
                       // Apply texture
                       if (Array.isArray( child.material )) {
@@ -929,6 +967,31 @@
                         child.material.map = texture;
                         child.material.needsUpdate = true;
                       }
+
+                      URL.revokeObjectURL( file );
+                    });
+                  });
+                } else if (texture_files_tga.length > 0) {
+                  texture_files_tga.forEach( file => {
+                    tga_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                      texture.encoding = THREE.sRGBEncoding;
+                      texture.wrapS = THREE.RepeatWrapping;
+                      texture.wrapT = THREE.RepeatWrapping;
+                      texture.magFilter = THREE.NearestFilter;
+                      texture.flipY = false;
+
+                      // Apply texture
+                      if (Array.isArray( child.material )) {
+                        child.material.forEach( mtl => {
+                          mtl.map = texture;
+                          mtl.needsUpdate = true;
+                        });
+                      } else {
+                        child.material.map = texture;
+                        child.material.needsUpdate = true;
+                      }
+
+                      URL.revokeObjectURL( file );
                     });
                   });
                 }
@@ -937,6 +1000,7 @@
 
             mmd_loader.loadAnimation( URL.createObjectURL( selected_vmd_camera_file ), camera, function ( cameraAnimation ) {
               helper.add( camera, {	animation: cameraAnimation });
+              URL.revokeObjectURL( selected_vmd_camera_file );
             }, function ( xhr ) {
               let today = new Date();
               let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -951,6 +1015,7 @@
               console.log( error );
               render_requested = false;
               ready = false;
+              URL.revokeObjectURL( selected_vmd_camera_file );
             });
 
             if (selected_audio_file) {
@@ -959,6 +1024,7 @@
               	sound.setLoop(true);
               	sound.setVolume(0.3);
                 helper.add(sound, { delayTime: 3.5 } );
+                URL.revokeObjectURL( selected_audio_file );
               }, function ( xhr ) {
                 let today = new Date();
                 let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -973,6 +1039,7 @@
                 console.log( error );
                 render_requested = false;
                 ready = false;
+                URL.revokeObjectURL( selected_audio_file );
               });
             }
 
@@ -981,6 +1048,11 @@
 
             scene.add( mmd_obj );
             camera.lookAt( mmd_obj.position );
+
+            ready = true;
+
+            URL.revokeObjectURL( selected_mmd_file );
+            URL.revokeObjectURL( selected_vmd_file );
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -995,6 +1067,9 @@
             console.log( error );
             render_requested = false;
             ready = false;
+
+            URL.revokeObjectURL( selected_mmd_file );
+            URL.revokeObjectURL( selected_vmd_file );
           });
         } else {
           mmd_loader.loadWithAnimation( URL.createObjectURL( selected_mmd_file ), URL.createObjectURL( selected_vmd_file ), ext, mmd => {
@@ -1035,6 +1110,28 @@
                       texture.wrapS = THREE.RepeatWrapping;
                       texture.wrapT = THREE.RepeatWrapping;
                       texture.magFilter = THREE.NearestFilter;
+                      texture.flipY = false;
+
+                      // Apply texture
+                      if (Array.isArray( child.material )) {
+                        child.material.forEach( mtl => {
+                          mtl.map = texture;
+                          mtl.needsUpdate = true;
+                        });
+                      } else {
+                        child.material.map = texture;
+                        child.material.needsUpdate = true;
+                      }
+                    });
+                  });
+                } else if (texture_files_tga.length > 0) {
+                  texture_files_tga.forEach( file => {
+                    tga_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                      texture.encoding = THREE.sRGBEncoding;
+                      texture.wrapS = THREE.RepeatWrapping;
+                      texture.wrapT = THREE.RepeatWrapping;
+                      texture.magFilter = THREE.NearestFilter;
+                      texture.flipY = false;
 
                       // Apply texture
                       if (Array.isArray( child.material )) {
@@ -1083,6 +1180,11 @@
 
             scene.add( mmd_obj );
             camera.lookAt( mmd_obj.position );
+
+            ready = true;
+
+            URL.revokeObjectURL( selected_mmd_file );
+            URL.revokeObjectURL( selected_vmd_file );
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1097,10 +1199,11 @@
             console.log( error );
             render_requested = false;
             ready = false;
+
+            URL.revokeObjectURL( selected_mmd_file );
+            URL.revokeObjectURL( selected_vmd_file );
           });
         }
-
-        ready = true;
       }
 
       function loadAudioFile(){
@@ -1112,6 +1215,7 @@
 
           render_requested = false;
           ready = false;
+          URL.revokeObjectURL( selected_audio_file );
         }, function ( xhr ) {
           let today = new Date();
           let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1126,6 +1230,7 @@
           console.log( error );
           render_requested = false;
           ready = false;
+          URL.revokeObjectURL( selected_audio_file );
         });
       }
 
@@ -1176,6 +1281,7 @@
                     texture.wrapS = THREE.RepeatWrapping;
                     texture.wrapT = THREE.RepeatWrapping;
                     texture.magFilter = THREE.NearestFilter;
+                    texture.flipY = false;
 
                     // Apply texture
                     if (Array.isArray( child.material )) {
@@ -1187,6 +1293,31 @@
                       child.material.map = texture;
                       child.material.needsUpdate = true;
                     }
+
+                    URL.revokeObjectURL( file );
+                  });
+                });
+              } else if (texture_files_tga.length > 0) {
+                texture_files_tga.forEach( file => {
+                  tga_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                    texture.encoding = THREE.sRGBEncoding;
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.magFilter = THREE.NearestFilter;
+                    texture.flipY = false;
+
+                    // Apply texture
+                    if (Array.isArray( child.material )) {
+                      child.material.forEach( mtl => {
+                        mtl.map = texture;
+                        mtl.needsUpdate = true;
+                      });
+                    } else {
+                      child.material.map = texture;
+                      child.material.needsUpdate = true;
+                    }
+
+                    URL.revokeObjectURL( file );
                   });
                 });
               }
@@ -1204,6 +1335,7 @@
             	sound.setLoop(true);
             	sound.setVolume(0.3);
               sound.play();
+              URL.revokeObjectURL( selected_audio_file );
             }, function ( xhr ) {
               let today = new Date();
               let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1218,6 +1350,7 @@
               console.log( error );
               render_requested = false;
               ready = false;
+              URL.revokeObjectURL( selected_audio_file );
             });
           }
 
@@ -1232,6 +1365,8 @@
           camera.lookAt( mmd_obj.position );
 
           ready = true;
+
+          URL.revokeObjectURL( selected_mmd_file );
         }, function ( xhr ) {
           let today = new Date();
           let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1246,6 +1381,7 @@
           console.log( error );
           render_requested = false;
           ready = false;
+          URL.revokeObjectURL( selected_mmd_file );
         });
       }
 
@@ -1438,7 +1574,7 @@
           }
 
           if (selected_audio_url_file) {
-            audio_loader.load( selected_audio_file, function( buffer ) {
+            audio_loader.load( selected_audio_url_file, function( buffer ) {
             	sound.setBuffer( buffer );
             	sound.setLoop(true);
             	sound.setVolume(0.3);

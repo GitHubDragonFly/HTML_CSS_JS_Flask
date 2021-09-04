@@ -211,7 +211,7 @@
       var rot_x = 0, rot_y = 0, rot_z = 0;
       var previous_gltf_scale = '1', bounding_box = new THREE.Box3();
       var selected_gltf_file, selected_url_file = '', url_displayed, url_loading;
-      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_ktx2, draco_files;
+      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_ktx2, bin_file, draco_files;
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
@@ -223,6 +223,9 @@
       draco_loader.setDecoderPath( '../static/js/libs/draco/' );
       draco_loader.preload();
       gltf_loader.setDRACOLoader( draco_loader );
+
+      const file_loader = new THREE.FileLoader( manager );
+      THREE.Cache.enabled = true;
 
       function set_back_color() {
         scene.background = null;
@@ -562,6 +565,7 @@
         texture_files_jpg = [];
         texture_files_bmp = [];
         texture_files_ktx2 = [];
+        bin_file = null;
         draco_files = [];
         animations = [];
         animation_mixer = null;
@@ -588,9 +592,10 @@
           // Loaded file(s)
           let fi = document.getElementById('file_input');
 
-          // Include check for JPG/PNG/BMP, KTX2 and DRC (DRACO)
+          // Include check for GLB/GLTF, JPG/PNG/BMP, BIN, KTX2 and DRC (DRACO)
           for (let i = 0; i < fi.files.length; i++) {
             if (fi.files[i].name.toUpperCase().endsWith('.GLB') || fi.files[i].name.toUpperCase().endsWith('.GLTF')) { selected_gltf_file = fi.files[i]; }
+            else if (fi.files[i].name.toUpperCase().endsWith('.BIN')) { bin_file = fi.files[i]; }
             else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
@@ -599,6 +604,14 @@
           };
 
           if (!selected_gltf_file && draco_files.length == 0) { return; }
+
+          if (bin_file) {
+              console.log(bin_file);
+              file_loader.load( URL.createObjectURL( bin_file ), function( data ) {
+                console.log(data);
+              }, function( xhr ) { console.log( 'Loading BIN file...' );
+              }, function( err ) { console.error( 'Error loading BIN file' ); });
+            }
 
           selected_url_file = '';
         } else {
