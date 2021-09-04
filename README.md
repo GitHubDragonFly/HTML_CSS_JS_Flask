@@ -15,7 +15,7 @@ The main differences between these 2 projects:
  - KTX2 support was also added to the DAE Viewer
 
 Additional Notes:
- - Single character buttons, where applicable: `E` - edges, `A` - animations, `X`- extras, `M` - materials, `T` - textures, `P` - poses, `#` - grid
+ - Single character buttons, where applicable: `E` - edges, `F` - flatShading, `A` - animations, `X`- extras, `M` - materials, `T` - textures, `P` - poses, `#` - grid
  - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) non-module version was added to all viewers
  - FBX viewer appears to be fully functional in online preview, see the `Usage` section for the link
  - MMD viewer supports animation, changing pose, extras and audio:
@@ -40,6 +40,7 @@ Additional Notes:
    - do note that the above example seems to have some faults in it and has shown some disconnects and material issues, which are not necessarily visible in all viewers due to coding and design approach (try it in the viewers mentioned in the `Resources` section, with Don McCurdy's `GLTF Viewer` actually showing how many errors were detected)
    - other examples, like `Horse.glb` or `Parrot.glb`, will be showing those morph targets almost like frames of the animation itself
  - PLY viewer now includes STL file loader
+ - PLY / OBJ viewers also include an experimental flat shading button, with letter "F"
  - FBX / OBJ viewers also include an experimental texture switching button, with letter "T", which was tested as working with local version of this OBJ example:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus.obj`
    - this is only functional when loading local FBX / OBJ file together with texture files (and without MTL file in case of OBJ viewer)
