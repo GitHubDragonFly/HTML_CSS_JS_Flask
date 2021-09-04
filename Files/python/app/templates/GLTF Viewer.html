@@ -211,7 +211,7 @@
       var rot_x = 0, rot_y = 0, rot_z = 0;
       var previous_gltf_scale = '1', bounding_box = new THREE.Box3();
       var selected_gltf_file, selected_url_file = '', url_displayed, url_loading;
-      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_ktx2, bin_file, draco_files;
+      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_ktx2, draco_files;
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
@@ -224,8 +224,7 @@
       draco_loader.preload();
       gltf_loader.setDRACOLoader( draco_loader );
 
-      const file_loader = new THREE.FileLoader( manager );
-      THREE.Cache.enabled = true;
+      const texture_loader = new THREE.TextureLoader( manager );
 
       function set_back_color() {
         scene.background = null;
@@ -258,8 +257,7 @@
           document.body.style.backgroundColor = document.getElementById('back_color').value;
 
           if (fii.files[0].type.startsWith('image/')) {
-            const loader = new THREE.TextureLoader();
-            loader.load( URL.createObjectURL( fii.files[0] ) , function ( texture ) {
+            texture_loader.load( URL.createObjectURL( fii.files[0] ) , function ( texture ) {
               scene.background = texture;
             });
           } else {
@@ -565,7 +563,6 @@
         texture_files_jpg = [];
         texture_files_bmp = [];
         texture_files_ktx2 = [];
-        bin_file = null;
         draco_files = [];
         animations = [];
         animation_mixer = null;
@@ -592,10 +589,9 @@
           // Loaded file(s)
           let fi = document.getElementById('file_input');
 
-          // Include check for GLB/GLTF, JPG/PNG/BMP, BIN, KTX2 and DRC (DRACO)
+          // Include check for GLB/GLTF, JPG/PNG/BMP, KTX2 and DRC (DRACO)
           for (let i = 0; i < fi.files.length; i++) {
             if (fi.files[i].name.toUpperCase().endsWith('.GLB') || fi.files[i].name.toUpperCase().endsWith('.GLTF')) { selected_gltf_file = fi.files[i]; }
-            else if (fi.files[i].name.toUpperCase().endsWith('.BIN')) { bin_file = fi.files[i]; }
             else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
@@ -604,14 +600,6 @@
           };
 
           if (!selected_gltf_file && draco_files.length == 0) { return; }
-
-          if (bin_file) {
-              console.log(bin_file);
-              file_loader.load( URL.createObjectURL( bin_file ), function( data ) {
-                console.log(data);
-              }, function( xhr ) { console.log( 'Loading BIN file...' );
-              }, function( err ) { console.error( 'Error loading BIN file' ); });
-            }
 
           selected_url_file = '';
         } else {
@@ -797,8 +785,7 @@
                   let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : texture_files_bmp);
 
                   files.forEach( file => {
-                    let loader = new THREE.TextureLoader();
-                    loader.load( URL.createObjectURL( file ) , function( texture ) {
+                    texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
                       texture.encoding = THREE.sRGBEncoding;
                       texture.wrapS = THREE.RepeatWrapping;
                       texture.wrapT = THREE.RepeatWrapping;
@@ -895,8 +882,7 @@
               let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : texture_files_bmp);
 
               files.forEach( file => {
-                let loader = new THREE.TextureLoader();
-                loader.load( URL.createObjectURL( file ), function( texture ) {
+                texture_loader.load( URL.createObjectURL( file ), function( texture ) {
                   texture.encoding = THREE.sRGBEncoding;
                   texture.wrapS = THREE.RepeatWrapping;
                   texture.wrapT = THREE.RepeatWrapping;
@@ -924,7 +910,7 @@
                 });
               });
             } else {
-              let texture = new THREE.TextureLoader().load( 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAAzSURBVBhXFYrJDQAxDAIHl5tG9pWOI8/aICGunO9qP0JRNZqwltgspltKdtmfihNMoc0PFNkQjHSfyTIAAAAASUVORK5CYII=' );
+              let texture = texture_loader().load( 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAAzSURBVBhXFYrJDQAxDAIHl5tG9pWOI8/aICGunO9qP0JRNZqwltgspltKdtmfihNMoc0PFNkQjHSfyTIAAAAASUVORK5CYII=' );
               draco_material = new THREE.MeshStandardMaterial( { map: texture, opacity: 1, transparent: true } );
 
               gltf_obj = new THREE.Mesh( geometry, draco_material );
@@ -966,7 +952,7 @@
             draco_loader.load( selected_url_file, function( geometry ) {
               geometry.computeVertexNormals();
 
-              let texture = new THREE.TextureLoader().load( 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAAzSURBVBhXFYrJDQAxDAIHl5tG9pWOI8/aICGunO9qP0JRNZqwltgspltKdtmfihNMoc0PFNkQjHSfyTIAAAAASUVORK5CYII=' );
+              let texture = texture_loader().load( 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAAzSURBVBhXFYrJDQAxDAIHl5tG9pWOI8/aICGunO9qP0JRNZqwltgspltKdtmfihNMoc0PFNkQjHSfyTIAAAAASUVORK5CYII=' );
               draco_material = new THREE.MeshStandardMaterial( { map: texture, opacity: 1, transparent: true } );
 
               gltf_obj = new THREE.Mesh( geometry, draco_material );
