@@ -210,7 +210,7 @@
       var mouse_rotation, reset_rotation, events_initialized;
       var rot_x = 0, rot_y = 0, rot_z = 0;
       var previous_obj_scale = '1', bounding_box = new THREE.Box3();
-      var selected_mtl_file, selected_obj_file, selected_url_file = '', url_displayed, url_loading;
+      var selected_mtl_file, selected_mtl_url_file, selected_obj_file, selected_obj_url_file, selected_url_file = '', url_displayed, url_loading;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_dds, current_texture, textures;
 
       // Manager from ThreeJs to track a loader and its status
@@ -465,7 +465,9 @@
 
         obj_loader.setMaterials( null );
         selected_obj_file = null;
+        selected_obj_url_file = null;
         selected_mtl_file = null;
+        selected_mtl_url_file = null;
         texture_files_jpg = [];
         texture_files_png = [];
         texture_files_bmp = [];
@@ -787,50 +789,137 @@
 
       function loadURLFile() {
         if (selected_url_file != '') {
-          obj_loader.load( selected_url_file, function ( object ) {
-            Obj = object.clone();
+          if (selected_url_file.indexOf(',') > -1) {
+            let urls = selected_url_file.split(',');
+            textures = [];
 
-            let child_count = 1;
-
-            // Go through all children of the loaded object and search for a Mesh
-            Obj.traverse( function( child ) {
-              // This will allow us to check if the child is an instance of the Mesh constructor
-        	    if (child instanceof THREE.Mesh) {
-                // Enable transparency for the Opacity control and enable shadows
-                child.material.side = THREE.DoubleSide;
-                child.material.skinning = true;
-                child.material.opacity = 1;
-                child.material.transparent = true;
-                child.castShadow = true;
-                child.receiveShadow = false;
-
-                child.name = 'child_' + child_count;
-                edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
-                child_count += 1;
-    		      }
-    	      });
-
-            set_initial_scale();
-            resize();
-
-            // Add the 3D object in the scene
-            scene.add( Obj );
-
-            camera.lookAt( Obj.position );
-          }, function ( xhr ) {
-            let today = new Date();
-            let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
-
-            if (xhr.loaded == 0 && xhr.total == 0) {
-              console.log( 'URL OBJ 0% loaded - ' + time );
-            } else {
-              console.log( 'URL OBJ ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+            for (let i = 0; i < urls.length; i++) {
+              let url = urls[i].trim();
+              if (url.toUpperCase().endsWith('.PNG') || url.toUpperCase().endsWith('.JPG') || url.toUpperCase().endsWith('.BMP') || url.toUpperCase().endsWith('.DDS')) {
+                texture_loader.load( url, function( texture ) { textures.push( texture ); });
+              } else if (url.toUpperCase().endsWith('.MTL')) {
+                selected_mtl_url_file = url;
+              } else if (url.toUpperCase().endsWith('.OBJ')) {
+                selected_obj_url_file = url;
+              }
             }
-          }, function ( error ) {
-            console.log( 'Error loading URL OBJ!' );
-            console.log( error );
-            render_requested = false;
-          });
+
+            if (selected_obj_url_file != '') {
+              if (selected_mtl_url_file) {
+                mtl_loader.load( selected_mtl_url_file, ( mtl ) => {
+                  mtl.preload();
+                  obj_loader.setMaterials( mtl );
+                }, function ( xhr ) {
+                  let today = new Date();
+                  let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+                  if (xhr.loaded == 0 && xhr.total == 0) {
+                    console.log( 'URL MTL 0% loaded - ' + time );
+                  } else {
+                    console.log( 'URL MTL ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                  }
+                }, function ( error ) {
+                  console.log( 'Error loading URL MTL!' );
+                  console.log( error );
+                  render_requested = false;
+                });
+              } else {
+                if (textures) { document.getElementById('btn_textures').disabled = false; }
+              }
+
+              obj_loader.load( selected_obj_url_file, function ( object ) {
+                Obj = object.clone();
+
+                let child_count = 1;
+
+                // Go through all children of the loaded object and search for a Mesh
+                Obj.traverse( function( child ) {
+                  // This will allow us to check if the child is an instance of the Mesh constructor
+            	    if (child instanceof THREE.Mesh) {
+                    // Enable transparency for the Opacity control and enable shadows
+                    child.material.side = THREE.DoubleSide;
+                    child.material.skinning = true;
+                    child.material.opacity = 1;
+                    child.material.transparent = true;
+                    child.castShadow = true;
+                    child.receiveShadow = false;
+
+                    child.name = 'child_' + child_count;
+                    edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+                    child_count += 1;
+    	    	      }
+    	          });
+
+                set_initial_scale();
+                resize();
+
+                // Add the 3D object in the scene
+                scene.add( Obj );
+
+                camera.lookAt( Obj.position );
+              }, function ( xhr ) {
+                let today = new Date();
+                let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+                if (xhr.loaded == 0 && xhr.total == 0) {
+                  console.log( 'URL OBJ 0% loaded - ' + time );
+                } else {
+                  console.log( 'URL OBJ ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                }
+              }, function ( error ) {
+                console.log( 'Error loading URL OBJ!' );
+                console.log( error );
+                render_requested = false;
+              });
+            } else {
+              return;
+            }
+          } else {
+            obj_loader.load( selected_url_file, function ( object ) {
+              Obj = object.clone();
+
+              let child_count = 1;
+
+              // Go through all children of the loaded object and search for a Mesh
+              Obj.traverse( function( child ) {
+                // This will allow us to check if the child is an instance of the Mesh constructor
+          	    if (child instanceof THREE.Mesh) {
+                  // Enable transparency for the Opacity control and enable shadows
+                  child.material.side = THREE.DoubleSide;
+                  child.material.skinning = true;
+                  child.material.opacity = 1;
+                  child.material.transparent = true;
+                  child.castShadow = true;
+                  child.receiveShadow = false;
+
+                  child.name = 'child_' + child_count;
+                  edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+                  child_count += 1;
+    	  	      }
+    	        });
+
+              set_initial_scale();
+              resize();
+
+              // Add the 3D object in the scene
+              scene.add( Obj );
+
+              camera.lookAt( Obj.position );
+            }, function ( xhr ) {
+              let today = new Date();
+              let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+              if (xhr.loaded == 0 && xhr.total == 0) {
+                console.log( 'URL OBJ 0% loaded - ' + time );
+              } else {
+                console.log( 'URL OBJ ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              }
+            }, function ( error ) {
+              console.log( 'Error loading URL OBJ!' );
+              console.log( error );
+              render_requested = false;
+            });
+          }
         }
       }
 
@@ -940,28 +1029,39 @@
               child.material.map = null;
               child.material.needsUpdate = true;
             } else {
-              if (textures[ current_texture ].name.toUpperCase().endsWith('.DDS')) {
-                dds_loader.load( URL.createObjectURL( textures[ current_texture ] ), function( texture ) {
-                  texture.encoding = THREE.sRGBEncoding;
-                  texture.wrapS = THREE.RepeatWrapping;
-                  texture.wrapT = THREE.RepeatWrapping;
-                  texture.magFilter = THREE.NearestFilter;
+              if (selected_obj_url_file) {
+                textures[ current_texture ].encoding = THREE.sRGBEncoding;
+                textures[ current_texture ].wrapS = THREE.RepeatWrapping;
+                textures[ current_texture ].wrapT = THREE.RepeatWrapping;
+                textures[ current_texture ].magFilter = THREE.NearestFilter;
 
-                  // Apply texture
-                  child.material.map = texture;
-                  child.material.needsUpdate = true;
-                });
+                // Apply texture
+                child.material.map = textures[ current_texture ];
+                child.material.needsUpdate = true;
               } else {
-                texture_loader.load( URL.createObjectURL( textures[ current_texture ] ), function( texture ) {
-                  texture.encoding = THREE.sRGBEncoding;
-                  texture.wrapS = THREE.RepeatWrapping;
-                  texture.wrapT = THREE.RepeatWrapping;
-                  texture.magFilter = THREE.NearestFilter;
+                if (textures[ current_texture ].name.toUpperCase().endsWith('.DDS')) {
+                  dds_loader.load( URL.createObjectURL( textures[ current_texture ] ), function( texture ) {
+                    texture.encoding = THREE.sRGBEncoding;
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.magFilter = THREE.NearestFilter;
 
-                  // Apply texture
-                  child.material.map = texture;
-                  child.material.needsUpdate = true;
-                });
+                    // Apply texture
+                    child.material.map = texture;
+                    child.material.needsUpdate = true;
+                  });
+                } else {
+                  texture_loader.load( URL.createObjectURL( textures[ current_texture ] ), function( texture ) {
+                    texture.encoding = THREE.sRGBEncoding;
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.magFilter = THREE.NearestFilter;
+
+                    // Apply texture
+                    child.material.map = texture;
+                    child.material.needsUpdate = true;
+                  });
+                }
               }
             }
           }
@@ -1075,9 +1175,11 @@
         }
 
         if (!reset) {
-          // Page (re)loading so reset the file input, spinner, textures button and disable controls
+          // Page (re)loading so reset the file input, spinner, URL entry, textures button and disable controls
           document.getElementById('file_input').value = "";
           document.getElementById('div_spinner').style.display = "block";
+          document.getElementById('url_entry').value = '';
+          selected_url_file = '';
           document.getElementById('btn_textures').disabled = true;
           enable_disable( true );
         }

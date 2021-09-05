@@ -1000,9 +1000,11 @@
         }
 
         if (!reset) {
-          // Page (re)loading so reset the file input, spinner and disable controls
+          // Page (re)loading so reset the file input, spinner, URL entry and disable controls
           document.getElementById('file_input').value = "";
           document.getElementById('div_spinner').style.display = "block";
+          document.getElementById('url_entry').value = '';
+          selected_url_file = '';
           enable_disable( true );
         }
       }
