@@ -210,7 +210,7 @@
       var mouse_rotation, reset_rotation, events_initialized;
       var rot_x = 0, rot_y = 0, rot_z = 0;
       var previous_fbx_scale = '1', bounding_box = new THREE.Box3();
-      var selected_fbx_file, selected_url_file = '', url_displayed, url_loading;
+      var selected_fbx_file, selected_fbx_url_file, selected_url_file = '', url_displayed, url_loading;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_dds, current_texture, textures;
 
       // Manager from ThreeJs to track a loader and its status
@@ -220,6 +220,7 @@
       const fbx_loader = new THREE.FBXLoader( manager );
 
       const texture_loader = new THREE.TextureLoader( manager );
+
       const dds_loader = new THREE.DDSLoader( manager );
       manager.addHandler( /\.dds$/i, dds_loader );
 
@@ -493,6 +494,7 @@
         enable_disable( true );
 
         selected_fbx_file = null;
+        selected_fbx_url_file = null;
         texture_files_png = [];
         texture_files_jpg = [];
         texture_files_bmp = [];
@@ -730,81 +732,176 @@
 
       function loadURLFile() {
         if (selected_url_file != '') {
-          fbx_loader.load( selected_url_file, ( fbx_scene ) => {
-            animations = fbx_scene.animations;
+          if (selected_url_file.indexOf(',') > -1) {
+            let urls = selected_url_file.split(',');
+            textures = [];
 
-            if (animations.length > 0) {
-              animation_mixer = new THREE.AnimationMixer( fbx_scene );
-              current_animation = 0;
-              animations.forEach( clip => { animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat; });
+            for (let i = 0; i < urls.length; i++) {
+              let url = urls[i].trim();
+
+              if (url.toUpperCase().endsWith('.PNG') || url.toUpperCase().endsWith('.JPG') || url.toUpperCase().endsWith('.BMP') || url.toUpperCase().endsWith('.DDS')) {
+                texture_loader.load( url, function( texture ) { textures.push( texture ); });
+              } else if (url.toUpperCase().endsWith('.FBX')) {
+                selected_fbx_url_file = url;
+              }
             }
 
-            let child_count = 1;
+            if (selected_fbx_url_file) {
+              if (textures) { document.getElementById('btn_textures').disabled = false; }
 
-            // Go through all children of the loaded object and search for a Mesh
-            fbx_scene.traverse( function( child ) {
-              // This allow us to check if the children is an instance of the Mesh constructor
-          	  if (child instanceof THREE.Mesh) {
-                child.geometry.computeVertexNormals();
+              fbx_loader.load( selected_fbx_url_file, ( fbx_scene ) => {
+                animations = fbx_scene.animations;
 
-                if (Array.isArray( child.material )) {
-                  child.material.forEach( mtl => {
-                    // Enable transparency for the Opacity control
-                    mtl.opacity = 1;
-                    mtl.transparent = true;
-                    mtl.skinning = true;
-                    mtl.side = THREE.DoubleSide;
-                  });
-                } else {
-                  // Enable transparency for the Opacity control
-                  child.material.opacity = 1;
-                  child.material.transparent = true;
-                  child.material.skinning = true;
-                  child.material.side = THREE.DoubleSide;
+                if (animations.length > 0) {
+                  animation_mixer = new THREE.AnimationMixer( fbx_scene );
+                  current_animation = 0;
+                  animations.forEach( clip => { animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat; });
                 }
 
-                // Enable shadows
-                child.castShadow = true;
-                child.receiveShadow = false;
+                let child_count = 1;
 
-                child.name = 'child_' + child_count;
-                edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
-                child_count += 1;
-    		      }
-    	      });
+                // Go through all children of the loaded object and search for a Mesh
+                fbx_scene.traverse( function( child ) {
+                  // This allow us to check if the children is an instance of the Mesh constructor
+              	  if (child instanceof THREE.Mesh) {
+                    child.geometry.computeVertexNormals();
 
-            fbx_obj = fbx_scene;
-            fbx_obj.name = 'url_model';
+                    if (Array.isArray( child.material )) {
+                      child.material.forEach( mtl => {
+                        // Enable transparency for the Opacity control
+                        mtl.opacity = 1;
+                        mtl.transparent = true;
+                        mtl.skinning = true;
+                        mtl.side = THREE.DoubleSide;
+                      });
+                    } else {
+                      // Enable transparency for the Opacity control
+                      child.material.opacity = 1;
+                      child.material.transparent = true;
+                      child.material.skinning = true;
+                      child.material.side = THREE.DoubleSide;
+                    }
 
-            set_initial_scale();
-            resize();
+                    // Enable shadows
+                    child.castShadow = true;
+                    child.receiveShadow = false;
 
-            // Add fbx model to scene
-            scene.add( fbx_obj );
+                    child.name = 'child_' + child_count;
+                    edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+                    child_count += 1;
+    	    	      }
+    	          });
 
-            camera.lookAt( fbx_obj.position );
+                fbx_obj = fbx_scene;
+                fbx_obj.name = 'url_model';
 
-            if (animations.length > 0) {
-              animation_mixer.clipAction( animations[0] ).play();
-              document.getElementById('btn_animate').disabled = false;
-              document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
-              document.getElementById('btn_animate').innerHTML = 'A0';
-              animation_running = true;
+                set_initial_scale();
+                resize();
+
+                // Add fbx model to scene
+                scene.add( fbx_obj );
+
+                camera.lookAt( fbx_obj.position );
+
+                if (animations.length > 0) {
+                  animation_mixer.clipAction( animations[0] ).play();
+                  document.getElementById('btn_animate').disabled = false;
+                  document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
+                  document.getElementById('btn_animate').innerHTML = 'A0';
+                  animation_running = true;
+                }
+              }, function ( xhr ) {
+                let today = new Date();
+                let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+                if (xhr.loaded == 0 && xhr.total == 0) {
+                  console.log( 'URL FBX 0% loaded - ' + time );
+                } else {
+                  console.log( 'URL FBX ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                }
+              }, function ( error ) {
+                console.log( 'Error loading URL FBX!' );
+                console.log( error );
+                render_requested = false;
+              });
             }
-          }, function ( xhr ) {
-            let today = new Date();
-            let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+          } else {
+            fbx_loader.load( selected_url_file, ( fbx_scene ) => {
+              animations = fbx_scene.animations;
 
-            if (xhr.loaded == 0 && xhr.total == 0) {
-              console.log( 'URL FBX 0% loaded - ' + time );
-            } else {
-              console.log( 'URL FBX ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
-            }
-          }, function ( error ) {
-            console.log( 'Error loading URL FBX!' );
-            console.log( error );
-            render_requested = false;
-          });
+              if (animations.length > 0) {
+                animation_mixer = new THREE.AnimationMixer( fbx_scene );
+                current_animation = 0;
+                animations.forEach( clip => { animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat; });
+              }
+
+              let child_count = 1;
+
+              // Go through all children of the loaded object and search for a Mesh
+              fbx_scene.traverse( function( child ) {
+                // This allow us to check if the children is an instance of the Mesh constructor
+            	  if (child instanceof THREE.Mesh) {
+                  child.geometry.computeVertexNormals();
+
+                  if (Array.isArray( child.material )) {
+                    child.material.forEach( mtl => {
+                      // Enable transparency for the Opacity control
+                      mtl.opacity = 1;
+                      mtl.transparent = true;
+                      mtl.skinning = true;
+                      mtl.side = THREE.DoubleSide;
+                    });
+                  } else {
+                    // Enable transparency for the Opacity control
+                    child.material.opacity = 1;
+                    child.material.transparent = true;
+                    child.material.skinning = true;
+                    child.material.side = THREE.DoubleSide;
+                  }
+
+                  // Enable shadows
+                  child.castShadow = true;
+                  child.receiveShadow = false;
+
+                  child.name = 'child_' + child_count;
+                  edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+                  child_count += 1;
+    	  	      }
+    	        });
+
+              fbx_obj = fbx_scene;
+              fbx_obj.name = 'url_model';
+
+              set_initial_scale();
+              resize();
+
+              // Add fbx model to scene
+              scene.add( fbx_obj );
+
+              camera.lookAt( fbx_obj.position );
+
+              if (animations.length > 0) {
+                animation_mixer.clipAction( animations[0] ).play();
+                document.getElementById('btn_animate').disabled = false;
+                document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
+                document.getElementById('btn_animate').innerHTML = 'A0';
+                animation_running = true;
+              }
+            }, function ( xhr ) {
+              let today = new Date();
+              let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+              if (xhr.loaded == 0 && xhr.total == 0) {
+                console.log( 'URL FBX 0% loaded - ' + time );
+              } else {
+                console.log( 'URL FBX ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              }
+            }, function ( error ) {
+              console.log( 'Error loading URL FBX!' );
+              console.log( error );
+              render_requested = false;
+            });
+          }
         }
       }
 
@@ -902,28 +999,39 @@
               child.material.map = null;
               child.material.needsUpdate = true;
             } else {
-              if (textures[ current_texture ].name.toUpperCase().endsWith('.DDS')) {
-                dds_loader.load( URL.createObjectURL( textures[ current_texture ] ), function( texture ) {
-                  texture.encoding = THREE.sRGBEncoding;
-                  texture.wrapS = THREE.RepeatWrapping;
-                  texture.wrapT = THREE.RepeatWrapping;
-                  texture.magFilter = THREE.NearestFilter;
+              if (selected_fbx_url_file) {
+                textures[ current_texture ].encoding = THREE.sRGBEncoding;
+                textures[ current_texture ].wrapS = THREE.RepeatWrapping;
+                textures[ current_texture ].wrapT = THREE.RepeatWrapping;
+                textures[ current_texture ].magFilter = THREE.NearestFilter;
 
-                  // Apply texture
-                  child.material.map = texture;
-                  child.material.needsUpdate = true;
-                });
+                // Apply texture
+                child.material.map = textures[ current_texture ];
+                child.material.needsUpdate = true;
               } else {
-                texture_loader.load( URL.createObjectURL( textures[ current_texture ] ), function( texture ) {
-                  texture.encoding = THREE.sRGBEncoding;
-                  texture.wrapS = THREE.RepeatWrapping;
-                  texture.wrapT = THREE.RepeatWrapping;
-                  texture.magFilter = THREE.NearestFilter;
+                if (textures[ current_texture ].name.toUpperCase().endsWith('.DDS')) {
+                  dds_loader.load( URL.createObjectURL( textures[ current_texture ] ), function( texture ) {
+                    texture.encoding = THREE.sRGBEncoding;
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.magFilter = THREE.NearestFilter;
 
-                  // Apply texture
-                  child.material.map = texture;
-                  child.material.needsUpdate = true;
-                });
+                    // Apply texture
+                    child.material.map = texture;
+                    child.material.needsUpdate = true;
+                  });
+                } else {
+                  texture_loader.load( URL.createObjectURL( textures[ current_texture ] ), function( texture ) {
+                    texture.encoding = THREE.sRGBEncoding;
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.magFilter = THREE.NearestFilter;
+
+                    // Apply texture
+                    child.material.map = texture;
+                    child.material.needsUpdate = true;
+                  });
+                }
               }
             }
           }
