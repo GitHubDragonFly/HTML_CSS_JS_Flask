@@ -1,15 +1,17 @@
 # HTML_CSS_JS_Flask
 Generally intended for educational purposes.
 
-This is a modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project so check a description of all the features there. It is set to be used with `python3` and `Flask` server. There are several Three.js viewers, not necessarily perfect but functional as they are (preview links are available in the `Usage` section but do have some limitations).
+This is a modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project so check a description of all the features there. It is set to be used with `python3` and `Flask` server.
+
+There are several Three.js viewers, not necessarily perfect but functional as they are (preview links are available in the `Usage` section but do have some limitations).
 
 The main differences between these 2 projects:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
  - uploading any pictures via the `Form` will then have those saved in the new `uploads` folder
- - new additions are FBX and MMD viewers (Miku Miku Dance)
- - viewers in this project support URL loading, use Orbit Controls, have a gizmo and a grid / polar grid button present
+ - new additions are Three.js FBX and MMD viewers (Miku Miku Dance)
+ - all Three.js viewers in this project support URL loading, use Orbit Controls, have a gizmo and a grid / polar grid button present
  - DRACO and KTX2 support were added to the GLTF Viewer:
-   - this seems to work fine when using URL option (see the screenshot) so try using it for fetching files both locally and from the Internet
+   - this seems to work fine when using URL option (see the screenshot) so try using it for fetching files both locally from the server and from the Internet
    - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG/BMP` texture file along just to see if and how it changes the object's appearance)
    - you can also open `.drc` file types either alone or together with some texture file
  - KTX2 support was also added to the DAE Viewer
