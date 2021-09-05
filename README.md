@@ -44,7 +44,7 @@ Additional Notes:
  - FBX / OBJ viewers also include an experimental texture switching button, with letter "T", which was tested as working with both local and URL version of this OBJ example:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus.obj`
    - URL loading of the above OBJ example has to be done with multiple comma separated URLs: `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus.obj, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_A.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_M.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_N.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_R.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_RM.jpg`
-   - for FBX viewer, currently this is only functional when loading local FBX file together with texture files
+   - for FBX viewer, you can experiment with the above just by changing the first line to: `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/fbx/cloth.fbx,`
  - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in all viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
 
 Notes about showing the edges (button with letter "E"):
