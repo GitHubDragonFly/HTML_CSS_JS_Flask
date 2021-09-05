@@ -27,6 +27,7 @@ Additional Notes:
    - URL option is set for either 1 or more comma separated URLs, like the following:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd`
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
+   - it includes TGA texture loader, which can be tested via URL option with the following link: `https://raw.githubusercontent.com/takahirox/mmd-viewer-js/master/model/low_miku/gumi.pmd`
  - GLTF / DAE / FBX viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
    - Xbot.glb is the multi-animation example that can be accessed in the GLTF viewer via the following URL:
