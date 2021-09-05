@@ -745,6 +745,8 @@
         if (selected_mmd_file.name.toUpperCase().endsWith('.PMX')) { ext = 'pmx'; }
 
         mmd_loader.load( URL.createObjectURL( selected_mmd_file ), ext, mesh => {
+          URL.revokeObjectURL( selected_mmd_file );
+
           mesh.traverse( function( child ) {
             // Check for morph targets
             if (child.morphTargetDictionary) {
@@ -782,6 +784,7 @@
 
                 files.forEach( file => {
                   texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                    URL.revokeObjectURL( file );
                     texture.encoding = THREE.sRGBEncoding;
                     texture.wrapS = THREE.RepeatWrapping;
                     texture.wrapT = THREE.RepeatWrapping;
@@ -798,18 +801,33 @@
                       child.material.map = texture;
                       child.material.needsUpdate = true;
                     }
+                  }, function ( xhr ) {
+                    let today = new Date();
+                    let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
 
+                    if (xhr.loaded == 0 && xhr.total == 0) {
+                      console.log( 'Local Texture File 0% loaded - ' + time );
+                    } else {
+                      console.log( 'Local Texture File ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                    }
+                  }, function ( error ) {
+                    console.log( 'Error loading Local Texture File!' );
+                    console.log( error );
+                    render_requested = false;
+                    ready = false;
                     URL.revokeObjectURL( file );
                   });
                 });
               } else if (texture_files_tga.length > 0) {
                 texture_files_tga.forEach( file => {
                   tga_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                    URL.revokeObjectURL( file );
+                    texture.generateMipmaps = true;
                     texture.encoding = THREE.sRGBEncoding;
-                    texture.wrapS = THREE.RepeatWrapping;
-                    texture.wrapT = THREE.RepeatWrapping;
-                    texture.magFilter = THREE.NearestFilter;
-                    texture.flipY = false;
+                    texture.wrapS = THREE.ClampToEdgeWrapping;
+                    texture.wrapT = THREE.ClampToEdgeWrapping;
+                    texture.magFilter = THREE.LinearFilter;
+                    texture.minFilter = THREE.LinearMipmapLinearFilter;
 
                     // Apply texture
                     if (Array.isArray( child.material )) {
@@ -821,7 +839,20 @@
                       child.material.map = texture;
                       child.material.needsUpdate = true;
                     }
+                  }, function ( xhr ) {
+                    let today = new Date();
+                    let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
 
+                    if (xhr.loaded == 0 && xhr.total == 0) {
+                      console.log( 'Local TGA Texture File 0% loaded - ' + time );
+                    } else {
+                      console.log( 'Local TGA Texture File ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                    }
+                  }, function ( error ) {
+                    console.log( 'Error loading Local TGA Texture File!' );
+                    console.log( error );
+                    render_requested = false;
+                    ready = false;
                     URL.revokeObjectURL( file );
                   });
                 });
@@ -831,8 +862,9 @@
 
           selected_vpd_files.forEach( file => {
             mmd_loader.loadVPD( URL.createObjectURL( file ), false, vpd => {
-              poses.push( vpd );
               URL.revokeObjectURL( file );
+
+              poses.push( vpd );
             }, function ( xhr ) {
               let today = new Date();
               let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -891,7 +923,6 @@
 
           scene.add( mmd_obj );
           camera.lookAt( mmd_obj.position );
-          URL.revokeObjectURL( selected_mmd_file );
         }, function ( xhr ) {
           let today = new Date();
           let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -918,6 +949,9 @@
 
         if (selected_vmd_camera_file) {
           mmd_loader.loadWithAnimation( URL.createObjectURL( selected_mmd_file ), URL.createObjectURL( selected_vmd_file ), ext, mmd => {
+            URL.revokeObjectURL( selected_mmd_file );
+            URL.revokeObjectURL( selected_vmd_file );
+
             helper.add( mmd.mesh, { animation: mmd.animation,	physics: true	});
 
             // Go through all children of the loaded object and search for a Mesh
@@ -951,6 +985,7 @@
 
                   files.forEach( file => {
                     texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                      URL.revokeObjectURL( file );
                       texture.encoding = THREE.sRGBEncoding;
                       texture.wrapS = THREE.RepeatWrapping;
                       texture.wrapT = THREE.RepeatWrapping;
@@ -967,18 +1002,33 @@
                         child.material.map = texture;
                         child.material.needsUpdate = true;
                       }
+                    }, function ( xhr ) {
+                      let today = new Date();
+                      let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
 
+                      if (xhr.loaded == 0 && xhr.total == 0) {
+                        console.log( 'Local Texture File 0% loaded - ' + time );
+                      } else {
+                        console.log( 'Local Texture File ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                      }
+                    }, function ( error ) {
+                      console.log( 'Error loading Local Texture File!' );
+                      console.log( error );
+                      render_requested = false;
+                      ready = false;
                       URL.revokeObjectURL( file );
                     });
                   });
                 } else if (texture_files_tga.length > 0) {
                   texture_files_tga.forEach( file => {
                     tga_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                      URL.revokeObjectURL( file );
+                      texture.generateMipmaps = true;
                       texture.encoding = THREE.sRGBEncoding;
-                      texture.wrapS = THREE.RepeatWrapping;
-                      texture.wrapT = THREE.RepeatWrapping;
-                      texture.magFilter = THREE.NearestFilter;
-                      texture.flipY = false;
+                      texture.wrapS = THREE.ClampToEdgeWrapping;
+                      texture.wrapT = THREE.ClampToEdgeWrapping;
+                      texture.magFilter = THREE.LinearFilter;
+                      texture.minFilter = THREE.LinearMipmapLinearFilter;
 
                       // Apply texture
                       if (Array.isArray( child.material )) {
@@ -990,7 +1040,20 @@
                         child.material.map = texture;
                         child.material.needsUpdate = true;
                       }
+                    }, function ( xhr ) {
+                      let today = new Date();
+                      let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
 
+                      if (xhr.loaded == 0 && xhr.total == 0) {
+                        console.log( 'Local TGA Texture File 0% loaded - ' + time );
+                      } else {
+                        console.log( 'Local TGA Texture File ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                      }
+                    }, function ( error ) {
+                      console.log( 'Error loading Local TGA Texture File!' );
+                      console.log( error );
+                      render_requested = false;
+                      ready = false;
                       URL.revokeObjectURL( file );
                     });
                   });
@@ -999,8 +1062,9 @@
             });
 
             mmd_loader.loadAnimation( URL.createObjectURL( selected_vmd_camera_file ), camera, function ( cameraAnimation ) {
-              helper.add( camera, {	animation: cameraAnimation });
               URL.revokeObjectURL( selected_vmd_camera_file );
+
+              helper.add( camera, {	animation: cameraAnimation });
             }, function ( xhr ) {
               let today = new Date();
               let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1050,9 +1114,6 @@
             camera.lookAt( mmd_obj.position );
 
             ready = true;
-
-            URL.revokeObjectURL( selected_mmd_file );
-            URL.revokeObjectURL( selected_vmd_file );
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1073,6 +1134,9 @@
           });
         } else {
           mmd_loader.loadWithAnimation( URL.createObjectURL( selected_mmd_file ), URL.createObjectURL( selected_vmd_file ), ext, mmd => {
+            URL.revokeObjectURL( selected_mmd_file );
+            URL.revokeObjectURL( selected_vmd_file );
+
             helper.add( mmd.mesh, { animation: mmd.animation,	physics: true	});
 
             // Go through all children of the loaded object and search for a Mesh
@@ -1106,6 +1170,7 @@
 
                   files.forEach( file => {
                     texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                      URL.revokeObjectURL( file );
                       texture.encoding = THREE.sRGBEncoding;
                       texture.wrapS = THREE.RepeatWrapping;
                       texture.wrapT = THREE.RepeatWrapping;
@@ -1122,16 +1187,33 @@
                         child.material.map = texture;
                         child.material.needsUpdate = true;
                       }
+                    }, function ( xhr ) {
+                      let today = new Date();
+                      let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+                      if (xhr.loaded == 0 && xhr.total == 0) {
+                        console.log( 'Local Texture File 0% loaded - ' + time );
+                      } else {
+                        console.log( 'Local Texture File ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                      }
+                    }, function ( error ) {
+                      console.log( 'Error loading Local Texture File!' );
+                      console.log( error );
+                      render_requested = false;
+                      ready = false;
+                      URL.revokeObjectURL( file );
                     });
                   });
                 } else if (texture_files_tga.length > 0) {
                   texture_files_tga.forEach( file => {
                     tga_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                      URL.revokeObjectURL( file );
+                      texture.generateMipmaps = true;
                       texture.encoding = THREE.sRGBEncoding;
-                      texture.wrapS = THREE.RepeatWrapping;
-                      texture.wrapT = THREE.RepeatWrapping;
-                      texture.magFilter = THREE.NearestFilter;
-                      texture.flipY = false;
+                      texture.wrapS = THREE.ClampToEdgeWrapping;
+                      texture.wrapT = THREE.ClampToEdgeWrapping;
+                      texture.magFilter = THREE.LinearFilter;
+                      texture.minFilter = THREE.LinearMipmapLinearFilter;
 
                       // Apply texture
                       if (Array.isArray( child.material )) {
@@ -1143,6 +1225,21 @@
                         child.material.map = texture;
                         child.material.needsUpdate = true;
                       }
+                    }, function ( xhr ) {
+                      let today = new Date();
+                      let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+                      if (xhr.loaded == 0 && xhr.total == 0) {
+                        console.log( 'Local TGA Texture File 0% loaded - ' + time );
+                      } else {
+                        console.log( 'Local TGA Texture File ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                      }
+                    }, function ( error ) {
+                      console.log( 'Error loading Local TGA Texture File!' );
+                      console.log( error );
+                      render_requested = false;
+                      ready = false;
+                      URL.revokeObjectURL( file );
                     });
                   });
                 }
@@ -1182,9 +1279,6 @@
             camera.lookAt( mmd_obj.position );
 
             ready = true;
-
-            URL.revokeObjectURL( selected_mmd_file );
-            URL.revokeObjectURL( selected_vmd_file );
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1239,6 +1333,8 @@
         if (selected_mmd_file.name.toUpperCase().endsWith('.PMX')) { ext = 'pmx'; }
 
         mmd_loader.load( URL.createObjectURL( selected_mmd_file ), ext, mesh => {
+          URL.revokeObjectURL( selected_mmd_file );
+
           // Go through all children of the loaded object and search for a Mesh
           mesh.traverse( function( child ) {
             // Check for morph targets
@@ -1277,6 +1373,7 @@
 
                 files.forEach( file => {
                   texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                    URL.revokeObjectURL( file );
                     texture.encoding = THREE.sRGBEncoding;
                     texture.wrapS = THREE.RepeatWrapping;
                     texture.wrapT = THREE.RepeatWrapping;
@@ -1293,18 +1390,33 @@
                       child.material.map = texture;
                       child.material.needsUpdate = true;
                     }
+                  }, function ( xhr ) {
+                    let today = new Date();
+                    let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
 
+                    if (xhr.loaded == 0 && xhr.total == 0) {
+                      console.log( 'Local Texture File 0% loaded - ' + time );
+                    } else {
+                      console.log( 'Local Texture File ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                    }
+                  }, function ( error ) {
+                    console.log( 'Error loading Local Texture File!' );
+                    console.log( error );
+                    render_requested = false;
+                    ready = false;
                     URL.revokeObjectURL( file );
                   });
                 });
               } else if (texture_files_tga.length > 0) {
                 texture_files_tga.forEach( file => {
                   tga_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                    URL.revokeObjectURL( file );
+                    texture.generateMipmaps = true;
                     texture.encoding = THREE.sRGBEncoding;
-                    texture.wrapS = THREE.RepeatWrapping;
-                    texture.wrapT = THREE.RepeatWrapping;
-                    texture.magFilter = THREE.NearestFilter;
-                    texture.flipY = false;
+                    texture.wrapS = THREE.ClampToEdgeWrapping;
+                    texture.wrapT = THREE.ClampToEdgeWrapping;
+                    texture.magFilter = THREE.LinearFilter;
+                    texture.minFilter = THREE.LinearMipmapLinearFilter;
 
                     // Apply texture
                     if (Array.isArray( child.material )) {
@@ -1316,7 +1428,20 @@
                       child.material.map = texture;
                       child.material.needsUpdate = true;
                     }
+                  }, function ( xhr ) {
+                    let today = new Date();
+                    let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
 
+                    if (xhr.loaded == 0 && xhr.total == 0) {
+                      console.log( 'Local TGA Texture File 0% loaded - ' + time );
+                    } else {
+                      console.log( 'Local TGA Texture File ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                    }
+                  }, function ( error ) {
+                    console.log( 'Error loading Local TGA Texture File!' );
+                    console.log( error );
+                    render_requested = false;
+                    ready = false;
                     URL.revokeObjectURL( file );
                   });
                 });
@@ -1331,11 +1456,11 @@
 
           if (selected_audio_file) {
             audio_loader.load( URL.createObjectURL( selected_audio_file ), function( buffer ) {
+              URL.revokeObjectURL( selected_audio_file );
             	sound.setBuffer( buffer );
             	sound.setLoop(true);
             	sound.setVolume(0.3);
               sound.play();
-              URL.revokeObjectURL( selected_audio_file );
             }, function ( xhr ) {
               let today = new Date();
               let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1365,8 +1490,6 @@
           camera.lookAt( mmd_obj.position );
 
           ready = true;
-
-          URL.revokeObjectURL( selected_mmd_file );
         }, function ( xhr ) {
           let today = new Date();
           let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1391,15 +1514,17 @@
             let urls = selected_url_file.split(',');
 
             for (let i = 0; i < urls.length; i++) {
-              if (urls[i].toUpperCase().endsWith('.PMD') || urls[i].toUpperCase().endsWith('.PMX')) { selected_mmd_url_file = urls[i].trim(); }
-              else if (urls[i].toUpperCase().endsWith('.VMD')) {
-                if (urls[i].toUpperCase().includes('CAMERA')) {
-                  selected_vmd_camera_url_file = urls[i].trim();
+              let url = urls[i].trim();
+
+              if (url.toUpperCase().endsWith('.PMD') || url.toUpperCase().endsWith('.PMX')) { selected_mmd_url_file = url; }
+              else if (url.toUpperCase().endsWith('.VMD')) {
+                if (url.toUpperCase().includes('CAMERA')) {
+                  selected_vmd_camera_url_file = url;
                 } else {
-                  selected_vmd_url_file = urls[i].trim(); }
+                  selected_vmd_url_file = url; }
               }
-              else if (urls[i].toUpperCase().endsWith('.VPD')) { selected_vpd_url_files.push( urls[i].trim() ); }
-              else if (urls[i].toUpperCase().endsWith('.MP3') || urls[i].toUpperCase().endsWith('.OGG')) { selected_audio_url_file = urls[i].trim(); }
+              else if (url.toUpperCase().endsWith('.VPD')) { selected_vpd_url_files.push( url ); }
+              else if (url.toUpperCase().endsWith('.MP3') || url.toUpperCase().endsWith('.OGG')) { selected_audio_url_file = url; }
             };
 
             if (selected_mmd_url_file && selected_vpd_url_files.length > 0) {
@@ -1430,6 +1555,7 @@
                         mtl.transparent = true;
                         mtl.skinning = true;
                         mtl.side = THREE.DoubleSide;
+                        if (mtl.map) { mtl.map.generateMipmaps = true; }
                       });
                     } else {
                       // Enable transparency for the Opacity control
@@ -1437,6 +1563,7 @@
                       child.material.transparent = true;
                       child.material.skinning = true;
                       child.material.side = THREE.DoubleSide;
+                      if (child.material.map) { child.material.map.generateMipmaps = true; }
                     }
 
                     // Enable shadows

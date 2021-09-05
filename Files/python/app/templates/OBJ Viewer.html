@@ -210,7 +210,8 @@
       var mouse_rotation, reset_rotation, events_initialized;
       var rot_x = 0, rot_y = 0, rot_z = 0;
       var previous_obj_scale = '1', bounding_box = new THREE.Box3();
-      var selected_mtl_file, selected_mtl_url_file, selected_obj_file, selected_obj_url_file, selected_url_file = '', url_displayed, url_loading;
+      var selected_url_file = '', url_displayed, url_loading;
+      var selected_mtl_file, selected_mtl_url_file, selected_obj_file, selected_obj_url_file;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_dds, current_texture, textures;
 
       // Manager from ThreeJs to track a loader and its status
@@ -221,6 +222,7 @@
       const obj_loader = new THREE.OBJLoader( manager );
 
       const texture_loader = new THREE.TextureLoader( manager );
+
       const dds_loader = new THREE.DDSLoader( manager );
       manager.addHandler( /\.dds$/i, dds_loader );
 
@@ -256,6 +258,7 @@
 
           if (fii.files[0].type.startsWith('image/')) {
             texture_loader.load( URL.createObjectURL( fii.files[0] ) , function ( texture ) {
+              URL.revokeObjectURL( fii.files[0] );
               scene.background = texture;
             });
           } else {
@@ -616,12 +619,15 @@
       function loadFile() {
         if (selected_mtl_file) {
           mtl_loader.load( URL.createObjectURL( selected_mtl_file ), ( mtl ) => {
+            URL.revokeObjectURL( selected_mtl_file );
+
             if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_dds.length > 0) {
               if (texture_files_png.length > 0) {
                 for (const [ key, value ] of Object.entries( mtl.materialsInfo )) {
                   texture_files_png.forEach( file => {
                     if (file.name === value.map_kd) {
                       mtl.materials[ key ] = URL.createObjectURL( file );
+                      URL.revokeObjectURL( file );
                       mtl.materialsInfo[ key ].map_kd = mtl.materials[ key ].substring(10);
                     }
                   });
@@ -633,6 +639,7 @@
                   texture_files_jpg.forEach( file => {
                     if (file.name === value.map_kd) {
                       mtl.materials[ key ] = URL.createObjectURL( file );
+                      URL.revokeObjectURL( file );
                       mtl.materialsInfo[ key ].map_kd = mtl.materials[ key ].substring(10);
                     }
                   });
@@ -644,6 +651,7 @@
                   texture_files_bmp.forEach( file => {
                     if (file.name === value.map_kd) {
                       mtl.materials[ key ] = URL.createObjectURL( file );
+                      URL.revokeObjectURL( file );
                       mtl.materialsInfo[ key ].map_kd = mtl.materials[ key ].substring(10);
                     }
                   });
@@ -655,6 +663,7 @@
                   texture_files_dds.forEach( file => {
                     if (file.name === value.map_kd) {
                       mtl.materials[ key ] = URL.createObjectURL( file );
+                      URL.revokeObjectURL( file );
                       mtl.materialsInfo[ key ].map_kd = mtl.materials[ key ].substring(10);
                     }
                   });
@@ -667,6 +676,7 @@
 
             // Launch loading of the selected file
             obj_loader.load( URL.createObjectURL( selected_obj_file ), function ( object ) {
+              URL.revokeObjectURL( selected_obj_file );
               Obj = object.clone();
 
               let child_count = 1;
@@ -733,6 +743,7 @@
         } else {
           // Launch loading of the selected file
           obj_loader.load( URL.createObjectURL( selected_obj_file ), function ( object ) {
+            URL.revokeObjectURL( selected_obj_file );
             Obj = object.clone();
 
             textures = [];
@@ -795,6 +806,7 @@
 
             for (let i = 0; i < urls.length; i++) {
               let url = urls[i].trim();
+
               if (url.toUpperCase().endsWith('.PNG') || url.toUpperCase().endsWith('.JPG') || url.toUpperCase().endsWith('.BMP') || url.toUpperCase().endsWith('.DDS')) {
                 texture_loader.load( url, function( texture ) { textures.push( texture ); });
               } else if (url.toUpperCase().endsWith('.MTL')) {
@@ -1041,6 +1053,7 @@
               } else {
                 if (textures[ current_texture ].name.toUpperCase().endsWith('.DDS')) {
                   dds_loader.load( URL.createObjectURL( textures[ current_texture ] ), function( texture ) {
+                    URL.revokeObjectURL( textures[ current_texture ] );
                     texture.encoding = THREE.sRGBEncoding;
                     texture.wrapS = THREE.RepeatWrapping;
                     texture.wrapT = THREE.RepeatWrapping;
@@ -1052,6 +1065,7 @@
                   });
                 } else {
                   texture_loader.load( URL.createObjectURL( textures[ current_texture ] ), function( texture ) {
+                    URL.revokeObjectURL( textures[ current_texture ] );
                     texture.encoding = THREE.sRGBEncoding;
                     texture.wrapS = THREE.RepeatWrapping;
                     texture.wrapT = THREE.RepeatWrapping;
