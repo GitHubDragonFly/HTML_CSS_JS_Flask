@@ -39,7 +39,7 @@ Additional Notes:
  - GLTF viewer also includes an experimental extras / morph targets button (with letter "X") which was tested as working with this example:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/RobotExpressive/RobotExpressive.glb`
    - subsequent clicks of the button will run any subsequent morph target one at the time
-   - the facial expressions of the mentioned example are located at X6-X7-X8 for `Head_4` object, while X0 to X5 contain those same expressions but for Head_2 and Head_3 objects, which are parts of the whole `Head` and I am not really sure why those facial expressions exist as such
+   - the facial expressions of the mentioned example are located at X6-X7-X8 for `Head_4` object, while X0 to X5 contain those same expressions but for `Head_2` and `Head_3` objects, which are parts of the whole `Head` and I am not really sure why those facial expressions exist as such
    - do note that the above example seems to have some faults in it and has shown some disconnects and material issues, which are not necessarily visible in all viewers due to coding and design approach (try it in the viewers mentioned in the `Resources` section, with Don McCurdy's `GLTF Viewer` actually showing how many errors were detected)
    - other examples, like `Horse.glb` or `Parrot.glb`, will be showing those morph targets almost like frames of the animation itself
  - PLY viewer now includes STL file loader
@@ -50,8 +50,8 @@ Additional Notes:
    - for FBX viewer, you can experiment with the above just by changing the first line to: `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/fbx/cloth.fbx,`
  - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in all viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
  - TGA (Truevision TGA or TARGA) texture viewer is fully functional in online preview:
-   - it only serves a purpose of showing `tga` file applied to a cube
-   - source could be either local files or online files via their URLs (multiple URLs need to be comma separated), like the following:
+   - it only serves a purpose of showing `tga` file when applied to a cube
+   - source could be either local `tga` files or online files via their URLs (multiple URLs need to be comma separated), like the following:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/crate_grey8.tga, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/crate_color8.tga`
    - texture switching button ("T") will let you switch between multiple textures
 
