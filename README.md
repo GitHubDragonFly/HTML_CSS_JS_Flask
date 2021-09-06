@@ -8,8 +8,8 @@ There are several Three.js viewers, not necessarily perfect but functional as th
 The main differences between these 2 projects:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
  - uploading any pictures via the `Form` will then have those saved in the new `uploads` folder
- - new additions are Three.js FBX and MMD viewers (Miku Miku Dance)
- - all Three.js viewers in this project support `URL loading`, use `Orbit Controls`, have a `gizmo` and a `grid / polar grid` buttons present
+ - new additions are Three.js FBX and MMD (Miku Miku Dance) viewers and a TGA texture viewer
+ - all Three.js viewers in this project support `URL loading`, use `Orbit Controls`, have a `grid / polar grid` buttons and a `gizmo` present
  - DRACO and KTX2 support were added to the GLTF Viewer:
    - this seems to work fine when using URL option (see the screenshot) so try using it for fetching files both locally from the server and from the Internet
    - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG/BMP` texture file along just to see if and how it changes the object's appearance)
@@ -49,6 +49,9 @@ Additional Notes:
    - URL loading of the above OBJ example has to be done with multiple comma separated URLs: `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus.obj, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_A.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_M.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_N.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_R.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_RM.jpg`
    - for FBX viewer, you can experiment with the above just by changing the first line to: `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/fbx/cloth.fbx,`
  - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in all viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
+ - TGA (Truevision TGA or TARGA) texture viewer only serves a purpose of showing `tga` file applied to a cube:
+   - source could be either local files or online files via their URLs (multiple URLs need to be comma separated)
+   - texture switching button ("T") will let you switch between multiple textures
 
 Notes about showing the edges (button with letter "E"):
  - these are aplied to the still version of the object itself and will not follow the animation in case of GLTF and DAE viewers
