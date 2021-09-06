@@ -744,6 +744,7 @@
 
                 // Apply texture
                 child.material.map = texture_files_tga[ current_texture ];
+                child.material.map.flipY = true;
                 child.material.needsUpdate = true;
               } else {
                 tga_loader.load( URL.createObjectURL( texture_files_tga[ current_texture ] ), function( texture ) {
@@ -757,6 +758,7 @@
 
                   // Apply texture
                   child.material.map = texture;
+                  child.material.map.flipY = true;
                   child.material.needsUpdate = true;
                 });
               }
