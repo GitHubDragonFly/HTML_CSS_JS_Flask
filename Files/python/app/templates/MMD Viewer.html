@@ -276,7 +276,23 @@
 
           if (fii.files[0].type.startsWith('image/')) {
             texture_loader.load( URL.createObjectURL( fii.files[0] ) , function ( texture ) {
+              URL.revokeObjectURL( fii.files[0] );
+
               scene.background = texture;
+            }, function ( xhr ) {
+              let today = new Date();
+              let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+              if (xhr.loaded == 0 && xhr.total == 0) {
+                console.log( 'Background Image File 0% loaded - ' + time );
+              } else {
+                console.log( 'Background Image File ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              }
+            }, function ( error ) {
+              console.log( 'Error loading Background Image File!' );
+              console.log( error );
+
+              URL.revokeObjectURL( fii.files[0] );
             });
           } else {
             fii.value = "";
@@ -604,7 +620,7 @@
             else if (fi.files[i].name.toUpperCase().endsWith('.TGA')) { texture_files_tga.push( fi.files[i] ); }
           };
 
-          if (!selected_mmd_file && !selected_audio_file) { return; }
+          if (!selected_mmd_file && !selected_audio_file) { console.log('No valid PMD/PMX file selected!'); return; }
 
           selected_url_file = '';
         } else {
@@ -741,8 +757,7 @@
       function loadPoseFiles(){
         current_pose = -1;
 
-        let ext = 'pmd';
-        if (selected_mmd_file.name.toUpperCase().endsWith('.PMX')) { ext = 'pmx'; }
+        let ext = selected_mmd_file.name.toUpperCase().endsWith('.PMX') ? 'pmx' : 'pmd';
 
         mmd_loader.load( URL.createObjectURL( selected_mmd_file ), ext, mesh => {
           URL.revokeObjectURL( selected_mmd_file );
@@ -785,6 +800,7 @@
                 files.forEach( file => {
                   texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
                     URL.revokeObjectURL( file );
+
                     texture.encoding = THREE.sRGBEncoding;
                     texture.wrapS = THREE.RepeatWrapping;
                     texture.wrapT = THREE.RepeatWrapping;
@@ -815,6 +831,7 @@
                     console.log( error );
                     render_requested = false;
                     ready = false;
+
                     URL.revokeObjectURL( file );
                   });
                 });
@@ -822,12 +839,12 @@
                 texture_files_tga.forEach( file => {
                   tga_loader.load( URL.createObjectURL( file ) , function( texture ) {
                     URL.revokeObjectURL( file );
+
                     texture.generateMipmaps = true;
                     texture.encoding = THREE.sRGBEncoding;
-                    texture.wrapS = THREE.ClampToEdgeWrapping;
-                    texture.wrapT = THREE.ClampToEdgeWrapping;
-                    texture.magFilter = THREE.LinearFilter;
-                    texture.minFilter = THREE.LinearMipmapLinearFilter;
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.magFilter = THREE.NearestFilter;
 
                     // Apply texture
                     if (Array.isArray( child.material )) {
@@ -853,6 +870,7 @@
                     console.log( error );
                     render_requested = false;
                     ready = false;
+
                     URL.revokeObjectURL( file );
                   });
                 });
@@ -879,6 +897,7 @@
               console.log( error );
               render_requested = false;
               ready = false;
+
               URL.revokeObjectURL( file );
             });
           });
@@ -892,11 +911,12 @@
 
           if (selected_audio_file) {
             audio_loader.load( URL.createObjectURL( selected_audio_file ), function( buffer ) {
-            	sound.setBuffer( buffer );
+              URL.revokeObjectURL( selected_audio_file );
+
+              sound.setBuffer( buffer );
             	sound.setLoop(true);
             	sound.setVolume(0.3);
               sound.play();
-              URL.revokeObjectURL( selected_audio_file );
             }, function ( xhr ) {
               let today = new Date();
               let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -911,6 +931,7 @@
               console.log( error );
               render_requested = false;
               ready = false;
+
               URL.revokeObjectURL( selected_audio_file );
             });
           }
@@ -944,8 +965,7 @@
       }
 
       function loadMotionFiles(){
-        let ext = 'pmd';
-        if (selected_mmd_file.name.toUpperCase().endsWith('.PMX')) { ext = 'pmx'; }
+        let ext = selected_mmd_file.name.toUpperCase().endsWith('.PMX') ? 'pmx' : 'pmd';
 
         if (selected_vmd_camera_file) {
           mmd_loader.loadWithAnimation( URL.createObjectURL( selected_mmd_file ), URL.createObjectURL( selected_vmd_file ), ext, mmd => {
@@ -986,6 +1006,7 @@
                   files.forEach( file => {
                     texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
                       URL.revokeObjectURL( file );
+
                       texture.encoding = THREE.sRGBEncoding;
                       texture.wrapS = THREE.RepeatWrapping;
                       texture.wrapT = THREE.RepeatWrapping;
@@ -1016,6 +1037,7 @@
                       console.log( error );
                       render_requested = false;
                       ready = false;
+
                       URL.revokeObjectURL( file );
                     });
                   });
@@ -1023,12 +1045,12 @@
                   texture_files_tga.forEach( file => {
                     tga_loader.load( URL.createObjectURL( file ) , function( texture ) {
                       URL.revokeObjectURL( file );
+
                       texture.generateMipmaps = true;
                       texture.encoding = THREE.sRGBEncoding;
-                      texture.wrapS = THREE.ClampToEdgeWrapping;
-                      texture.wrapT = THREE.ClampToEdgeWrapping;
-                      texture.magFilter = THREE.LinearFilter;
-                      texture.minFilter = THREE.LinearMipmapLinearFilter;
+                      texture.wrapS = THREE.RepeatWrapping;
+                      texture.wrapT = THREE.RepeatWrapping;
+                      texture.magFilter = THREE.NearestFilter;
 
                       // Apply texture
                       if (Array.isArray( child.material )) {
@@ -1054,6 +1076,7 @@
                       console.log( error );
                       render_requested = false;
                       ready = false;
+
                       URL.revokeObjectURL( file );
                     });
                   });
@@ -1070,21 +1093,24 @@
               let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
 
               if (xhr.loaded == 0 && xhr.total == 0) {
-                console.log( 'Local VMD 0% loaded - ' + time );
+                console.log( 'Local VMD Camera 0% loaded - ' + time );
               } else {
-                console.log( 'Local VMD ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                console.log( 'Local VMD Camera ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
               }
             }, function ( error ) {
-              console.log( 'Error loading Local VMD!' );
+              console.log( 'Error loading Local VMD Camera!' );
               console.log( error );
               render_requested = false;
               ready = false;
+
               URL.revokeObjectURL( selected_vmd_camera_file );
             });
 
             if (selected_audio_file) {
               audio_loader.load( URL.createObjectURL( selected_audio_file ), function( buffer ) {
-              	sound.setBuffer( buffer );
+                URL.revokeObjectURL( selected_audio_file );
+
+                sound.setBuffer( buffer );
               	sound.setLoop(true);
               	sound.setVolume(0.3);
                 helper.add(sound, { delayTime: 3.5 } );
@@ -1103,6 +1129,7 @@
                 console.log( error );
                 render_requested = false;
                 ready = false;
+
                 URL.revokeObjectURL( selected_audio_file );
               });
             }
@@ -1171,6 +1198,7 @@
                   files.forEach( file => {
                     texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
                       URL.revokeObjectURL( file );
+
                       texture.encoding = THREE.sRGBEncoding;
                       texture.wrapS = THREE.RepeatWrapping;
                       texture.wrapT = THREE.RepeatWrapping;
@@ -1201,6 +1229,7 @@
                       console.log( error );
                       render_requested = false;
                       ready = false;
+
                       URL.revokeObjectURL( file );
                     });
                   });
@@ -1208,12 +1237,12 @@
                   texture_files_tga.forEach( file => {
                     tga_loader.load( URL.createObjectURL( file ) , function( texture ) {
                       URL.revokeObjectURL( file );
+
                       texture.generateMipmaps = true;
                       texture.encoding = THREE.sRGBEncoding;
-                      texture.wrapS = THREE.ClampToEdgeWrapping;
-                      texture.wrapT = THREE.ClampToEdgeWrapping;
-                      texture.magFilter = THREE.LinearFilter;
-                      texture.minFilter = THREE.LinearMipmapLinearFilter;
+                      texture.wrapS = THREE.RepeatWrapping;
+                      texture.wrapT = THREE.RepeatWrapping;
+                      texture.magFilter = THREE.NearestFilter;
 
                       // Apply texture
                       if (Array.isArray( child.material )) {
@@ -1239,6 +1268,7 @@
                       console.log( error );
                       render_requested = false;
                       ready = false;
+
                       URL.revokeObjectURL( file );
                     });
                   });
@@ -1248,7 +1278,9 @@
 
             if (selected_audio_file) {
               audio_loader.load( URL.createObjectURL( selected_audio_file ), function( buffer ) {
-              	sound.setBuffer( buffer );
+                URL.revokeObjectURL( selected_audio_file );
+
+                sound.setBuffer( buffer );
               	sound.setLoop(true);
               	sound.setVolume(0.3);
                 helper.add(sound, { delayTime: 3.5 } );
@@ -1266,6 +1298,8 @@
                 console.log( error );
                 render_requested = false;
                 ready = false;
+
+                URL.revokeObjectURL( selected_audio_file );
               });
             }
 
@@ -1302,6 +1336,8 @@
 
       function loadAudioFile(){
         audio_loader.load( URL.createObjectURL( selected_audio_file ), function( buffer ) {
+          URL.revokeObjectURL( selected_audio_file );
+
           sound.setBuffer( buffer );
           sound.setLoop(true);
           sound.setVolume(0.3);
@@ -1309,7 +1345,6 @@
 
           render_requested = false;
           ready = false;
-          URL.revokeObjectURL( selected_audio_file );
         }, function ( xhr ) {
           let today = new Date();
           let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -1324,13 +1359,13 @@
           console.log( error );
           render_requested = false;
           ready = false;
+
           URL.revokeObjectURL( selected_audio_file );
         });
       }
 
       function loadFile(){
-        let ext = 'pmd';
-        if (selected_mmd_file.name.toUpperCase().endsWith('.PMX')) { ext = 'pmx'; }
+        let ext = selected_mmd_file.name.toUpperCase().endsWith('.PMX') ? 'pmx' : 'pmd';
 
         mmd_loader.load( URL.createObjectURL( selected_mmd_file ), ext, mesh => {
           URL.revokeObjectURL( selected_mmd_file );
@@ -1371,9 +1406,10 @@
               if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0) {
                 let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : texture_files_bmp);
 
-                files.forEach( file => {
+                files.forEach( ( file, index ) => {
                   texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
                     URL.revokeObjectURL( file );
+
                     texture.encoding = THREE.sRGBEncoding;
                     texture.wrapS = THREE.RepeatWrapping;
                     texture.wrapT = THREE.RepeatWrapping;
@@ -1382,10 +1418,15 @@
 
                     // Apply texture
                     if (Array.isArray( child.material )) {
-                      child.material.forEach( mtl => {
-                        mtl.map = texture;
-                        mtl.needsUpdate = true;
-                      });
+                      if (child.material.length == files.length) {
+                        child.material[ index ].map = texture;
+                        child.material[ index ].needsUpdate = true;
+                      } else {
+                        child.material.forEach( mtl => {
+                          mtl.map = texture;
+                          mtl.needsUpdate = true;
+                        });
+                      }
                     } else {
                       child.material.map = texture;
                       child.material.needsUpdate = true;
@@ -1404,26 +1445,32 @@
                     console.log( error );
                     render_requested = false;
                     ready = false;
+
                     URL.revokeObjectURL( file );
                   });
                 });
               } else if (texture_files_tga.length > 0) {
-                texture_files_tga.forEach( file => {
+                texture_files_tga.forEach( ( file, index ) => {
                   tga_loader.load( URL.createObjectURL( file ) , function( texture ) {
                     URL.revokeObjectURL( file );
+
                     texture.generateMipmaps = true;
                     texture.encoding = THREE.sRGBEncoding;
-                    texture.wrapS = THREE.ClampToEdgeWrapping;
-                    texture.wrapT = THREE.ClampToEdgeWrapping;
-                    texture.magFilter = THREE.LinearFilter;
-                    texture.minFilter = THREE.LinearMipmapLinearFilter;
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.magFilter = THREE.NearestFilter;
 
                     // Apply texture
                     if (Array.isArray( child.material )) {
-                      child.material.forEach( mtl => {
-                        mtl.map = texture;
-                        mtl.needsUpdate = true;
-                      });
+                      if (child.material.length == texture_files_tga.length) {
+                        child.material[ index ].map = texture;
+                        child.material[ index ].needsUpdate = true;
+                      } else {
+                        child.material.forEach( mtl => {
+                          mtl.map = texture;
+                          mtl.needsUpdate = true;
+                        });
+                      }
                     } else {
                       child.material.map = texture;
                       child.material.needsUpdate = true;
@@ -1442,6 +1489,7 @@
                     console.log( error );
                     render_requested = false;
                     ready = false;
+
                     URL.revokeObjectURL( file );
                   });
                 });
@@ -1457,7 +1505,8 @@
           if (selected_audio_file) {
             audio_loader.load( URL.createObjectURL( selected_audio_file ), function( buffer ) {
               URL.revokeObjectURL( selected_audio_file );
-            	sound.setBuffer( buffer );
+
+              sound.setBuffer( buffer );
             	sound.setLoop(true);
             	sound.setVolume(0.3);
               sound.play();
@@ -1475,6 +1524,7 @@
               console.log( error );
               render_requested = false;
               ready = false;
+
               URL.revokeObjectURL( selected_audio_file );
             });
           }
@@ -1504,6 +1554,7 @@
           console.log( error );
           render_requested = false;
           ready = false;
+
           URL.revokeObjectURL( selected_mmd_file );
         });
       }
@@ -1627,6 +1678,8 @@
                 render_requested = false;
                 ready = false;
               });
+            } else {
+              console.log('Unsupported URL file!');
             }
           }
         }
@@ -1635,8 +1688,7 @@
       function loadURLPoseFiles(){
         current_pose = -1;
 
-        let ext = 'pmd';
-        if (selected_mmd_url_file.toUpperCase().endsWith('.PMX')) { ext = 'pmx'; }
+        let ext = selected_mmd_url_file.toUpperCase().endsWith('.PMX') ? 'pmx' : 'pmd';
 
         mmd_loader.load( selected_mmd_url_file, ext, mesh => {
           mesh.traverse( function( child ) {
@@ -1658,6 +1710,7 @@
                   mtl.transparent = true;
                   mtl.skinning = true;
                   mtl.side = THREE.DoubleSide;
+                  if (mtl.map) { mtl.map.generateMipmaps = true; }
                 });
               } else {
                 // Enable transparency for the Opacity control
@@ -1665,6 +1718,7 @@
                 child.material.transparent = true;
                 child.material.skinning = true;
                 child.material.side = THREE.DoubleSide;
+                if (child.material.map) { mtl.map.generateMipmaps = true; }
               }
 
               // Enable shadows
@@ -1751,8 +1805,7 @@
       }
 
       function loadURLMotionFiles(){
-        let ext = 'pmd';
-        if (selected_mmd_url_file.toUpperCase().endsWith('.PMX')) { ext = 'pmx'; }
+        let ext = selected_mmd_url_file.toUpperCase().endsWith('.PMX') ? 'pmx' : 'pmd';
 
         if (selected_vmd_camera_url_file) {
           mmd_loader.loadWithAnimation( selected_mmd_url_file, selected_vmd_url_file, ext, mmd => {
