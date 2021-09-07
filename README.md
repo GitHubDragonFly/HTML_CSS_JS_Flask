@@ -26,9 +26,10 @@ Additional Notes:
    - observe the LICENSES of that and any other content you want to use
    - mainly designed to be used with local files, which should all be in the same folder (PMD, PMX, VMD, VPD, MP3)
    - try all the different combinations of the mentioned files to see what works
-   - URL option is set for either 1 or more comma separated URLs, like the following:
+   - URL option is set for either 1 or more comma separated URLs, allowing mixed sites, like the following:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd`
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
+   - `https://raw.githubusercontent.com/takahirox/mmd-viewer-js/master/model/low_miku/gumi.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
    - it includes TGA texture loader, which can be tested via URL option with the following link: `https://raw.githubusercontent.com/takahirox/mmd-viewer-js/master/model/low_miku/gumi.pmd`
  - GLTF / DAE / FBX viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
