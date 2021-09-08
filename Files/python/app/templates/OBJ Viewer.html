@@ -7,6 +7,7 @@
     <script src="../static/js/three.js"></script>
     <script src="../static/js/MTLLoader.js"></script>
     <script src="../static/js/OBJLoader.js"></script>
+    <script src="../static/js/TGALoader.js"></script>
     <script src="../static/js/DDSLoader.js"></script>
     <script src="../static/js/OrbitControls.js"></script>
     <script src="../static/js/OrbitControlsGizmo.js"></script>
@@ -212,7 +213,8 @@
       var previous_obj_scale = '1', bounding_box = new THREE.Box3();
       var selected_url_file = '', url_displayed, url_loading;
       var selected_mtl_file, selected_mtl_url_file, selected_obj_file, selected_obj_url_file;
-      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_dds, current_texture, textures;
+      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_dds;
+      var texture_files_tga, url_tga_loaded, current_texture, textures;
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
@@ -222,6 +224,9 @@
       const obj_loader = new THREE.OBJLoader( manager );
 
       const texture_loader = new THREE.TextureLoader( manager );
+
+      const tga_loader = new THREE.TGALoader( manager );
+      manager.addHandler( /\.tga$/i, tga_loader );
 
       const dds_loader = new THREE.DDSLoader( manager );
       manager.addHandler( /\.dds$/i, dds_loader );
@@ -475,6 +480,8 @@
         texture_files_png = [];
         texture_files_bmp = [];
         texture_files_dds = [];
+        texture_files_tga = [];
+        url_tga_loaded = false;
         edges = {};
         edges_visible = false;
         grid_visible = false;
@@ -489,13 +496,14 @@
           // Loaded file(s)
           var fi = document.getElementById('file_input');
 
-          // Include check for JPG/PNG/BMP and DDS (DirectDraw Surface container file format)
+          // Include check for JPG/PNG/BMP, TGA and DDS (DirectDraw Surface container file format)
           for (let i = 0; i < fi.files.length; i++) {
             if (fi.files[i].name.toUpperCase().endsWith('.OBJ')) { selected_obj_file = fi.files[i]; }
             else if (fi.files[i].name.toUpperCase().endsWith('.MTL')) { selected_mtl_file = fi.files[i]; }
             else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.TGA')) { texture_files_tga.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.DDS')) { texture_files_dds.push( fi.files[i] ); }
           };
 
@@ -621,7 +629,7 @@
           mtl_loader.load( URL.createObjectURL( selected_mtl_file ), ( mtl ) => {
             URL.revokeObjectURL( selected_mtl_file );
 
-            if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_dds.length > 0) {
+            if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_tga.length > 0 || texture_files_dds.length > 0) {
               if (texture_files_png.length > 0) {
                 for (const [ key, value ] of Object.entries( mtl.materialsInfo )) {
                   texture_files_png.forEach( file => {
@@ -658,6 +666,18 @@
                 }
               }
 
+              if (texture_files_tga.length > 0) {
+                for (const [ key, value ] of Object.entries( mtl.materialsInfo )) {
+                  texture_files_tga.forEach( file => {
+                    if (file.name === value.map_kd) {
+                      mtl.materials[ key ] = URL.createObjectURL( file );
+                      URL.revokeObjectURL( file );
+                      mtl.materialsInfo[ key ].map_kd = mtl.materials[ key ].substring(10);
+                    }
+                  });
+                }
+              }
+
               if (texture_files_dds.length > 0) {
                 for (const [ key, value ] of Object.entries( mtl.materialsInfo )) {
                   texture_files_dds.forEach( file => {
@@ -677,6 +697,7 @@
             // Launch loading of the selected file
             obj_loader.load( URL.createObjectURL( selected_obj_file ), function ( object ) {
               URL.revokeObjectURL( selected_obj_file );
+
               Obj = object.clone();
 
               let child_count = 1;
@@ -687,6 +708,10 @@
         	      if (child instanceof THREE.Mesh) {
                   if (texture_files_dds.length > 0) {
                     child.material.map = dds_loader.load( mtl.materials[ child.material.name ] );
+                  } else if (texture_files_tga.length > 0) {
+                    child.material.map = tga_loader.load( mtl.materials[ child.material.name ] );
+                    child.material.map.generateMipmaps = true;
+                    child.material.map.flipY = true;
                   } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0) {
                     child.material.map = mtl.loadTexture( mtl.materials[ child.material.name ] );
                   }
@@ -750,8 +775,9 @@
             if (texture_files_png.length > 0) { texture_files_png.forEach( file => { textures.push( file ); }); }
             if (texture_files_jpg.length > 0) { texture_files_jpg.forEach( file => { textures.push( file ); }); }
             if (texture_files_bmp.length > 0) { texture_files_bmp.forEach( file => { textures.push( file ); }); }
+            if (texture_files_tga.length > 0) { texture_files_tga.forEach( file => { textures.push( file ); }); }
             if (texture_files_dds.length > 0) { texture_files_dds.forEach( file => { textures.push( file ); }); }
-                
+
             if (textures.length > 0) { document.getElementById('btn_textures').disabled = false; }
 
             let child_count = 1;
@@ -807,8 +833,15 @@
             for (let i = 0; i < urls.length; i++) {
               let url = urls[i].trim();
 
-              if (url.toUpperCase().endsWith('.PNG') || url.toUpperCase().endsWith('.JPG') || url.toUpperCase().endsWith('.BMP') || url.toUpperCase().endsWith('.DDS')) {
+              if (url.toUpperCase().endsWith('.PNG') || url.toUpperCase().endsWith('.JPG') || url.toUpperCase().endsWith('.BMP')) {
                 texture_loader.load( url, function( texture ) { textures.push( texture ); });
+              } else if (url.toUpperCase().endsWith('.DDS')) {
+                dds_loader.load( url, function( texture ) { textures.push( texture ); });
+              } else if (url.toUpperCase().endsWith('.TGA')) {
+                tga_loader.load( url, function( texture ) {
+                  textures.push( texture );
+                  url_tga_loaded = true;
+                });
               } else if (url.toUpperCase().endsWith('.MTL')) {
                 selected_mtl_url_file = url;
               } else if (url.toUpperCase().endsWith('.OBJ')) {
@@ -849,6 +882,7 @@
                   // This will allow us to check if the child is an instance of the Mesh constructor
             	    if (child instanceof THREE.Mesh) {
                     // Enable transparency for the Opacity control and enable shadows
+                    if (child.material.map) { child.material.map.generateMipmaps = true; }
                     child.material.side = THREE.DoubleSide;
                     child.material.skinning = true;
                     child.material.opacity = 1;
@@ -1049,11 +1083,16 @@
 
                 // Apply texture
                 child.material.map = textures[ current_texture ];
+                if (url_tga_loaded) {
+                  child.material.map.generateMipmaps = true;
+                  child.material.map.flipY = true;
+                }
                 child.material.needsUpdate = true;
               } else {
                 if (textures[ current_texture ].name.toUpperCase().endsWith('.DDS')) {
                   dds_loader.load( URL.createObjectURL( textures[ current_texture ] ), function( texture ) {
                     URL.revokeObjectURL( textures[ current_texture ] );
+
                     texture.encoding = THREE.sRGBEncoding;
                     texture.wrapS = THREE.RepeatWrapping;
                     texture.wrapT = THREE.RepeatWrapping;
@@ -1063,9 +1102,25 @@
                     child.material.map = texture;
                     child.material.needsUpdate = true;
                   });
+                } else if (textures[ current_texture ].name.toUpperCase().endsWith('.TGA')) {
+                  tga_loader.load( URL.createObjectURL( textures[ current_texture ] ), function( texture ) {
+                    URL.revokeObjectURL( textures[ current_texture ] );
+
+                    texture.generateMipmaps = true;
+                    texture.encoding = THREE.sRGBEncoding;
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.magFilter = THREE.NearestFilter;
+
+                    // Apply texture
+                    child.material.map = texture;
+                    child.material.map.flipY = true;
+                    child.material.needsUpdate = true;
+                  });
                 } else {
                   texture_loader.load( URL.createObjectURL( textures[ current_texture ] ), function( texture ) {
                     URL.revokeObjectURL( textures[ current_texture ] );
+
                     texture.encoding = THREE.sRGBEncoding;
                     texture.wrapS = THREE.RepeatWrapping;
                     texture.wrapT = THREE.RepeatWrapping;
