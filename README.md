@@ -8,7 +8,7 @@ There are several Three.js viewers, not necessarily perfect but functional as th
 The main differences between these 2 projects:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
  - uploading any pictures via the `Form` will then have those saved in the new `uploads` folder
- - new additions are Three.js FBX and MMD (Miku Miku Dance) viewers and a TGA texture viewer
+ - new additions are Three.js FBX and MMD (Miku Miku Dance) viewers, VRML and a TGA texture viewer
  - all Three.js viewers in this project support `URL loading`, use `Orbit Controls`, have a `grid / polar grid` buttons and a `gizmo` present
  - DRACO and KTX2 support were added to the GLTF Viewer:
    - this seems to work fine when using URL option (see the screenshot) so try using it for fetching files both locally from the server and from the Internet
@@ -20,6 +20,9 @@ Additional Notes:
  - Single character buttons, where applicable: `E` - edges, `F` - flatShading, `A` - animations, `X`- extras, `M` - materials, `T` - textures, `P` - poses, `#` - grid
  - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) non-module version was added to all viewers
  - FBX viewer appears to be fully functional in online preview, see the `Usage` section for the link
+ - VRML viewer is module based, requires a server and will not be functional in online preview
+   - if using a server then try the following link via the URL option:
+   - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/vrml/house.wrl`
  - MMD viewer supports animation, changing pose, extras and audio:
    - appears to be fully functional in online preview, see the `Usage` section for the link (`ammo.wasm.wasm` file needed to be added to the `templates` folder so the loading of local files would work - whatever the reason behind this is)
    - tested only with three.js examples and has audio delayTime set for those (with current value of 3.5)
@@ -70,6 +73,7 @@ All it takes to run this project is to do either of the below listed:
 a) Even though this is all intended to be used with the `Flask` server, thanks to the [GitHub & BitBucket HTML Preview](https://github.com/htmlpreview/htmlpreview.github.com) you can still preview the [Exercise](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/Exercise.html) page online and use its fixed menu to access the rest, with the following limitations:
  - GLTF Viewer does allow loading DRACO files but does not allow loading KTX2 textures (check the module "import" console error)
  - DAE Viewer will not allow loading KTX2 textures (check the module "import" console error)
+ - VRML viewer is module based and will not be functional in online preview
  - The Form entries are set to be handled by the server and will not work in the preview
 
 And just for the convenience, you can access the viewers directly here: [OBJ](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/OBJ%20Viewer.html) / [PLY + STL](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/PLY%20Viewer.html) / [FBX](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/FBX%20Viewer.html) / [DAE](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/DAE%20Viewer.html) / [GLTF](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/GLTF%20Viewer.html) / [MMD](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/MMD%20Viewer.html) / [TGA](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/TGA%20Viewer.html)
