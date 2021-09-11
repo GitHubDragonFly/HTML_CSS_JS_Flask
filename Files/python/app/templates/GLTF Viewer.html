@@ -113,7 +113,8 @@
       <div id="url" style="display: none;">
         <label for="url_entry" style="margin: 2px 2px 2px 5px;">URL:</label>
         <input type="text" id="url_entry" name="url_entry" size="90" value="" style="margin: 2px 5px 2px 0;" />
-        <button id="btn_load_url" onclick="load_url_file()" style="-webkit-border-radius: 2px; border-radius: 2px; width: 50px; margin: 2px 0 2px 0; padding: 2px;">Load</button>
+        <button onclick="load_url_file()" style="-webkit-border-radius: 2px; border-radius: 2px; width: 50px; margin: 2px 5px 2px 0; padding: 2px;">Load</button>
+        <button onclick="clear_url()" style="-webkit-border-radius: 2px; border-radius: 2px; width: 50px; margin: 2px 2px 2px 0; padding: 2px;">Clear</button>
       </div>
       <div>
         <label style="color: blue; margin: 2px 0 2px 0;"><input type="radio" id="hlight" name="mode" value="HL" onchange="radio_changed()" disabled />HL</label>
@@ -164,9 +165,10 @@
 
       function load_url_file() {
         let url = document.getElementById('url_entry').value.trim();
-
         if (url != '') { selected_url_file = url; url_loading = true; init(); }
       }
+
+      function clear_url() { document.getElementById('url_entry').value = ''; }
 
       function initialize_event_listeners() {
         var cnvs = document.getElementById('scene');
