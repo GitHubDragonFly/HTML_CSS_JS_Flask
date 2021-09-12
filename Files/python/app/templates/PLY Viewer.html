@@ -211,8 +211,8 @@
       var rot_x = 0, rot_y = 0, rot_z = 0;
       var previous_ply_scale = '1', bounding_box = new THREE.Box3();
       var selected_ply_file, selected_stl_file, selected_url_file = '', url_displayed, url_loading;
-      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_dds;
-      var texture_files_tga, url_tga_loaded;
+      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_gif;
+      var texture_files_dds, texture_files_tga, url_tga_loaded;
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
@@ -469,6 +469,7 @@
         texture_files_png = [];
         texture_files_jpg = [];
         texture_files_bmp = [];
+        texture_files_gif = [];
         texture_files_dds = [];
         texture_files_tga = [];
         url_tga_loaded = false;
@@ -485,13 +486,14 @@
           // Loaded file
           var fi = document.getElementById('file_input');
 
-          // Include check for JPG/PNG/BMP, TGA and DDS (DirectDraw Surface container file format)
+          // Include check for JPG/PNG/BMP/GIF, TGA and DDS (DirectDraw Surface container file format)
           for (let i = 0; i < fi.files.length; i++) {
             if (fi.files[i].name.toUpperCase().endsWith('.PLY')) { selected_ply_file = fi.files[i]; }
             else if (fi.files[i].name.toUpperCase().endsWith('.STL')) { selected_stl_file = fi.files[i]; }
             else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.GIF')) { texture_files_gif.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.TGA')) { texture_files_tga.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.DDS')) { texture_files_dds.push( fi.files[i] ); }
           };
@@ -663,6 +665,20 @@
           } else if (texture_files_bmp.length > 0) {
             texture = texture_loader.load( URL.createObjectURL( texture_files_bmp[0] ));
             URL.revokeObjectURL( texture_files_bmp[0] );
+
+            material = new THREE.MeshPhongMaterial( {
+              side: THREE.DoubleSide,
+              map: texture,
+              fog: false,
+              shininess: 100,
+              opacity: 1,
+              transparent: true,
+              skinning: true,
+              vertexColors: THREE.VertexColors
+            });
+          } else if (texture_files_gif.length > 0) {
+            texture = texture_loader.load( URL.createObjectURL( texture_files_gif[0] ));
+            URL.revokeObjectURL( texture_files_gif[0] );
 
             material = new THREE.MeshPhongMaterial( {
               side: THREE.DoubleSide,

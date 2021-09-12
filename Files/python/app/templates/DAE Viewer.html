@@ -495,8 +495,8 @@
         texture_files_png = [];
         texture_files_jpg = [];
         texture_files_bmp = [];
-        texture_files_ktx2 = [];
         texture_files_dds = [];
+        texture_files_ktx2 = [];
         animations = [];
         animation_mixer = null;
         animation_running = false;
@@ -1086,7 +1086,7 @@
     </script>
 
     <script type="module">
-      import { KTX2Loader } from '../static/js/KTX2Loader.js';
+      import { KTX2Loader } from '../static/jsm/KTX2Loader.js';
 
       renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
       renderer.setPixelRatio( window.devicePixelRatio );

@@ -213,7 +213,7 @@
       var rot_x = 0, rot_y = 0, rot_z = 0;
       var previous_gltf_scale = '1', bounding_box = new THREE.Box3();
       var selected_gltf_file, selected_url_file = '', url_displayed, url_loading;
-      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_ktx2, draco_files;
+      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_gif, texture_files_ktx2, draco_files;
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
@@ -564,6 +564,7 @@
         texture_files_png = [];
         texture_files_jpg = [];
         texture_files_bmp = [];
+        texture_files_gif = [];
         texture_files_ktx2 = [];
         draco_files = [];
         animations = [];
@@ -591,12 +592,13 @@
           // Loaded file(s)
           let fi = document.getElementById('file_input');
 
-          // Include check for GLB/GLTF, JPG/PNG/BMP, KTX2 and DRC (DRACO)
+          // Include check for GLB/GLTF, JPG/PNG/BMP/GIF, KTX2 and DRC (DRACO)
           for (let i = 0; i < fi.files.length; i++) {
             if (fi.files[i].name.toUpperCase().endsWith('.GLB') || fi.files[i].name.toUpperCase().endsWith('.GLTF')) { selected_gltf_file = fi.files[i]; }
             else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.GIF')) { texture_files_gif.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.KTX2')) { texture_files_ktx2.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.DRC')) { draco_files.push( fi.files[i] ); }
           };
@@ -783,8 +785,8 @@
                       child.material.needsUpdate = true;
                     });
                   });
-                } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0) {
-                  let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : texture_files_bmp);
+                } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_gif.length > 0) {
+                  let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : ((texture_files_bmp.length > 0) ? texture_files_bmp : texture_files_gif));
 
                   files.forEach( file => {
                     texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
@@ -880,8 +882,8 @@
                   camera.lookAt( gltf_obj.position );
                 });
               });
-            } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0) {
-              let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : texture_files_bmp);
+            } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_gif.length > 0) {
+              let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : ((texture_files_bmp.length > 0) ? texture_files_bmp : texture_files_gif));
 
               files.forEach( file => {
                 texture_loader.load( URL.createObjectURL( file ), function( texture ) {
@@ -1311,7 +1313,7 @@
     </script>
 
     <script type="module">
-      import { KTX2Loader } from '../static/js/KTX2Loader.js';
+      import { KTX2Loader } from '../static/jsm/KTX2Loader.js';
 
       renderer = new THREE.WebGLRenderer({ canvas : document.getElementById('scene'), antialias: true, alpha: true });
       renderer.setPixelRatio( window.devicePixelRatio );

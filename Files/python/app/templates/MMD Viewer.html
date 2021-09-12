@@ -220,7 +220,7 @@
       var selected_mmd_file, selected_vmd_file, selected_vmd_camera_file, selected_vpd_files, selected_audio_file;
       var selected_url_file = '', url_displayed, url_loading;
       var selected_mmd_url_file, selected_vmd_url_file, selected_vmd_camera_url_file, selected_vpd_url_files, selected_audio_url_file;
-      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_tga;
+      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_gif, texture_files_tga;
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
@@ -587,6 +587,7 @@
         texture_files_png = [];
         texture_files_jpg = [];
         texture_files_bmp = [];
+        texture_files_gif = [];
         texture_files_tga = [];
         extras = [];
         extra_running = false;
@@ -606,7 +607,7 @@
 
           if (!fi.files) { return; }
 
-          // Include check for JPG/PNG/BMP, PMD/PMX (model), VMD (motion), VPD (posing) and MP3 / OGG audio
+          // Include check for JPG/PNG/BMP/GIF, PMD/PMX (model), VMD (motion), VPD (posing) and MP3 / OGG audio
           for (let i = 0; i < fi.files.length; i++) {
             if (fi.files[i].name.toUpperCase().endsWith('.PMD') || fi.files[i].name.toUpperCase().endsWith('.PMX')) { selected_mmd_file = fi.files[i]; }
             else if (fi.files[i].name.toUpperCase().endsWith('.VMD')) {
@@ -620,6 +621,7 @@
             else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.GIF')) { texture_files_gif.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.TGA')) { texture_files_tga.push( fi.files[i] ); }
           };
 
@@ -797,8 +799,8 @@
               child.castShadow = true;
               child.receiveShadow = true;
 
-              if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0) {
-                let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : texture_files_bmp);
+              if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_gif.length > 0) {
+                let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : ((texture_files_bmp.length > 0) ? texture_files_bmp : texture_files_gif));
 
                 files.forEach( file => {
                   texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
@@ -1003,8 +1005,8 @@
                 child.castShadow = true;
                 child.receiveShadow = true;
 
-                if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0) {
-                  let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : texture_files_bmp);
+                if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_gif.length > 0) {
+                  let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : ((texture_files_bmp.length > 0) ? texture_files_bmp : texture_files_gif));
 
                   files.forEach( file => {
                     texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
@@ -1195,8 +1197,8 @@
                 child.castShadow = true;
                 child.receiveShadow = true;
 
-                if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0) {
-                  let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : texture_files_bmp);
+                if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_gif.length > 0) {
+                  let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : ((texture_files_bmp.length > 0) ? texture_files_bmp : texture_files_gif));
 
                   files.forEach( file => {
                     texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
@@ -1406,8 +1408,8 @@
               child.castShadow = true;
               child.receiveShadow = true;
 
-              if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0) {
-                let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : texture_files_bmp);
+              if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_gif.length > 0) {
+                let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : ((texture_files_bmp.length > 0) ? texture_files_bmp : texture_files_gif));
 
                 files.forEach( ( file, index ) => {
                   texture_loader.load( URL.createObjectURL( file ) , function( texture ) {

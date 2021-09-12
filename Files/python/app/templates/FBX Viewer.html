@@ -213,7 +213,8 @@
       var rot_x = 0, rot_y = 0, rot_z = 0;
       var previous_fbx_scale = '1', bounding_box = new THREE.Box3();
       var selected_fbx_file, selected_fbx_url_file, selected_url_file = '', url_displayed, url_loading;
-      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_dds, current_texture, textures;
+      var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_gif;
+      var texture_files_dds, current_texture, textures;
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
@@ -504,6 +505,7 @@
         texture_files_png = [];
         texture_files_jpg = [];
         texture_files_bmp = [];
+        texture_files_gif = [];
         texture_files_dds = [];
         animations = [];
         animation_mixer = null;
@@ -526,12 +528,13 @@
 
           if (!fi.files) { return; }
 
-          // Include check for JPG/PNG/BMP and DDS (DirectDraw Surface container file format)
+          // Include check for JPG/PNG/BMP/GIF and DDS (DirectDraw Surface container file format)
           for (let i = 0; i < fi.files.length; i++) {
             if (fi.files[i].name.toUpperCase().endsWith('.FBX')) { selected_fbx_file = fi.files[i]; }
             else if (fi.files[i].name.toUpperCase().endsWith('.PNG')) { texture_files_png.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.GIF')) { texture_files_gif.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.DDS')) { texture_files_dds.push( fi.files[i] ); }
           };
 
@@ -678,6 +681,7 @@
         if (texture_files_png.length > 0) { texture_files_png.forEach( file => { textures.push( file ); }); }
         if (texture_files_jpg.length > 0) { texture_files_jpg.forEach( file => { textures.push( file ); }); }
         if (texture_files_bmp.length > 0) { texture_files_bmp.forEach( file => { textures.push( file ); }); }
+        if (texture_files_gif.length > 0) { texture_files_gif.forEach( file => { textures.push( file ); }); }
         if (texture_files_dds.length > 0) { texture_files_dds.forEach( file => { textures.push( file ); }); }
                 
         if (textures.length > 0) { document.getElementById('btn_textures').disabled = false; }
