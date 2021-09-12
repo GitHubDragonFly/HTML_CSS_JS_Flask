@@ -1,7 +1,7 @@
 # HTML_CSS_JS_Flask
 Generally intended for educational purposes.
 
-This is a modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project so check a description of all the features there. It is set to be used with `python3` and `Flask` server.
+This is an expanded and modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project, set to be used with `python3` and `Flask` server.
 
 There are several Three.js viewers, not necessarily perfect but functional as they are. Online preview links are available in the `Usage` section but do have some limitations. Do note  that loading any textures directly from your hard drive might make the object look either interesting or funny.
 
@@ -12,14 +12,14 @@ The main differences between these 2 projects:
  - almost all Three.js viewers in this project support `URL loading`, use `Orbit Controls`, have a `grid / polar grid` buttons and a `gizmo` present
  - DRACO and KTX2 support were added to the GLTF Viewer:
    - this seems to work fine when using URL option (see the screenshot) so try using it for fetching files both locally from the server and from the Internet
-   - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG/BMP` texture file along just to see if and how it changes the object's appearance)
+   - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG/BMP/GIF` texture file along just to see if and how it changes the object's appearance)
    - you can also open `.drc` file types either alone or together with some texture file
  - KTX2 support was also added to the DAE Viewer
 
 Additional Notes:
  - Single character buttons, where applicable: `E` - edges, `F` - flatShading, `A` - animations, `X`- extras, `M` - materials, `T` - textures, `P` - poses, `#` - grid
  - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) non-module version was added to all viewers
- - VRML viewer is module based, requires a server and will not be functional in the online preview
+ - VRML viewer is module based, requires a server and will not be functional in the online preview:
    - if using a server then try the following link via the URL option:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/vrml/house.wrl`
  - FBX viewer appears to be fully functional in the online preview, see the `Usage` section for the link
@@ -45,9 +45,9 @@ Additional Notes:
    - subsequent clicks of the button will run any subsequent morph target one at the time
    - the facial expressions of the mentioned example are located at X6-X7-X8 for `Head_4` object, while X0 to X5 contain those same expressions but for `Head_2` and `Head_3` objects, which are parts of the whole `Head` and I am not really sure why those facial expressions exist as such
    - do note that the above example seems to have some faults in it and has shown some disconnects and material issues, which are not necessarily visible in all viewers due to coding and design approach (try it in the viewers mentioned in the `Resources` section, with Don McCurdy's `GLTF Viewer` actually showing how many errors were detected)
-   - other examples, like `Horse.glb` or `Parrot.glb`, will be showing those morph targets almost like frames of the animation itself
+   - other examples, like `Horse.glb` or `Parrot.glb`, will be showing those morph targets like frames of the animation itself
  - PLY viewer now includes STL file loader
- - PLY / OBJ viewers also include an experimental flat shading button, with letter "F"
+ - PLY / OBJ viewers also include an experimental flat shading button, with letter "F", which will be disabled for STL files since they don't seem to respond to it
  - FBX / OBJ viewers also include an experimental texture switching button, with letter "T", which was tested as working with both local and URL version of this OBJ example:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus.obj`
    - URL loading of the above OBJ example has to be done with multiple comma separated URLs: `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus.obj, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_A.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_M.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_N.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_R.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_RM.jpg`
