@@ -25,7 +25,7 @@ Additional Notes:
  - FBX viewer appears to be fully functional in the online preview, see the `Usage` section for the link
  - MMD viewer supports animation, changing pose, extras and audio:
    - appears to be fully functional in online preview, see the `Usage` section for the link (`ammo.wasm.wasm` file needed to be added to the `templates` folder so the loading of local files would work - whatever the reason behind this is)
-   - tested only with three.js examples and has audio delayTime set for those (with current value of 3.5)
+   - tested with three.js examples and has audio delayTime set for those (with current value of 3.5)
    - observe the LICENSES of that and any other content you want to use
    - mainly designed to be used with local files, which should all be in the same folder (PMD, PMX, VMD, VPD, MP3)
    - try all the different combinations of the mentioned files to see what works
