@@ -24,8 +24,11 @@ Additional Notes:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/vrml/house.wrl`
  - FBX viewer appears to be fully functional in the online preview, see the `Usage` section for the link
  - 3DM viewer appears to be fully functional in the online preview, see the `Usage` section for the link
+   - you could try the following example via its URL option:
+   - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/3dm/Rhino_Logo.3dm`
  - MMD viewer supports animation, changing pose, extras and audio:
-   - appears to be fully functional in online preview, see the `Usage` section for the link (`ammo.wasm.wasm` file needed to be added to the `templates` folder so the loading of local files would work - whatever the reason behind this is)
+   - appears to be fully functional in online preview, see the `Usage` section for the link
+   - `ammo.wasm.wasm` file was added to the `templates` folder so the loading of local files would work - whatever the reason behind this is
    - tested with three.js examples and has audio delayTime set for those (with current value of 3.5)
    - observe the LICENSES of that and any other content you want to use
    - mainly designed to be used with local files, which should all be in the same folder (PMD, PMX, VMD, VPD, MP3)
