@@ -3,7 +3,7 @@ Generally intended for educational purposes.
 
 This is an expanded and modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project, set to be used with `python3` and `Flask` server.
 
-There are several Three.js viewers, not necessarily perfect but functional as they are. Online preview links are available in the `Usage` section but do have some limitations. Do note  that loading any textures directly from your hard drive might make the object look either interesting or funny.
+There are several three.js viewers, not necessarily perfect but functional as they are. Online preview links are available in the `Usage` section but do have some limitations. Do note  that loading any textures directly from your hard drive might make the object look either interesting or funny.
 
 The main differences between these 2 projects:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
@@ -57,7 +57,7 @@ Additional Notes:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus.obj`
    - URL loading of the above OBJ example has to be done with multiple comma separated URLs: `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus.obj, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_A.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_M.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_N.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_R.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_RM.jpg`
    - for FBX viewer, you can experiment with the above just by changing the first line to: `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/fbx/cloth.fbx,`
- - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [Three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in all viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
+ - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in all viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
  - TGA (Truevision TGA or TARGA) texture viewer is fully functional in online preview:
    - it only serves a purpose of showing `tga` file when applied to a cube
    - source could be either local `tga` files or online files via their URLs (multiple URLs need to be comma separated), like the following:
@@ -81,7 +81,7 @@ a) Even though this is all intended to be used with the `Flask` server, thanks t
  - VRML viewer is module based, requires a server and will not be functional in the preview (check the module "import" console error)
  - The Form entries are set to be handled by the server and will not work in the preview
 
-And just for the convenience, you can access the viewers directly here: [OBJ](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/OBJ%20Viewer.html) / [PLY + STL](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/PLY%20Viewer.html) / [FBX](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/FBX%20Viewer.html) / [3DM](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/3DM%20Viewer.html) / [DAE](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/DAE%20Viewer.html) / [GLTF](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/GLTF%20Viewer.html) / [MMD](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/MMD%20Viewer.html) / [TGA](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/TGA%20Viewer.html)
+And just for the convenience, you can access three.js viewers directly here: [OBJ](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/OBJ%20Viewer.html) / [PLY + STL](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/PLY%20Viewer.html) / [FBX](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/FBX%20Viewer.html) / [3DM](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/3DM%20Viewer.html) / [DAE](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/DAE%20Viewer.html) / [GLTF](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/GLTF%20Viewer.html) / [MMD](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/MMD%20Viewer.html) / [TGA](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/TGA%20Viewer.html)
 
 b) OR with the `Flask` server support:
 
@@ -90,7 +90,7 @@ b) OR with the `Flask` server support:
  - Use the command prompt to navigate to the `app` folder and run the following command: `python -m app` or `python3 -m app`
  - The server will show you the IP address and the port, generally accessible in the Internet browser via `localhost:5000`.
 
-Note: Opening any of the Three.js viewers `HTML` files directly from your hard drive in the browser will probably have some limitations due to the CORS restrictions that your browser might have enabled. This is why the `Flask` server should be used.
+Note: Opening any of the three.js viewers `HTML` files directly from your hard drive in the browser will probably have some limitations due to the CORS restrictions that your browser might have enabled. This is why the `Flask` server should be used.
 
 Optionally use VS Code for editing, troubleshooting and running the app, which should be far easier than using the command prompt.
 
