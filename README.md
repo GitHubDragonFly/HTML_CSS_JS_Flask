@@ -8,7 +8,7 @@ There are several Three.js viewers, not necessarily perfect but functional as th
 The main differences between these 2 projects:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
  - uploading any pictures via the `Form` will then have those saved in the new `uploads` folder
- - new additions are Three.js FBX, VRML and MMD (Miku Miku Dance) viewers and a TGA texture viewer
+ - new additions are three.js FBX, 3DM (rhino), VRML and MMD (Miku Miku Dance) viewers and a TGA texture viewer
  - almost all Three.js viewers in this project support `URL loading`, use `Orbit Controls`, have a `grid / polar grid` buttons and a `gizmo` present
  - DRACO and KTX2 support were added to the GLTF Viewer:
    - this seems to work fine when using URL option (see the screenshot) so try using it for fetching files both locally from the server and from the Internet
@@ -23,6 +23,7 @@ Additional Notes:
    - if using a server then try the following link via the URL option:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/vrml/house.wrl`
  - FBX viewer appears to be fully functional in the online preview, see the `Usage` section for the link
+ - 3DM viewer appears to be fully functional in the online preview, see the `Usage` section for the link
  - MMD viewer supports animation, changing pose, extras and audio:
    - appears to be fully functional in online preview, see the `Usage` section for the link (`ammo.wasm.wasm` file needed to be added to the `templates` folder so the loading of local files would work - whatever the reason behind this is)
    - tested with three.js examples and has audio delayTime set for those (with current value of 3.5)
@@ -76,7 +77,7 @@ a) Even though this is all intended to be used with the `Flask` server, thanks t
  - VRML viewer is module based, requires a server and will not be functional in the preview (check the module "import" console error)
  - The Form entries are set to be handled by the server and will not work in the preview
 
-And just for the convenience, you can access the viewers directly here: [OBJ](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/OBJ%20Viewer.html) / [PLY + STL](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/PLY%20Viewer.html) / [FBX](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/FBX%20Viewer.html) / [DAE](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/DAE%20Viewer.html) / [GLTF](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/GLTF%20Viewer.html) / [MMD](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/MMD%20Viewer.html) / [TGA](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/TGA%20Viewer.html)
+And just for the convenience, you can access the viewers directly here: [OBJ](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/OBJ%20Viewer.html) / [PLY + STL](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/PLY%20Viewer.html) / [FBX](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/FBX%20Viewer.html) / [3DM](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/3DM%20Viewer.html) / [DAE](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/DAE%20Viewer.html) / [GLTF](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/GLTF%20Viewer.html) / [MMD](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/MMD%20Viewer.html) / [TGA](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/TGA%20Viewer.html)
 
 b) OR with the `Flask` server support:
 
