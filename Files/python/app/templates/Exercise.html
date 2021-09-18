@@ -281,6 +281,7 @@
         .then(function(devices) {
           let i = 0;
           let j = 0;
+
           devices.forEach(function(device) {
             if (device.kind == "videoinput") {
               video_input_id.push(device.deviceId);
@@ -323,14 +324,19 @@
       <a href="#P10">Rotation</a>
       <a href="#P11">Video</a>
       <a href="#P12">JS + JQuery</a>
-      <a href="TGA Viewer.html" target="_blank">TGA</a>
-      <a href="OBJ Viewer.html" target="_blank">OBJ</a>
-      <a href="PLY Viewer.html" target="_blank">PLY/STL</a>
-      <a href="DAE Viewer.html" target="_blank">DAE</a>
-      <a href="FBX Viewer.html" target="_blank">FBX</a>
-      <a href="GLTF Viewer.html" target="_blank">GLTF</a>
-      <a href="MMD Viewer.html" target="_blank">MMD</a>
-      <a href="VRML Viewer.html" target="_blank">VRML</a>
+      <button class="dropdown" style="color: blue; width: 120px; border: none;">3D Model Viewers
+        <div class="dropdown-content" style="margin-top: 1px; transform: translateX(-10px);">
+          <a href="3DM Viewer.html" target="_blank">3DM Viewer</a>
+          <a href="DAE Viewer.html" target="_blank">DAE Viewer</a>
+          <a href="FBX Viewer.html" target="_blank">FBX Viewer</a>
+          <a href="OBJ Viewer.html" target="_blank">OBJ Viewer</a>
+          <a href="TGA Viewer.html" target="_blank">TGA Viewer</a>
+          <a href="MMD Viewer.html" target="_blank">MMD Viewer</a>
+          <a href="GLTF Viewer.html" target="_blank">GLTF Viewer</a>
+          <a href="VRML Viewer.html" target="_blank">VRML Viewer</a>
+          <a href="PLY Viewer.html" target="_blank">PLY/STL Viewer</a>
+        </div>
+      </button>
     </p>
 
     <br id="P1" /><br /><br />
