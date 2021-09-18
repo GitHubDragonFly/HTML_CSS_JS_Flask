@@ -58,6 +58,15 @@
         height: 15px;
       }
 
+      p.polar {
+        text-align: center;
+        content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAv0lEQVRIic2V6wqFIBCEe3PfWhDEjYIDtc7s5VjQDwkvO9/uaLqJyPZmCy0qpQhqywBPKAK6d85uLJCBfhq0Ar0gYxGKnYT0Qs+iqziEZgMQRCfUe5cJcEzUWoUF0k0EidwSRYO6EkvcjbcmtZB1WlgVIYAWZFUhnRDgn7FvAV63aHmTLcgjx5Rl8OiPhjLPXhWttSkGAnTp7MQgK02AlXnkNTOv6zHGWerxRZl4NoUfHMuG7LwLYPZkntQQYKXtSAJKMrYucd0AAAAASUVORK5CYII=);
+        margin: 1px 1px 1px 2px;
+        padding: 0;
+        width: 15px;
+        height: 15px;
+      }
+
       .fm { color: navy; width: 99%; border: 1px solid navy; -webkit-border-radius: 2px; border-radius: 2px; padding: 4px; margin: 1px; }
       #gui_position { position: absolute; margin-top: 84px; border: 1px solid navy; -webkit-border-radius: 2px; border-radius: 2px; padding-top: 10px; padding-bottom: 10px; }
 
@@ -119,6 +128,8 @@
         <label for="back_color" style="margin: 2px 0 2px 0;">BG:</label>
         <input type="color" id="back_color" name="back_color" onchange="set_back_color()" style="vertical-align: middle; background: none; padding: 0; width: 23px; margin: 0 5px 0 0;" disabled />
         <label style="margin: 2px 2px 2px 0;">Wireframe<input type="checkbox" id="wireframe" name="wireframe" onchange="show_wireframe()" disabled /></label>
+        <button id="btn_grid" onclick="show_grid()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 5px; padding: 0;" disabled>#</button>
+        <button id="btn_polar_grid" onclick="show_polar_grid()" style="font-size: 18px; background-color: #d1cefc; vertical-align: middle; width: 24px; margin: 2px 2px 2px 5px; padding: 0;" disabled><p class="polar"></p></button>
       </div>
     </div><br />
 
@@ -175,8 +186,8 @@
     </script>
 
     <script>
-      var renderer, scene, camera, rhino_obj, render_requested;
-      var controls, gui, gizmo, edges, edges_visible;
+      var renderer, scene, camera, rhino_obj, render_requested, edges, edges_visible;
+      var controls, gui, gizmo, grid, polar_grid, grid_visible, polar_grid_visible;
       var ambientLight, hemisphereLight, directionalLight;
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation, reset_rotation, events_initialized;
@@ -310,6 +321,8 @@
         }
 
         previous_rhino_scale = current_rhino_scale;
+        set_polar_grid_z();
+        set_grid_z();
       }
 
       function scale_10x_set() {
@@ -318,6 +331,9 @@
         } else {
           rhino_obj.scale.multiplyScalar( 0.1 );
         }
+
+        set_polar_grid_z();
+        set_grid_z();
       }
 
       function radio_changed() {
@@ -406,7 +422,11 @@
         texture = null;
         edges = {};
         edges_visible = false;
+        grid_visible = false;
+        polar_grid_visible = false;
         render_requested = false;
+        document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
+        document.getElementById('btn_polar_grid').style.backgroundColor = '#d1cefc';
 
         if (!url_loading) {
           // Loaded file
@@ -449,6 +469,10 @@
         if (rhino_obj == undefined) { rhino_obj = new THREE.Object3D(); }
 
         if (!events_initialized) { initialize_event_listeners(); events_initialized = true; }
+
+        // Create a grid helper for use with Orbit Controls
+        if (polar_grid == undefined) { polar_grid = new THREE.PolarGridHelper( 40, 10 ); polar_grid.geometry.rotateX( Math.PI / 2 ); }
+        if (grid == undefined) { grid = new THREE.GridHelper( 200, 200, "yellow" ); grid.geometry.rotateX( Math.PI / 2 ); }
 
         camera = new THREE.PerspectiveCamera( 45, ww/wh, 0.1, 1500 );
         camera.position.set( 0, 0, 250 );
@@ -705,6 +729,46 @@
       	renderer.render( scene, camera );
       }
 
+      function show_polar_grid() {
+        if (polar_grid_visible) {
+          scene.remove( polar_grid );
+          polar_grid_visible = false;
+          document.getElementById('btn_polar_grid').style.backgroundColor = '#d1cefc';
+          document.getElementById('btn_grid').disabled = false;
+        } else {
+          set_polar_grid_z();
+          scene.add( polar_grid );
+          polar_grid_visible = true;
+          document.getElementById('btn_polar_grid').style.backgroundColor = 'lightgreen';
+          document.getElementById('btn_grid').disabled = true;
+        }
+      }
+
+      function show_grid() {
+        if (grid_visible) {
+          scene.remove( grid );
+          grid_visible = false;
+          document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
+          document.getElementById('btn_polar_grid').disabled = false;
+        } else {
+          set_grid_z();
+          scene.add( grid );
+          grid_visible = true;
+          document.getElementById('btn_grid').style.backgroundColor = 'lightgreen';
+          document.getElementById('btn_polar_grid').disabled = true;
+        }
+      }
+
+      function set_polar_grid_z() {
+        bounding_box.setFromObject( rhino_obj );
+        polar_grid.position.z = bounding_box.min.z;
+      }
+
+      function set_grid_z() {
+        bounding_box.setFromObject( rhino_obj );
+        grid.position.z = bounding_box.min.z;
+      }
+
       function show_edges() {
         if (edges_visible) {
           edges_visible = false;
@@ -849,6 +913,8 @@
         document.getElementById('directional_light_intensity').disabled = disable;
         document.getElementById('back_color').disabled = disable;
         document.getElementById('btn_edges').disabled = disable;
+        document.getElementById('btn_polar_grid').disabled = disable;
+        document.getElementById('btn_grid').disabled = disable;
         document.getElementById('reset').disabled = disable;
       }
     </script>
