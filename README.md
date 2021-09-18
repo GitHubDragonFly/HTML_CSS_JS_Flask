@@ -23,6 +23,8 @@ Additional Notes:
    - if using a server then try the following link via the URL option:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/vrml/house.wrl`
  - FBX viewer appears to be fully functional in the online preview, see the `Usage` section for the link
+   - try the following link via the URL option or see a possible `cloth.fbx` experiment further below:
+   - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/fbx/Samba Dancing.fbx`
  - 3DM viewer appears to be fully functional in the online preview, see the `Usage` section for the link
    - it also includes dat.GUI controls to show layers
    - you could try the following example via the viewer's URL option:
