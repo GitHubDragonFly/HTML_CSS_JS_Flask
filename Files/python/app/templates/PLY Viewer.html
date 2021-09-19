@@ -790,8 +790,11 @@
         if (selected_url_file != '') {
           // Launch loading of the selected file, addFileInScene is the callback when it's ready
           if (selected_url_file.toUpperCase().endsWith('.PLY')) {
+            document.getElementById('btn_flat').disabled = false;
             ply_loader.load( selected_url_file, addURLFileInScene );
           } else if (selected_url_file.toUpperCase().endsWith('.STL')) {
+            document.getElementById('btn_flat').disabled = true;
+            document.getElementById('btn_flat').style.backgroundColor = '#d1cefc';
             stl_loader.load( selected_url_file, addURLFileInScene );
           }
         }
@@ -1044,7 +1047,7 @@
         // Reset the view
         if (reset) {
           controls.reset();
-          mesh.position.set( 0, 0, 0 );
+          if (mesh) mesh.position.set( 0, 0, 0 );
           hemisphereLight.position.set( 0, 10, 0 );
           spotLight.position.set( 150, -50, 350 );
           directionalLight.position.set( 0, 0, 250 );

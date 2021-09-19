@@ -2199,7 +2199,7 @@
         // Reset the view
         if (reset) {
           controls.reset();
-          mmd_obj.position.set( 0, 0, 0 );
+          if (mmd_obj) mmd_obj.position.set( 0, 0, 0 );
           hemisphereLight.position.set( 0, 10, 0 );
           spotLight.position.set( 150, 0, 350 );
           directionalLight.position.set( 0, 0, 250 );

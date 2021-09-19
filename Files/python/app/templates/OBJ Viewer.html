@@ -1255,7 +1255,7 @@
         // Reset the view
         if (reset) {
           controls.reset();
-          Obj.position.set( 0, 0, 0 );
+          if (Obj) Obj.position.set( 0, 0, 0 );
           hemisphereLight.position.set( 0, 10, 0 );
           spotLight.position.set( 150, -50, 350 );
           directionalLight.position.set( 0, 0, 250 );

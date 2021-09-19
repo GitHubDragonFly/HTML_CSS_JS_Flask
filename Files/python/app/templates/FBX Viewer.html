@@ -1151,7 +1151,7 @@
         // Reset the view
         if (reset) {
           controls.reset();
-          fbx_obj.position.set( 0, 0, 0 );
+          if (fbx_obj) fbx_obj.position.set( 0, 0, 0 );
           hemisphereLight.position.set( 0, 10, 0 );
           spotLight.position.set( 150, 0, 350 );
           directionalLight.position.set( 0, 0, 250 );

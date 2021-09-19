@@ -1035,7 +1035,7 @@
         // Reset the view
         if (reset) {
           controls.reset();
-          dae_obj.position.set( 0, 0, 0 );
+          if (dae_obj) dae_obj.position.set( 0, 0, 0 );
           hemisphereLight.position.set( 0, 10, 0 );
           spotLight.position.set( 150, 0, 350 );
           directionalLight.position.set( 0, 0, 250 );
