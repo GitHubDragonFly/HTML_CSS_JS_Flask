@@ -94,6 +94,8 @@
         <input type="file" id="file_input" name="file" onchange="init()" style="margin: 2px 5px 2px 0;" multiple />
         <label for="file_image_input" style="color: #CE8704; margin: 2px 2px 2px 0;">BG Image:</label>
         <input type="file" id="file_image_input" name="file_image_input" accept="image/png, image/jpeg, image/bmp, image/gif, image/svg+xml" onchange="set_scene_image()" style="margin: 2px 5px 2px 0;" disabled />
+        <label for="rhino_opacity" style="margin: 2px 2px 2px 0;">Opacity:</label>
+        <input type="number" id="rhino_opacity" name="rhino_opacity" min="0" max="1" step="0.05" value="1" onkeydown="return false" onchange="set_rhino_opacity()" style="width: 48px; margin: 2px 5px 2px 0;" disabled />
         <label for="rhino_scale" style="margin: 2px 2px 2px 0;">Scale:</label>
         <input type="number" id="rhino_scale" name="rhino_scale" onkeydown="return false" oninput="set_rhino_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 5px 2px 0; width: 48px;" disabled />
         <label style="margin: 2px 10px 2px 0;"><input type="checkbox" id="scale_10x" onchange="scale_10x_set();" disabled />10x</label>
@@ -211,6 +213,25 @@
         scene.background = null;
         document.getElementById('file_image_input').value = "";
         document.body.style.backgroundColor = document.getElementById('back_color').value;
+      }
+
+      function set_rhino_opacity() {
+        if (rhino_obj) {
+          let opacity_value = document.getElementById('rhino_opacity').value;
+
+          rhino_obj.traverse( function( child ) {
+            // This allow us to check if the children is an instance of the Mesh constructor
+          	if (child instanceof THREE.Mesh) {
+              if (Array.isArray( child.material )) {
+                child.material.forEach( mtl => {
+                  mtl.opacity = opacity_value;
+                });
+              } else {
+                child.material.opacity = opacity_value;
+              }
+    		    }
+          });
+        }
       }
 
       function set_scene_image() {
@@ -544,9 +565,14 @@
 
         rhino_obj.children.forEach( element => {
           element.traverse( function( child ) {
-            if (child.type == 'Group') {
+            if (child.type == 'Group' || child instanceof THREE.Group) {
               child.traverse( function( childX ) {
-                if (childX.type == 'Mesh') {
+                if (childX.type == 'Mesh' || childX instanceof THREE.Mesh) {
+                  childX.castShadow = true;
+                  childX.material.opacity = 1;
+                  childX.material.transparent = true;
+                  childX.material.skinning = true;
+
                   if (texture_files_jpg.length > 0) {
                     texture = texture_loader.load( URL.createObjectURL( texture_files_jpg[0] ));
                     URL.revokeObjectURL( texture_files_jpg[0] );
@@ -567,7 +593,6 @@
                     texture.wrapT = THREE.RepeatWrapping;
                     texture.magFilter = THREE.NearestFilter;
 
-                    childX.castShadow = true;
                     childX.material.map = texture;
                     childX.material.needsUpdate = true;
                   }
@@ -578,7 +603,12 @@
                 }
               });
             } else {
-              if (child.type == 'Mesh') {
+              if (child.type == 'Mesh' || child instanceof THREE.Mesh) {
+                child.castShadow = true;
+                child.material.opacity = 1;
+                child.material.transparent = true;
+                child.material.skinning = true;
+
                 if (texture_files_jpg.length > 0) {
                   texture = texture_loader.load( URL.createObjectURL( texture_files_jpg[0] ));
                   URL.revokeObjectURL( texture_files_jpg[0] );
@@ -599,7 +629,6 @@
                   texture.wrapT = THREE.RepeatWrapping;
                   texture.magFilter = THREE.NearestFilter;
 
-                  child.castShadow = true;
                   child.material.map = texture;
                   child.material.needsUpdate = true;
                 }
@@ -631,18 +660,26 @@
 
               rhino_obj.children.forEach( element => {
                 element.traverse( function( child ) {
-                  if (child.type == 'Group') {
+                  if (child.type == 'Group' || child instanceof THREE.Group) {
                     child.traverse( function( childX ) {
-                      if (childX.type == 'Mesh') {
+                      if (childX.type == 'Mesh' || childX instanceof THREE.Mesh) {
                         childX.castShadow = true;
+                        childX.material.opacity = 1;
+                        childX.material.transparent = true;
+                        childX.material.skinning = true;
+
                         childX.name = 'child_' + child_count;
                         edges[ childX.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( childX.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
                         child_count += 1;
                       }
                     });
                   } else {
-                    if (child.type == 'Mesh') {
+                    if (child.type == 'Mesh' || child instanceof THREE.Mesh) {
                       child.castShadow = true;
+                      child.material.opacity = 1;
+                      child.material.transparent = true;
+                      child.material.skinning = true;
+
                       child.name = 'child_' + child_count;
                       edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
                       child_count += 1;
@@ -780,9 +817,9 @@
 
         rhino_obj.children.forEach( element => {
           element.traverse( function( child ) {
-            if (child.type == 'Group') {
+            if (child.type == 'Group' || child instanceof THREE.Group) {
               child.traverse( function( childX ) {
-                if (childX.type == 'Mesh') {
+                if (childX.type == 'Mesh' || childX instanceof THREE.Mesh) {
                   if (edges_visible) {
                     childX.add( edges[ childX.name ] );
                   } else {
@@ -791,7 +828,7 @@
     		        }
     	        });
             } else {
-              if (child.type == 'Mesh') {
+              if (child.type == 'Mesh' || child instanceof THREE.Mesh) {
                 if (edges_visible) {
                   child.add( edges[ child.name ] );
                 } else {
@@ -806,14 +843,14 @@
       function show_wireframe() {
         rhino_obj.children.forEach( element => {
           element.traverse( function( child ) {
-            if (child.type == 'Group') {
+            if (child.type == 'Group' || child instanceof THREE.Group) {
               child.traverse( function( childX ) {
-                if (childX.type == 'Mesh') {
+                if (childX.type == 'Mesh' || childX instanceof THREE.Mesh) {
                   childX.material.wireframe = document.getElementById('wireframe').checked;
     		        }
     	        });
             } else {
-              if (child.type == 'Mesh') {
+              if (child.type == 'Mesh' || child instanceof THREE.Mesh) {
                 child.material.wireframe = document.getElementById('wireframe').checked;
     	  	    }
             }
@@ -859,11 +896,12 @@
         document.getElementById('hlight').checked = false;
         radio_changed();
 
-        // Reset edges and rhino_obj scale values
+        // Reset opacity, edges and rhino_obj scale values
+        document.getElementById('rhino_opacity').value = 1;
         edges_visible = false;
         document.getElementById('btn_edges').style.backgroundColor = '#d1cefc';
-        document.getElementById('rhino_scale').value = 1;
         previous_rhino_scale = '1';
+        document.getElementById('rhino_scale').value = 1;
 
         // Reset the wireframe and scale_10x checkboxes
         document.getElementById('wireframe').checked = false;
@@ -907,6 +945,7 @@
         document.getElementById('wireframe').disabled = disable;
         document.getElementById('scale_10x').disabled = disable;
         document.getElementById('rhino_scale').disabled = disable;
+        document.getElementById('rhino_opacity').disabled = disable;
         document.getElementById('ambient_light_color').disabled = disable;
         document.getElementById('hemisphere_light_color').disabled = disable;
         document.getElementById('directional_light_color').disabled = disable;
