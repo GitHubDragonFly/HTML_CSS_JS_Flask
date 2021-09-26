@@ -89,7 +89,7 @@
     <!-- OrbitControlsGizmo from: https://github.com/Fennec-hub/ThreeOrbitControlsGizmo -->
     <!-- OBJ Examples from: https://github.com/mrdoob/three.js -->
     <!-- Also see: https://davidoreilly.itch.io/walt-disney-3d-head , http://www.davidoreilly.com/ -->
-    <!-- More OBJ examples: https://people.math.sc.edu/Burkardt/data/data.html -->
+    <!-- More OBJ examples: https://people.math.sc.edu/Burkardt/data/data.html , http://casual-effects.com/data/index.html-->
     <title>OBJ Viewer</title>
   </head>
   <body onload="reset_all()" onresize="resize()">
@@ -462,9 +462,12 @@
 
       function init(){
         if (scene) {
-          if (Obj.material) Obj.material.dispose();
-  				if (Obj.material && Obj.material.map) Obj.material.map.dispose();
-	  			if (Obj.geometry) Obj.geometry.dispose();
+          if (Obj) {
+            if (Obj.material) Obj.material.dispose();
+    				if (Obj.material && Obj.material.map) Obj.material.map.dispose();
+	    			if (Obj.geometry) Obj.geometry.dispose();
+          }
+
           if (gizmo) { gizmo.dispose(); }
 
           scene.remove.apply( scene, scene.children );
@@ -1179,22 +1182,24 @@
             if (Math.abs(Obj.rotation.y) > 2 * Math.PI ) { Obj.rotation.y = 0; }
             if (Math.abs(Obj.rotation.z) > 2 * Math.PI ) { Obj.rotation.z = 0; }
           }
+
+          controls.update();
+          if (gizmo) { gizmo.update(); }
+
+          renderer.clear();
+        	renderer.render( scene, camera );
         }
-
-        controls.update();
-        if (gizmo) { gizmo.update(); }
-
-        renderer.clear();
-      	renderer.render( scene, camera );
       }
 
       function reset_only() {
         if (polar_grid_visible) {show_polar_grid(); }
         if (grid_visible) { show_grid(); }
 
-        if (Obj.material) Obj.material.dispose();
-				if (Obj.material && Obj.material.map) Obj.material.map.dispose();
-				if (Obj.geometry) Obj.geometry.dispose();
+        if (Obj) {
+          if (Obj.material) Obj.material.dispose();
+  				if (Obj.material && Obj.material.map) Obj.material.map.dispose();
+	  			if (Obj.geometry) Obj.geometry.dispose();
+        }
 
         scene.remove( Obj );
 

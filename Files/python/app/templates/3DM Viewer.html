@@ -421,9 +421,13 @@
 
       function init(){
         if (scene) {
-          if (rhino_obj.material) rhino_obj.material.dispose();
-					if (rhino_obj.material && rhino_obj.material.map) rhino_obj.material.map.dispose();
-					if (rhino_obj.geometry) rhino_obj.geometry.dispose();
+          if (rhino_obj) {
+            if (flatShading_enabled) { set_flat(); }
+            if (rhino_obj.material) rhino_obj.material.dispose();
+  					if (rhino_obj.material && rhino_obj.material.map) rhino_obj.material.map.dispose();
+	  				if (rhino_obj.geometry) rhino_obj.geometry.dispose();
+          }
+
           if (gizmo) { gizmo.dispose(); }
           if (texture) texture.dispose();
           if (gui) { gui.destroy(); gui = null; }
@@ -547,34 +551,67 @@
           render();
 
           // Load 3DM file
-          loadFile();
+          if (selected_rhino_file) {
+            loadFile();
+          } else {
+            loadURLFile();
+          }
         }
       }
 
       function loadFile(){
-        if (selected_rhino_file) {
-          rhino_loader.load( URL.createObjectURL( selected_rhino_file ), addFileInScene );
-        } else {
-          loadURLFile();
-        }
-      }
+        rhino_loader.load( URL.createObjectURL( selected_rhino_file ), function( object ) {
+          URL.revokeObjectURL( selected_rhino_file );
 
-      function addFileInScene( object ){
-        URL.revokeObjectURL( selected_rhino_file );
+          rhino_obj = object.clone();
 
-        rhino_obj = object.clone();
+          let child_count = 1;
 
-        let child_count = 1;
+          rhino_obj.children.forEach( element => {
+            element.traverse( function( child ) {
+              if (child.type == 'Group' || child instanceof THREE.Group) {
+                child.traverse( function( childX ) {
+                  if (childX.type == 'Mesh' || childX instanceof THREE.Mesh) {
+                    childX.castShadow = true;
+                    childX.material.opacity = 1;
+                    childX.material.transparent = true;
+                    childX.material.skinning = true;
 
-        rhino_obj.children.forEach( element => {
-          element.traverse( function( child ) {
-            if (child.type == 'Group' || child instanceof THREE.Group) {
-              child.traverse( function( childX ) {
-                if (childX.type == 'Mesh' || childX instanceof THREE.Mesh) {
-                  childX.castShadow = true;
-                  childX.material.opacity = 1;
-                  childX.material.transparent = true;
-                  childX.material.skinning = true;
+                    if (texture_files_jpg.length > 0) {
+                      texture = texture_loader.load( URL.createObjectURL( texture_files_jpg[0] ));
+                      URL.revokeObjectURL( texture_files_jpg[0] );
+                    } else if (texture_files_png.length > 0) {
+                      texture = texture_loader.load( URL.createObjectURL( texture_files_png[0] ));
+                      URL.revokeObjectURL( texture_files_png[0] );
+                    } else if (texture_files_bmp.length > 0) {
+                      texture = texture_loader.load( URL.createObjectURL( texture_files_bmp[0] ));
+                      URL.revokeObjectURL( texture_files_bmp[0] );
+                    } else if (texture_files_gif.length > 0) {
+                      texture = texture_loader.load( URL.createObjectURL( texture_files_gif[0] ));
+                      URL.revokeObjectURL( texture_files_gif[0] );
+          	        }
+
+                    if (texture) {
+                      texture.encoding = THREE.sRGBEncoding;
+                      texture.wrapS = THREE.RepeatWrapping;
+                      texture.wrapT = THREE.RepeatWrapping;
+                      texture.magFilter = THREE.NearestFilter;
+
+                      childX.material.map = texture;
+                      childX.material.needsUpdate = true;
+                    }
+
+                    childX.name = 'child_' + child_count;
+                    edges[ childX.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( childX.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+                    child_count += 1;
+                  }
+                });
+              } else {
+                if (child.type == 'Mesh' || child instanceof THREE.Mesh) {
+                  child.castShadow = true;
+                  child.material.opacity = 1;
+                  child.material.transparent = true;
+                  child.material.skinning = true;
 
                   if (texture_files_jpg.length > 0) {
                     texture = texture_loader.load( URL.createObjectURL( texture_files_jpg[0] ));
@@ -588,7 +625,7 @@
                   } else if (texture_files_gif.length > 0) {
                     texture = texture_loader.load( URL.createObjectURL( texture_files_gif[0] ));
                     URL.revokeObjectURL( texture_files_gif[0] );
-        	        }
+                  }
 
                   if (texture) {
                     texture.encoding = THREE.sRGBEncoding;
@@ -596,61 +633,40 @@
                     texture.wrapT = THREE.RepeatWrapping;
                     texture.magFilter = THREE.NearestFilter;
 
-                    childX.material.map = texture;
-                    childX.material.needsUpdate = true;
+                    child.material.map = texture;
+                    child.material.needsUpdate = true;
                   }
 
-                  childX.name = 'child_' + child_count;
-                  edges[ childX.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( childX.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+                  child.name = 'child_' + child_count;
+                  edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
                   child_count += 1;
                 }
-              });
-            } else {
-              if (child.type == 'Mesh' || child instanceof THREE.Mesh) {
-                child.castShadow = true;
-                child.material.opacity = 1;
-                child.material.transparent = true;
-                child.material.skinning = true;
-
-                if (texture_files_jpg.length > 0) {
-                  texture = texture_loader.load( URL.createObjectURL( texture_files_jpg[0] ));
-                  URL.revokeObjectURL( texture_files_jpg[0] );
-                } else if (texture_files_png.length > 0) {
-                  texture = texture_loader.load( URL.createObjectURL( texture_files_png[0] ));
-                  URL.revokeObjectURL( texture_files_png[0] );
-                } else if (texture_files_bmp.length > 0) {
-                  texture = texture_loader.load( URL.createObjectURL( texture_files_bmp[0] ));
-                  URL.revokeObjectURL( texture_files_bmp[0] );
-                } else if (texture_files_gif.length > 0) {
-                  texture = texture_loader.load( URL.createObjectURL( texture_files_gif[0] ));
-                  URL.revokeObjectURL( texture_files_gif[0] );
-                }
-
-                if (texture) {
-                  texture.encoding = THREE.sRGBEncoding;
-                  texture.wrapS = THREE.RepeatWrapping;
-                  texture.wrapT = THREE.RepeatWrapping;
-                  texture.magFilter = THREE.NearestFilter;
-
-                  child.material.map = texture;
-                  child.material.needsUpdate = true;
-                }
-
-                child.name = 'child_' + child_count;
-                edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
-                child_count += 1;
               }
-            }
-    	    });
+    	      });
+          });
+
+          set_initial_scale();
+          resize();
+
+          // Add rhino_obj to the scene
+          scene.add( rhino_obj );
+          camera.lookAt( rhino_obj.position );
+          if (rhino_obj.userData.layers.length > 1) { start_gui(); }
+        }, function ( xhr ) {
+          let today = new Date();
+          let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+          if (xhr.loaded == 0 && xhr.total == 0) {
+            console.log( '3DM 0% loaded - ' + time );
+          } else {
+            console.log( '3DM ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+          }
+        }, function ( error ) {
+          console.log( 'Error loading 3DM!' );
+          console.log( error );
+          render_requested = false;
+          URL.revokeObjectURL( selected_rhino_file );
         });
-
-        set_initial_scale();
-        resize();
-
-        // Add rhino_obj to the scene
-        scene.add( rhino_obj );
-        camera.lookAt( rhino_obj.position );
-        start_gui();
       }
 
       function loadURLFile() {
@@ -697,7 +713,20 @@
               // Add rhino_obj to the scene
               scene.add( rhino_obj );
               camera.lookAt( rhino_obj.position );
-              start_gui();
+              if (rhino_obj.userData.layers.length > 1) { start_gui(); }
+            }, function ( xhr ) {
+              let today = new Date();
+              let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+              if (xhr.loaded == 0 && xhr.total == 0) {
+                console.log( 'URL 3DM 0% loaded - ' + time );
+              } else {
+                console.log( 'URL 3DM ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              }
+            }, function ( error ) {
+              console.log( 'Error loading URL 3DM!' );
+              console.log( error );
+              render_requested = false;
             });
           }
         }
@@ -890,18 +919,29 @@
       }
 
       function reset_only() {
+        if (polar_grid_visible) {show_polar_grid(); }
+        if (grid_visible) { show_grid(); }
+
         if (texture) texture.dispose();
 
-        if (rhino_obj.material) rhino_obj.material.dispose();
-				if (rhino_obj.material && rhino_obj.material.map) rhino_obj.material.map.dispose();
-				if (rhino_obj.geometry) rhino_obj.geometry.dispose();
-        if (gui) { gui.destroy(); }
+        if (rhino_obj) {
+          if (flatShading_enabled) { set_flat(); }
+          if (rhino_obj.material) rhino_obj.material.dispose();
+  				if (rhino_obj.material && rhino_obj.material.map) rhino_obj.material.map.dispose();
+	  			if (rhino_obj.geometry) rhino_obj.geometry.dispose();
+        }
+
+        if (gui) { gui.destroy(); gui = null; }
 
         scene.remove( rhino_obj );
 
         reset_all( true );
 
-        loadFile();
+        if (selected_rhino_file) {
+          loadFile();
+        } else {
+          loadURLFile();
+        }
       }
 
       function reset_all( reset = false ) {
@@ -928,6 +968,7 @@
         radio_changed();
 
         // Reset flat, opacity, edges and rhino_obj scale values
+        flatShading_enabled = false;
         document.getElementById('btn_flat').style.backgroundColor = '#d1cefc';
         document.getElementById('rhino_opacity').value = 1;
         edges_visible = false;
