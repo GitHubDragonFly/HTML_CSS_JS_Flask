@@ -100,6 +100,7 @@
         <input type="number" id="rhino_scale" name="rhino_scale" onkeydown="return false" oninput="set_rhino_scale()" min="0.25" max="2" value="1" step="0.25" style="margin: 2px 5px 2px 0; width: 48px;" disabled />
         <label style="margin: 2px 10px 2px 0;"><input type="checkbox" id="scale_10x" onchange="scale_10x_set();" disabled />10x</label>
         <button id="btn_edges" onclick="show_edges()" style="background-color: #d1cefc; vertical-align: middle; width: 20px; margin: 2px 2px 2px 2px; padding: 0;" disabled>E</button>
+        <button id="btn_flat" onclick="set_flat()" style="background-color: #d1cefc; vertical-align: middle; width: 20px; margin: 2px 2px 2px 2px; padding: 0;" disabled>F</button>
         <button id="reset" onclick="reset_only()" style="vertical-align: middle; color: maroon; width: 55px; margin: 2px 5px 2px 10px;" disabled>Reset</button>
         <button id="btn_full_screen" onclick="full_screen()" style="background-color: #d1cefc; vertical-align: middle; width: 22px; margin: 2px 2px 2px 2px; padding: 0;"><p class="full_screen"></p></button>
       </div>
@@ -192,7 +193,7 @@
       var controls, gui, gizmo, grid, polar_grid, grid_visible, polar_grid_visible;
       var ambientLight, hemisphereLight, directionalLight;
       var ww = window.innerWidth,	wh = window.innerHeight;
-      var mouse_rotation, reset_rotation, events_initialized;
+      var mouse_rotation, reset_rotation, events_initialized, flatShading_enabled;
       var rot_x = 0, rot_y = 0, rot_z = 0;
       var previous_rhino_scale = '1', bounding_box = new THREE.Box3();
       var selected_rhino_file, selected_url_file = '', url_displayed, url_loading;
@@ -425,7 +426,7 @@
 					if (rhino_obj.geometry) rhino_obj.geometry.dispose();
           if (gizmo) { gizmo.dispose(); }
           if (texture) texture.dispose();
-          if (gui) { gui.destroy(); }
+          if (gui) { gui.destroy(); gui = null; }
 
           scene.remove.apply( scene, scene.children );
 
@@ -446,6 +447,8 @@
         grid_visible = false;
         polar_grid_visible = false;
         render_requested = false;
+        flatShading_enabled = false;
+        document.getElementById('btn_flat').style.backgroundColor = '#d1cefc';
         document.getElementById('btn_grid').style.backgroundColor = '#d1cefc';
         document.getElementById('btn_polar_grid').style.backgroundColor = '#d1cefc';
 
@@ -757,13 +760,13 @@
             if (Math.abs(rhino_obj.rotation.y) > 2 * Math.PI ) { rhino_obj.rotation.y = 0; }
             if (Math.abs(rhino_obj.rotation.z) > 2 * Math.PI ) { rhino_obj.rotation.z = 0; }
           }
+
+          controls.update();
+          if (gizmo) { gizmo.update(); }
+
+          renderer.clear();
+        	renderer.render( scene, camera );
         }
-
-        controls.update();
-        if (gizmo) { gizmo.update(); }
-
-        renderer.clear();
-      	renderer.render( scene, camera );
       }
 
       function show_polar_grid() {
@@ -840,6 +843,34 @@
         });
       }
 
+      function set_flat() {
+        if (flatShading_enabled) {
+          flatShading_enabled = false;
+          document.getElementById('btn_flat').style.backgroundColor = '#d1cefc';
+        } else {
+          flatShading_enabled = true;
+          document.getElementById('btn_flat').style.backgroundColor = 'lightgreen';
+        }
+
+        rhino_obj.children.forEach( element => {
+          element.traverse( function( child ) {
+            if (child.type == 'Group' || child instanceof THREE.Group) {
+              child.traverse( function( childX ) {
+                if (childX.type == 'Mesh' || childX instanceof THREE.Mesh) {
+                  childX.material.flatShading = flatShading_enabled;
+                  childX.material.needsUpdate = true;
+    		        }
+    	        });
+            } else {
+              if (child.type == 'Mesh' || child instanceof THREE.Mesh) {
+                child.material.flatShading = flatShading_enabled;
+                child.material.needsUpdate = true;
+    	  	    }
+            }
+          });
+        });
+      }
+
       function show_wireframe() {
         rhino_obj.children.forEach( element => {
           element.traverse( function( child ) {
@@ -896,7 +927,8 @@
         document.getElementById('hlight').checked = false;
         radio_changed();
 
-        // Reset opacity, edges and rhino_obj scale values
+        // Reset flat, opacity, edges and rhino_obj scale values
+        document.getElementById('btn_flat').style.backgroundColor = '#d1cefc';
         document.getElementById('rhino_opacity').value = 1;
         edges_visible = false;
         document.getElementById('btn_edges').style.backgroundColor = '#d1cefc';
@@ -952,6 +984,7 @@
         document.getElementById('directional_light_intensity').disabled = disable;
         document.getElementById('back_color').disabled = disable;
         document.getElementById('btn_edges').disabled = disable;
+        document.getElementById('btn_flat').disabled = disable;
         document.getElementById('btn_polar_grid').disabled = disable;
         document.getElementById('btn_grid').disabled = disable;
         document.getElementById('reset').disabled = disable;
