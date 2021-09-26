@@ -212,7 +212,7 @@
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation, reset_rotation, events_initialized;
       var rot_x = 0, rot_y = 0, rot_z = 0;
-      var previous_obj_scale = '1', bounding_box = new THREE.Box3();
+      var initial_opacity, previous_obj_scale = '1', bounding_box = new THREE.Box3();
       var selected_url_file = '', url_displayed, url_loading;
       var selected_mtl_file, selected_mtl_url_file, selected_obj_file, selected_obj_url_file;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_gif;
@@ -247,7 +247,7 @@
           Obj.traverse( function ( child ) {
             // This will allow us to check if the child is an instance of the Mesh constructor
     	      if (child instanceof THREE.Mesh) {
-              child.material.opacity = opacity_value;
+              child.material.opacity = initial_opacity[ child.name ] * opacity_value;
               if (document.getElementById('shadow').checked) {
                 shadowMaterial.opacity = opacity_value * document.getElementById('spot_light_intensity').value;
               }
@@ -494,6 +494,7 @@
         url_tga_loaded = false;
         edges = {};
         edges_visible = false;
+        initial_opacity = {};
         grid_visible = false;
         polar_grid_visible = false;
         render_requested = false;
@@ -743,12 +744,12 @@
                   // Enable transparency for the Opacity control and enable shadows
                   child.material.side = THREE.DoubleSide;
                   child.material.skinning = true;
-                  child.material.opacity = 1;
                   child.material.transparent = true;
                   child.castShadow = true;
                   child.receiveShadow = false;
 
                   child.name = 'child_' + child_count;
+                  initial_opacity[ child.name ] = child.material.opacity;
                   edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
                   child_count += 1;
     		        }
@@ -814,12 +815,12 @@
                 // Enable transparency for the Opacity control and enable shadows
                 child.material.side = THREE.DoubleSide;
                 child.material.skinning = true;
-                child.material.opacity = 1;
                 child.material.transparent = true;
                 child.castShadow = true;
                 child.receiveShadow = false;
 
                 child.name = 'child_' + child_count;
+                initial_opacity[ child.name ] = child.material.opacity;
                 edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
                 child_count += 1;
     		      }
@@ -910,12 +911,12 @@
                     if (child.material.map) { child.material.map.generateMipmaps = true; }
                     child.material.side = THREE.DoubleSide;
                     child.material.skinning = true;
-                    child.material.opacity = 1;
                     child.material.transparent = true;
                     child.castShadow = true;
                     child.receiveShadow = false;
 
                     child.name = 'child_' + child_count;
+                    initial_opacity[ child.name ] = child.material.opacity;
                     edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
                     child_count += 1;
     	    	      }
@@ -958,12 +959,12 @@
                   // Enable transparency for the Opacity control and enable shadows
                   child.material.side = THREE.DoubleSide;
                   child.material.skinning = true;
-                  child.material.opacity = 1;
                   child.material.transparent = true;
                   child.castShadow = true;
                   child.receiveShadow = false;
 
                   child.name = 'child_' + child_count;
+                  initial_opacity[ child.name ] = child.material.opacity;
                   edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
                   child_count += 1;
     	  	      }

@@ -195,7 +195,7 @@
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation, reset_rotation, events_initialized, flatShading_enabled;
       var rot_x = 0, rot_y = 0, rot_z = 0;
-      var previous_rhino_scale = '1', bounding_box = new THREE.Box3();
+      var initial_opacity, previous_rhino_scale = '1', bounding_box = new THREE.Box3();
       var selected_rhino_file, selected_url_file = '', url_displayed, url_loading;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_gif, texture;
 
@@ -220,17 +220,20 @@
         if (rhino_obj) {
           let opacity_value = document.getElementById('rhino_opacity').value;
 
-          rhino_obj.traverse( function( child ) {
-            // This allow us to check if the children is an instance of the Mesh constructor
-          	if (child instanceof THREE.Mesh) {
-              if (Array.isArray( child.material )) {
-                child.material.forEach( mtl => {
-                  mtl.opacity = opacity_value;
-                });
+          rhino_obj.children.forEach( element => {
+            element.traverse( function( child ) {
+              if (child.type == 'Group' || child instanceof THREE.Group) {
+                child.traverse( function( childX ) {
+                  if (childX.type == 'Mesh' || childX instanceof THREE.Mesh) {
+                    childX.material.opacity = initial_opacity[ childX.name ] * opacity_value;
+    		          }
+    	          });
               } else {
-                child.material.opacity = opacity_value;
+                if (child.type == 'Mesh' || child instanceof THREE.Mesh) {
+                  child.material.opacity = initial_opacity[ child.name ] * opacity_value;
+    	  	      }
               }
-    		    }
+            });
           });
         }
       }
@@ -447,6 +450,7 @@
         texture_files_gif = [];
         texture = null;
         edges = {};
+        initial_opacity = {};
         edges_visible = false;
         grid_visible = false;
         polar_grid_visible = false;
@@ -573,7 +577,6 @@
                 child.traverse( function( childX ) {
                   if (childX.type == 'Mesh' || childX instanceof THREE.Mesh) {
                     childX.castShadow = true;
-                    childX.material.opacity = 1;
                     childX.material.transparent = true;
                     childX.material.skinning = true;
 
@@ -602,6 +605,7 @@
                     }
 
                     childX.name = 'child_' + child_count;
+                    initial_opacity[ childX.name ] = childX.material.opacity;
                     edges[ childX.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( childX.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
                     child_count += 1;
                   }
@@ -609,7 +613,6 @@
               } else {
                 if (child.type == 'Mesh' || child instanceof THREE.Mesh) {
                   child.castShadow = true;
-                  child.material.opacity = 1;
                   child.material.transparent = true;
                   child.material.skinning = true;
 
@@ -638,6 +641,7 @@
                   }
 
                   child.name = 'child_' + child_count;
+                  initial_opacity[ child.name ] = child.material.opacity;
                   edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
                   child_count += 1;
                 }
@@ -683,11 +687,11 @@
                     child.traverse( function( childX ) {
                       if (childX.type == 'Mesh' || childX instanceof THREE.Mesh) {
                         childX.castShadow = true;
-                        childX.material.opacity = 1;
                         childX.material.transparent = true;
                         childX.material.skinning = true;
 
                         childX.name = 'child_' + child_count;
+                        initial_opacity[ childX.name ] = childX.material.opacity;
                         edges[ childX.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( childX.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
                         child_count += 1;
                       }
@@ -695,11 +699,11 @@
                   } else {
                     if (child.type == 'Mesh' || child instanceof THREE.Mesh) {
                       child.castShadow = true;
-                      child.material.opacity = 1;
                       child.material.transparent = true;
                       child.material.skinning = true;
 
                       child.name = 'child_' + child_count;
+                      initial_opacity[ child.name ] = child.material.opacity;
                       edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
                       child_count += 1;
                     }
