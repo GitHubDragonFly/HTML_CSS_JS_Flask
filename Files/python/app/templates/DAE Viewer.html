@@ -208,7 +208,7 @@
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation, reset_rotation, events_initialized;
       var rot_x = 0, rot_y = 0, rot_z = 0;
-      var previous_dae_scale = '1', bounding_box = new THREE.Box3();
+      var initial_opacity, previous_dae_scale = '1', bounding_box = new THREE.Box3();
       var selected_dae_file, selected_url_file = '', url_displayed, url_loading;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_gif;
       var ktx2_loader, texture_files_ktx2, texture_files_dds;
@@ -245,7 +245,7 @@
                   }
                 });
               } else {
-                child.material.opacity = opacity_value;
+                child.material.opacity = initial_opacity[ child.name ] * opacity_value;
                 if (document.getElementById('shadow').checked) {
                   shadowMaterial.opacity = opacity_value * document.getElementById('spot_light_intensity').value;
                 }
@@ -505,6 +505,7 @@
         animation_running = false;
         edges = {};
         edges_visible = false;
+        initial_opacity = {};
         grid_visible = false;
         polar_grid_visible = false;
         render_requested = false;
@@ -680,14 +681,12 @@
             if (Array.isArray( child.material )) {
               child.material.forEach( mtl => {
                 // Enable transparency for the Opacity control
-                mtl.opacity = 1;
                 mtl.transparent = true;
                 mtl.skinning = true;
                 mtl.side = THREE.DoubleSide;
               });
             } else {
               // Enable transparency for the Opacity control
-              child.material.opacity = 1;
               child.material.transparent = true;
               child.material.skinning = true;
               child.material.side = THREE.DoubleSide;
@@ -762,6 +761,7 @@
             }
 
             child.name = 'child_' + child_count;
+            initial_opacity[ child.name ] = child.material.opacity;
             edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
             child_count += 1;
           }
@@ -809,14 +809,12 @@
                 if (Array.isArray( child.material )) {
                   child.material.forEach( mtl => {
                     // Enable transparency for the Opacity control
-                    mtl.opacity = 1;
                     mtl.transparent = true;
                     mtl.skinning = true;
                     mtl.side = THREE.DoubleSide;
                   });
                 } else {
                   // Enable transparency for the Opacity control
-                  child.material.opacity = 1;
                   child.material.transparent = true;
                   child.material.skinning = true;
                   child.material.side = THREE.DoubleSide;
@@ -827,6 +825,7 @@
                 child.receiveShadow = false;
 
                 child.name = 'child_' + child_count;
+                initial_opacity[ child.name ] = child.material.opacity;
                 edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
                 child_count += 1;
     		      }
