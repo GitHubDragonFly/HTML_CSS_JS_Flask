@@ -113,6 +113,7 @@ Check the resources mentioned in the original HTML_CSS_JS project.
 Here are links to other online viewers:
 - [Online 3D Viewer](https://github.com/kovacsv/Online3DViewer)
 - [GLTF Viewer](https://gltf-viewer.donmccurdy.com/)
+- [3D Viewer](https://rufus31415.github.io/sandbox/3d-viewer)
 
 The following viewer is a Windows application, useful to a degree but the project appears to have been abandoned:
 - [Open 3D Model Viewer](https://github.com/acgessler/open3mod)
