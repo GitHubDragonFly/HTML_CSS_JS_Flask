@@ -52,6 +52,24 @@
       @-webkit-keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
       @keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
 
+      .error_msg {
+        position: absolute;
+        display: none;
+        background-color: transparent;
+        color: red;
+        text-align: center;
+        font-size: x-large;
+        width: 240px;
+        height: 40px;
+        top: 50%;
+        left: 50%;
+        margin-left: -127px;
+        padding: 10px;
+        border: 2px solid maroon;
+        -webkit-border-radius: 3%;
+        border-radius: 3%;
+      }
+
       p.full_screen {
         text-align: center;
         content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAf0lEQVRIie1VQQ6AMAjb/x9M4IRePICoK7GLB5eQbElpCTAY7j6YRiUPAvvxbNMkN76XIDhSRKCdjhmB494hzzwngcoBIa/eASgisMgTBo4ODqCTAiSFrW6Biv8LfL/I1DbtfDRV9VLgjVFhZp59A4g+7JaM6yULh7IyWUYX2AAPDxz26GjX+gAAAABJRU5ErkJggg==);
@@ -145,6 +163,7 @@
     </div><br />
 
     <div id="div_spinner" class="spinner"></div>
+    <div id="div_error" class="error_msg">E R R O R !</div>
 
     <div style="border: 0; margin: 0; padding: 0;">
       <canvas id="scene">
@@ -267,6 +286,7 @@
 
           if (fii.files[0].type.startsWith('image/')) {
             texture_loader.load( URL.createObjectURL( fii.files[0] ) , function ( texture ) {
+              URL.revokeObjectURL( fii.files[0] );
               scene.background = texture;
             });
           } else {
@@ -542,7 +562,12 @@
             else if (fi.files[i].name.toUpperCase().endsWith('.DDS')) { texture_files_dds.push( fi.files[i] ); }
           };
 
-          if (!selected_fbx_file) { return; }
+          if (!selected_fbx_file) {
+            document.body.style.backgroundImage = "none";
+            document.getElementById('div_spinner').style.display = "none";
+            document.getElementById('div_error').style.display = "block";
+            return;
+          }
 
           selected_url_file = '';
         } else {
@@ -553,6 +578,7 @@
 
         document.body.style.backgroundImage = "none";
         document.getElementById('div_spinner').style.display = "none";
+        document.getElementById('div_error').style.display = "none";
         enable_disable( false );
 
         if (renderer == undefined) {
@@ -668,79 +694,97 @@
       }
 
       function loadFile(){
-        // Launch loading of the selected file, addFileInScene is the callback when it's ready
-        fbx_loader.load( URL.createObjectURL( selected_fbx_file ), addFileInScene );
-      }
+        // Launch loading of the selected file
+        fbx_loader.load( URL.createObjectURL( selected_fbx_file ), function( fbx_scene ) {
+          URL.revokeObjectURL( selected_fbx_file );
 
-      function addFileInScene( fbx_scene ){
-        animations = fbx_scene.animations;
+          animations = fbx_scene.animations;
 
-        if (animations.length > 0) {
-          animation_mixer = new THREE.AnimationMixer( fbx_scene );
-          current_animation = 0;
-          animations.forEach( clip => { animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat; });
-        }
-
-        textures = [];
-        if (texture_files_png.length > 0) { texture_files_png.forEach( file => { textures.push( file ); }); }
-        if (texture_files_jpg.length > 0) { texture_files_jpg.forEach( file => { textures.push( file ); }); }
-        if (texture_files_bmp.length > 0) { texture_files_bmp.forEach( file => { textures.push( file ); }); }
-        if (texture_files_gif.length > 0) { texture_files_gif.forEach( file => { textures.push( file ); }); }
-        if (texture_files_dds.length > 0) { texture_files_dds.forEach( file => { textures.push( file ); }); }
-                
-        if (textures.length > 0) { document.getElementById('btn_textures').disabled = false; }
-
-        let child_count = 1;
-
-        // Go through all children of the loaded object and search for a Mesh
-        fbx_scene.traverse( function( child ) {
-          // This allow us to check if the children is an instance of the Mesh constructor
-          if (child instanceof THREE.Mesh) {
-            child.geometry.computeVertexNormals();
-
-            if (Array.isArray( child.material )) {
-              child.material.forEach( mtl => {
-                // Enable transparency for the Opacity control
-                mtl.transparent = true;
-                mtl.skinning = true;
-                mtl.side = THREE.DoubleSide;
-              });
-            } else {
-              // Enable transparency for the Opacity control
-              child.material.transparent = true;
-              child.material.skinning = true;
-              child.material.side = THREE.DoubleSide;
-            }
-
-            // Enable shadows
-            child.castShadow = true;
-            child.receiveShadow = false;
-
-            child.name = 'child_' + child_count;
-            initial_opacity[ child.name ] = child.material.opacity;
-            edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
-            child_count += 1;
+          if (animations.length > 0) {
+            animation_mixer = new THREE.AnimationMixer( fbx_scene );
+            current_animation = 0;
+            animations.forEach( clip => { animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat; });
           }
+
+          textures = [];
+          if (texture_files_png.length > 0) { texture_files_png.forEach( file => { textures.push( file ); }); }
+          if (texture_files_jpg.length > 0) { texture_files_jpg.forEach( file => { textures.push( file ); }); }
+          if (texture_files_bmp.length > 0) { texture_files_bmp.forEach( file => { textures.push( file ); }); }
+          if (texture_files_gif.length > 0) { texture_files_gif.forEach( file => { textures.push( file ); }); }
+          if (texture_files_dds.length > 0) { texture_files_dds.forEach( file => { textures.push( file ); }); }
+
+          if (textures.length > 0) { document.getElementById('btn_textures').disabled = false; }
+
+          let child_count = 1;
+
+          // Go through all children of the loaded object and search for a Mesh
+          fbx_scene.traverse( function( child ) {
+            // This allow us to check if the children is an instance of the Mesh constructor
+            if (child instanceof THREE.Mesh) {
+              child.geometry.computeVertexNormals();
+
+              if (Array.isArray( child.material )) {
+                child.material.forEach( mtl => {
+                  // Enable transparency for the Opacity control
+                  mtl.transparent = true;
+                  mtl.skinning = true;
+                  mtl.side = THREE.DoubleSide;
+                });
+              } else {
+                // Enable transparency for the Opacity control
+                child.material.transparent = true;
+                child.material.skinning = true;
+                child.material.side = THREE.DoubleSide;
+              }
+
+              // Enable shadows
+              child.castShadow = true;
+              child.receiveShadow = false;
+
+              child.name = 'child_' + child_count;
+              initial_opacity[ child.name ] = child.material.opacity;
+              edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+              child_count += 1;
+            }
+          });
+
+          fbx_obj = fbx_scene;
+          fbx_obj.name = 'local_model';
+
+          set_initial_scale();
+          resize();
+
+          // Add fbx model to scene
+          scene.add( fbx_obj );
+
+          camera.lookAt( fbx_obj.position );
+
+          if (animations.length > 0) {
+            animation_mixer.clipAction( animations[0] ).play();
+            document.getElementById('btn_animate').disabled = false;
+            document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
+            document.getElementById('btn_animate').innerHTML = 'A0';
+            animation_running = true;
+          }
+        }, function ( xhr ) {
+          let today = new Date();
+          let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+          if (xhr.loaded == 0 && xhr.total == 0) {
+            console.log( 'FBX 0% loaded - ' + time );
+          } else {
+            console.log( 'FBX ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+          }
+        }, function ( error ) {
+          console.log( 'Error loading FBX!' );
+          console.log( error );
+          render_requested = false;
+          enable_disable( true );
+          if (gizmo) { gizmo.dispose(); }
+          document.getElementById('div_error').style.display = "block";
+
+          URL.revokeObjectURL( selected_fbx_file );
         });
-
-        fbx_obj = fbx_scene;
-        fbx_obj.name = 'local_model';
-
-        set_initial_scale();
-        resize();
-
-        // Add fbx model to scene
-        scene.add( fbx_obj );
-
-        camera.lookAt( fbx_obj.position );
-
-        if (animations.length > 0) {
-          animation_mixer.clipAction( animations[0] ).play();
-          document.getElementById('btn_animate').disabled = false;
-          document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
-          document.getElementById('btn_animate').innerHTML = 'A0';
-          animation_running = true;
-        }
       }
 
       function loadURLFile() {
@@ -835,6 +879,9 @@
                 console.log( 'Error loading URL FBX!' );
                 console.log( error );
                 render_requested = false;
+                enable_disable( true );
+                if (gizmo) { gizmo.dispose(); }
+                document.getElementById('div_error').style.display = "block";
               });
             }
           } else {
@@ -911,6 +958,9 @@
               console.log( 'Error loading URL FBX!' );
               console.log( error );
               render_requested = false;
+              enable_disable( true );
+              if (gizmo) { gizmo.dispose(); }
+              document.getElementById('div_error').style.display = "block";
             });
           }
         }
@@ -1022,6 +1072,8 @@
               } else {
                 if (textures[ current_texture ].name.toUpperCase().endsWith('.DDS')) {
                   dds_loader.load( URL.createObjectURL( textures[ current_texture ] ), function( texture ) {
+                    URL.revokeObjectURL( textures[ current_texture ] );
+
                     texture.encoding = THREE.sRGBEncoding;
                     texture.wrapS = THREE.RepeatWrapping;
                     texture.wrapT = THREE.RepeatWrapping;
@@ -1033,6 +1085,8 @@
                   });
                 } else {
                   texture_loader.load( URL.createObjectURL( textures[ current_texture ] ), function( texture ) {
+                    URL.revokeObjectURL( textures[ current_texture ] );
+
                     texture.encoding = THREE.sRGBEncoding;
                     texture.wrapS = THREE.RepeatWrapping;
                     texture.wrapT = THREE.RepeatWrapping;
@@ -1170,11 +1224,12 @@
         }
 
         if (!reset) {
-          // Page (re)loading so reset the file input, URL entry, spinner, animate button and disable controls
+          // Page (re)loading so reset the file input, URL entry, spinner, error, animate button and disable controls
           document.getElementById('file_input').value = '';
           document.getElementById('url_entry').value = '';
           selected_url_file = '';
           document.getElementById('div_spinner').style.display = "block";
+          document.getElementById('div_error').style.display = "none";
           document.getElementById('btn_animate').disabled = true;
           document.getElementById('btn_textures').disabled = true;
           enable_disable( true );
