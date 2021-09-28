@@ -49,6 +49,24 @@
       @-webkit-keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
       @keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
 
+      .error_msg {
+        position: absolute;
+        display: none;
+        background-color: transparent;
+        color: red;
+        text-align: center;
+        font-size: x-large;
+        width: 240px;
+        height: 40px;
+        top: 50%;
+        left: 50%;
+        margin-left: -127px;
+        padding: 10px;
+        border: 2px solid maroon;
+        -webkit-border-radius: 3%;
+        border-radius: 3%;
+      }
+
       p.full_screen {
         text-align: center;
         content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAf0lEQVRIie1VQQ6AMAjb/x9M4IRePICoK7GLB5eQbElpCTAY7j6YRiUPAvvxbNMkN76XIDhSRKCdjhmB494hzzwngcoBIa/eASgisMgTBo4ODqCTAiSFrW6Biv8LfL/I1DbtfDRV9VLgjVFhZp59A4g+7JaM6yULh7IyWUYX2AAPDxz26GjX+gAAAABJRU5ErkJggg==);
@@ -142,6 +160,7 @@
     </div><br />
 
     <div id="div_spinner" class="spinner"></div>
+    <div id="div_error" class="error_msg">E R R O R !</div>
 
     <div style="border: 0; margin: 0; padding: 0;">
       <canvas id="scene">
@@ -531,7 +550,13 @@
             else if (fi.files[i].name.toUpperCase().endsWith('.DDS')) { texture_files_dds.push( fi.files[i] ); }
           };
 
-          if (!selected_dae_file) { return; }
+          if (!selected_dae_file) {
+            console.log( 'No valid DAE file selected!' );
+            document.body.style.backgroundImage = "none";
+            document.getElementById('div_spinner').style.display = "none";
+            document.getElementById('div_error').style.display = "block";
+            return;
+          }
 
           selected_url_file = '';
         } else {
@@ -542,6 +567,7 @@
 
         document.body.style.backgroundImage = "none";
         document.getElementById('div_spinner').style.display = "none";
+        document.getElementById('div_error').style.display = "none";
         enable_disable( false );
 
         if (renderer == undefined) {
@@ -657,212 +683,247 @@
       }
 
       function loadFile(){
-        // Launch loading of the selected file, addFileInScene is the callback when it's ready
-        dae_loader.load( URL.createObjectURL( selected_dae_file ), addFileInScene );
-      }
+        // Launch loading of the selected file
+        dae_loader.load( URL.createObjectURL( selected_dae_file ), function( collada ) {
+          URL.revokeObjectURL( selected_dae_file );
 
-      function addFileInScene( collada ){
-        animations = collada.scene.animations;
+          animations = collada.scene.animations;
 
-        if (animations.length > 0) {
-          animation_mixer = new THREE.AnimationMixer( collada.scene );
-          current_animation = 0;
-          animations.forEach( clip => { animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat; });
-        }
-
-        let child_count = 1;
-
-        // Go through all children of the loaded object and search for a Mesh
-        collada.scene.traverse( function( child ) {
-          // This allow us to check if the children is an instance of the Mesh constructor
-          if (child instanceof THREE.Mesh) {
-            child.geometry.computeVertexNormals();
-
-            if (Array.isArray( child.material )) {
-              child.material.forEach( mtl => {
-                // Enable transparency for the Opacity control
-                mtl.transparent = true;
-                mtl.skinning = true;
-                mtl.side = THREE.DoubleSide;
-              });
-            } else {
-              // Enable transparency for the Opacity control
-              child.material.transparent = true;
-              child.material.skinning = true;
-              child.material.side = THREE.DoubleSide;
-            }
-
-            // Enable shadows
-            child.castShadow = true;
-            child.receiveShadow = false;
-
-            if (texture_files_ktx2.length > 0) {
-              texture_files_ktx2.forEach( file => {
-                ktx2_loader.load( URL.createObjectURL( file ) , function( texture ) {
-                  texture.encoding = THREE.sRGBEncoding;
-                  texture.wrapS = THREE.RepeatWrapping;
-                  texture.wrapT = THREE.RepeatWrapping;
-                  texture.magFilter = THREE.NearestFilter;
-
-                  // Apply texture
-                  if (Array.isArray( child.material )) {
-                    child.material.forEach( mtl => {
-                      mtl.map = texture;
-                      mtl.needsUpdate = true;
-                    });
-                  } else {
-                    child.material.map = texture;
-                    child.material.needsUpdate = true;
-                  }
-                });
-              });
-            } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_gif.length > 0) {
-              let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : ((texture_files_bmp.length > 0) ? texture_files_bmp : texture_files_gif));
-
-              files.forEach( file => {
-                texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
-                  texture.encoding = THREE.sRGBEncoding;
-                  texture.wrapS = THREE.RepeatWrapping;
-                  texture.wrapT = THREE.RepeatWrapping;
-                  texture.magFilter = THREE.NearestFilter;
-
-                  // Apply texture
-                  if (Array.isArray( child.material )) {
-                    child.material.forEach( mtl => {
-                      mtl.map = texture;
-                      mtl.needsUpdate = true;
-                    });
-                  } else {
-                    child.material.map = texture;
-                    child.material.needsUpdate = true;
-                  }
-                });
-              });
-            } else if (texture_files_dds.length > 0) {
-              texture_files_dds.forEach( file => {
-                dds_loader.load( URL.createObjectURL( file ), function( texture ) {
-                  texture.encoding = THREE.sRGBEncoding;
-                  texture.wrapS = THREE.RepeatWrapping;
-                  texture.wrapT = THREE.RepeatWrapping;
-                  texture.magFilter = THREE.NearestFilter;
-
-                  // Apply texture
-                  if (Array.isArray( child.material )) {
-                    child.material.forEach( mtl => {
-                      mtl.map = texture;
-                      mtl.needsUpdate = true;
-                    });
-                  } else {
-                    child.material.map = texture;
-                    child.material.needsUpdate = true;
-                  }
-                });
-              });
-            }
-
-            child.name = 'child_' + child_count;
-            initial_opacity[ child.name ] = child.material.opacity;
-            edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
-            child_count += 1;
+          if (animations.length > 0) {
+            animation_mixer = new THREE.AnimationMixer( collada.scene );
+            current_animation = 0;
+            animations.forEach( clip => { animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat; });
           }
+
+          let child_count = 1;
+
+          // Go through all children of the loaded object and search for a Mesh
+          collada.scene.traverse( function( child ) {
+            // This allow us to check if the children is an instance of the Mesh constructor
+            if (child instanceof THREE.Mesh) {
+              child.geometry.computeVertexNormals();
+
+              if (Array.isArray( child.material )) {
+                child.material.forEach( mtl => {
+                  // Enable transparency for the Opacity control
+                  mtl.transparent = true;
+                  mtl.skinning = true;
+                  mtl.side = THREE.DoubleSide;
+                });
+              } else {
+                // Enable transparency for the Opacity control
+                child.material.transparent = true;
+                child.material.skinning = true;
+                child.material.side = THREE.DoubleSide;
+              }
+
+              // Enable shadows
+              child.castShadow = true;
+              child.receiveShadow = false;
+
+              if (texture_files_ktx2.length > 0) {
+                texture_files_ktx2.forEach( file => {
+                  ktx2_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                    URL.revokeObjectURL( file );
+
+                    texture.encoding = THREE.sRGBEncoding;
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.magFilter = THREE.NearestFilter;
+
+                    // Apply texture
+                    if (Array.isArray( child.material )) {
+                      child.material.forEach( mtl => {
+                        mtl.map = texture;
+                        mtl.needsUpdate = true;
+                      });
+                    } else {
+                      child.material.map = texture;
+                      child.material.needsUpdate = true;
+                    }
+                  });
+                });
+              } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_gif.length > 0) {
+                let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : ((texture_files_bmp.length > 0) ? texture_files_bmp : texture_files_gif));
+
+                files.forEach( file => {
+                  texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                    URL.revokeObjectURL( file );
+
+                    texture.encoding = THREE.sRGBEncoding;
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.magFilter = THREE.NearestFilter;
+
+                    // Apply texture
+                    if (Array.isArray( child.material )) {
+                      child.material.forEach( mtl => {
+                        mtl.map = texture;
+                        mtl.needsUpdate = true;
+                      });
+                    } else {
+                      child.material.map = texture;
+                      child.material.needsUpdate = true;
+                    }
+                  });
+                });
+              } else if (texture_files_dds.length > 0) {
+                texture_files_dds.forEach( file => {
+                  dds_loader.load( URL.createObjectURL( file ), function( texture ) {
+                    URL.revokeObjectURL( file );
+
+                    texture.encoding = THREE.sRGBEncoding;
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.magFilter = THREE.NearestFilter;
+
+                    // Apply texture
+                    if (Array.isArray( child.material )) {
+                      child.material.forEach( mtl => {
+                        mtl.map = texture;
+                        mtl.needsUpdate = true;
+                      });
+                    } else {
+                      child.material.map = texture;
+                      child.material.needsUpdate = true;
+                    }
+                  });
+                });
+              }
+
+              child.name = 'child_' + child_count;
+              initial_opacity[ child.name ] = child.material.opacity;
+              edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+              child_count += 1;
+            }
+          });
+
+          dae_obj = collada.scene;
+          dae_obj.name = 'local_model';
+
+          set_initial_scale();
+          resize();
+
+          // Add dae model to scene
+          scene.add( dae_obj );
+
+          camera.lookAt( dae_obj.position );
+
+          if (animations.length > 0) {
+            animation_mixer.clipAction( animations[0] ).play();
+            document.getElementById('btn_animate').disabled = false;
+            document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
+            document.getElementById('btn_animate').innerHTML = 'A0';
+            animation_running = true;
+          }
+        }, function ( xhr ) {
+          let today = new Date();
+          let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+          if (xhr.loaded == 0 && xhr.total == 0) {
+            console.log( 'DAE 0% loaded - ' + time );
+          } else {
+            console.log( 'DAE ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+          }
+        }, function ( error ) {
+          console.log( 'Error loading DAE!' );
+          console.log( error );
+          render_requested = false;
+          enable_disable( true );
+          if (gizmo) { gizmo.dispose(); }
+          document.getElementById('div_error').style.display = "block";
+
+          URL.revokeObjectURL( selected_dae_file );
         });
-
-        dae_obj = collada.scene;
-        dae_obj.name = 'local_model';
-
-        set_initial_scale();
-        resize();
-
-        // Add dae model to scene
-        scene.add( dae_obj );
-
-        camera.lookAt( dae_obj.position );
-
-        if (animations.length > 0) {
-          animation_mixer.clipAction( animations[0] ).play();
-          document.getElementById('btn_animate').disabled = false;
-          document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
-          document.getElementById('btn_animate').innerHTML = 'A0';
-          animation_running = true;
-        }
       }
 
       function loadURLFile() {
         if (selected_url_file != '') {
-          dae_loader.load( selected_url_file, ( collada ) => {
-            animations = collada.scene.animations;
+          if (selected_url_file.toUpperCase().endsWith('.DAE')) {
+            dae_loader.load( selected_url_file, ( collada ) => {
+              animations = collada.scene.animations;
 
-            if (animations.length > 0) {
-              animation_mixer = new THREE.AnimationMixer( collada.scene );
-              current_animation = 0;
-              animations.forEach( clip => { animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat; });
-            }
+              if (animations.length > 0) {
+                animation_mixer = new THREE.AnimationMixer( collada.scene );
+                current_animation = 0;
+                animations.forEach( clip => { animation_mixer.clipAction( clip ).loop = THREE.LoopRepeat; });
+              }
 
-            let child_count = 1;
+              let child_count = 1;
 
-            // Go through all children of the loaded object and search for a Mesh
-            collada.scene.traverse( function( child ) {
-              // This allow us to check if the children is an instance of the Mesh constructor
-          	  if (child instanceof THREE.Mesh) {
-                child.geometry.computeVertexNormals();
+              // Go through all children of the loaded object and search for a Mesh
+              collada.scene.traverse( function( child ) {
+                // This allow us to check if the children is an instance of the Mesh constructor
+            	  if (child instanceof THREE.Mesh) {
+                  child.geometry.computeVertexNormals();
 
-                if (Array.isArray( child.material )) {
-                  child.material.forEach( mtl => {
+                  if (Array.isArray( child.material )) {
+                    child.material.forEach( mtl => {
+                      // Enable transparency for the Opacity control
+                      mtl.transparent = true;
+                      mtl.skinning = true;
+                      mtl.side = THREE.DoubleSide;
+                    });
+                  } else {
                     // Enable transparency for the Opacity control
-                    mtl.transparent = true;
-                    mtl.skinning = true;
-                    mtl.side = THREE.DoubleSide;
-                  });
-                } else {
-                  // Enable transparency for the Opacity control
-                  child.material.transparent = true;
-                  child.material.skinning = true;
-                  child.material.side = THREE.DoubleSide;
-                }
+                    child.material.transparent = true;
+                    child.material.skinning = true;
+                    child.material.side = THREE.DoubleSide;
+                  }
 
-                // Enable shadows
-                child.castShadow = true;
-                child.receiveShadow = false;
+                  // Enable shadows
+                  child.castShadow = true;
+                  child.receiveShadow = false;
 
-                child.name = 'child_' + child_count;
-                initial_opacity[ child.name ] = child.material.opacity;
-                edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
-                child_count += 1;
-    		      }
-    	      });
+                  child.name = 'child_' + child_count;
+                  initial_opacity[ child.name ] = child.material.opacity;
+                  edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+                  child_count += 1;
+    		        }
+    	        });
 
-            dae_obj = collada.scene;
-            dae_obj.name = 'url_model';
+              dae_obj = collada.scene;
+              dae_obj.name = 'url_model';
 
-            set_initial_scale();
-            resize();
+              set_initial_scale();
+              resize();
 
-            // Add dae model to scene
-            scene.add( dae_obj );
+              // Add dae model to scene
+              scene.add( dae_obj );
 
-            camera.lookAt( dae_obj.position );
+              camera.lookAt( dae_obj.position );
 
-            if (animations.length > 0) {
-              animation_mixer.clipAction( animations[0] ).play();
-              document.getElementById('btn_animate').disabled = false;
-              document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
-              document.getElementById('btn_animate').innerHTML = 'A0';
-              animation_running = true;
-            }
-          }, function ( xhr ) {
-            let today = new Date();
-            let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+              if (animations.length > 0) {
+                animation_mixer.clipAction( animations[0] ).play();
+                document.getElementById('btn_animate').disabled = false;
+                document.getElementById('btn_animate').style.backgroundColor = 'lightgreen';
+                document.getElementById('btn_animate').innerHTML = 'A0';
+                animation_running = true;
+              }
+            }, function ( xhr ) {
+              let today = new Date();
+              let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
 
-            if (xhr.loaded == 0 && xhr.total == 0) {
-              console.log( 'URL DAE 0% loaded - ' + time );
-            } else {
-              console.log( 'URL DAE ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
-            }
-          }, function ( error ) {
-            console.log( 'Error loading URL DAE!' );
-            console.log( error );
+              if (xhr.loaded == 0 && xhr.total == 0) {
+                console.log( 'URL DAE 0% loaded - ' + time );
+              } else {
+                console.log( 'URL DAE ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              }
+            }, function ( error ) {
+              console.log( 'Error loading URL DAE!' );
+              console.log( error );
+              render_requested = false;
+              enable_disable( true );
+              if (gizmo) { gizmo.dispose(); }
+              document.getElementById('div_error').style.display = "block";
+            });
+          } else {
+            console.log('Unsupported URL file!');
             render_requested = false;
-          });
+            enable_disable( true );
+            if (gizmo) { gizmo.dispose(); }
+            document.getElementById('div_error').style.display = "block";
+          }
         }
       }
 
@@ -963,13 +1024,13 @@
           }
 
           if (animation_running) { animation_mixer.update( clock.getDelta() ); }
+
+          controls.update();
+          if (gizmo) { gizmo.update(); }
+
+          renderer.clear();
+        	renderer.render( scene, camera );
         }
-
-        controls.update();
-        if (gizmo) { gizmo.update(); }
-
-        renderer.clear();
-      	renderer.render( scene, camera );
       }
 
       function reset_only() {
@@ -1050,11 +1111,12 @@
         }
 
         if (!reset) {
-          // Page (re)loading so reset the file input, URL entry, spinner, animate button and disable controls
+          // Page (re)loading so reset the file input, URL entry, spinner, error, animate button and disable controls
           document.getElementById('file_input').value = '';
           document.getElementById('url_entry').value = '';
           selected_url_file = '';
           document.getElementById('div_spinner').style.display = "block";
+          document.getElementById('div_error').style.display = "none";
           document.getElementById('btn_animate').style.backgroundColor = '#d1cefc';
           document.getElementById('btn_animate').disabled = true;
           enable_disable( true );

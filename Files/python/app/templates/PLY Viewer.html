@@ -50,6 +50,24 @@
       @-webkit-keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
       @keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
 
+      .error_msg {
+        position: absolute;
+        display: none;
+        background-color: transparent;
+        color: red;
+        text-align: center;
+        font-size: x-large;
+        width: 240px;
+        height: 40px;
+        top: 50%;
+        left: 50%;
+        margin-left: -127px;
+        padding: 10px;
+        border: 2px solid maroon;
+        -webkit-border-radius: 3%;
+        border-radius: 3%;
+      }
+
       p.full_screen {
         text-align: center;
         content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAf0lEQVRIie1VQQ6AMAjb/x9M4IRePICoK7GLB5eQbElpCTAY7j6YRiUPAvvxbNMkN76XIDhSRKCdjhmB494hzzwngcoBIa/eASgisMgTBo4ODqCTAiSFrW6Biv8LfL/I1DbtfDRV9VLgjVFhZp59A4g+7JaM6yULh7IyWUYX2AAPDxz26GjX+gAAAABJRU5ErkJggg==);
@@ -144,6 +162,7 @@
     </div><br />
 
     <div id="div_spinner" class="spinner"></div>
+    <div id="div_error" class="error_msg">E R R O R !</div>
 
     <div style="border: 0; margin: 0; padding: 0;">
       <canvas id="scene">
@@ -498,7 +517,13 @@
             else if (fi.files[i].name.toUpperCase().endsWith('.DDS')) { texture_files_dds.push( fi.files[i] ); }
           };
 
-          if (!selected_ply_file && !selected_stl_file) { return; }
+          if (!selected_ply_file && !selected_stl_file) {
+            console.log( 'No valid PLY/STL file selected!' );
+            document.body.style.backgroundImage = "none";
+            document.getElementById('div_spinner').style.display = "none";
+            document.getElementById('div_error').style.display = "block";
+            return;
+          }
 
           selected_url_file = '';
         } else {
@@ -509,6 +534,7 @@
 
         document.body.style.backgroundImage = "none";
         document.getElementById('div_spinner').style.display = "none";
+        document.getElementById('div_error').style.display = "none";
         enable_disable( false );
 
         if (renderer == undefined) {
@@ -615,17 +641,49 @@
         // Launch loading of the selected file, addFileInScene is the callback when it's ready
         if (selected_ply_file) {
           document.getElementById('btn_flat').disabled = false;
-          ply_loader.load( URL.createObjectURL( selected_ply_file ), addFileInScene );
+          ply_loader.load( URL.createObjectURL( selected_ply_file ), addFileInScene, function( xhr ) {
+            let today = new Date();
+            let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+            if (xhr.loaded == 0 && xhr.total == 0) {
+              console.log( 'PLY 0% loaded - ' + time );
+            } else {
+              console.log( 'PLY ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+            }
+          }, function ( error ) {
+            console.log( 'Error loading PLY!' );
+            console.log( error );
+            render_requested = false;
+            enable_disable( true );
+            if (gizmo) { gizmo.dispose(); }
+            document.getElementById('div_error').style.display = "block";
+          });
         } else if (selected_stl_file) {
           document.getElementById('btn_flat').disabled = true;
           document.getElementById('btn_flat').style.backgroundColor = '#d1cefc';
-          stl_loader.load( URL.createObjectURL( selected_stl_file ), addFileInScene );
+          stl_loader.load( URL.createObjectURL( selected_stl_file ), addFileInScene, function( xhr ) {
+            let today = new Date();
+            let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+            if (xhr.loaded == 0 && xhr.total == 0) {
+              console.log( 'STL 0% loaded - ' + time );
+            } else {
+              console.log( 'STL ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+            }
+          }, function ( error ) {
+            console.log( 'Error loading STL!' );
+            console.log( error );
+            render_requested = false;
+            enable_disable( true );
+            if (gizmo) { gizmo.dispose(); }
+            document.getElementById('div_error').style.display = "block";
+          });
         } else {
           loadURLFile();
         }
       }
 
-      function addFileInScene( object ){
+      function addFileInScene( object ) {
         let smooth = object.clone();
         smooth.computeVertexNormals();
 
@@ -791,11 +849,49 @@
           // Launch loading of the selected file, addFileInScene is the callback when it's ready
           if (selected_url_file.toUpperCase().endsWith('.PLY')) {
             document.getElementById('btn_flat').disabled = false;
-            ply_loader.load( selected_url_file, addURLFileInScene );
+            ply_loader.load( selected_url_file, addURLFileInScene, function( xhr ) {
+              let today = new Date();
+              let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+              if (xhr.loaded == 0 && xhr.total == 0) {
+                console.log( 'URL PLY 0% loaded - ' + time );
+              } else {
+                console.log( 'URL PLY ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              }
+            }, function ( error ) {
+              console.log( 'Error loading URL PLY!' );
+              console.log( error );
+              render_requested = false;
+              enable_disable( true );
+              if (gizmo) { gizmo.dispose(); }
+              document.getElementById('div_error').style.display = "block";
+            });
           } else if (selected_url_file.toUpperCase().endsWith('.STL')) {
             document.getElementById('btn_flat').disabled = true;
             document.getElementById('btn_flat').style.backgroundColor = '#d1cefc';
-            stl_loader.load( selected_url_file, addURLFileInScene );
+            stl_loader.load( selected_url_file, addURLFileInScene, function( xhr ) {
+              let today = new Date();
+              let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+              if (xhr.loaded == 0 && xhr.total == 0) {
+                console.log( 'URL STL 0% loaded - ' + time );
+              } else {
+                console.log( 'URL STL ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              }
+            }, function ( error ) {
+              console.log( 'Error loading URL STL!' );
+              console.log( error );
+              render_requested = false;
+              enable_disable( true );
+              if (gizmo) { gizmo.dispose(); }
+              document.getElementById('div_error').style.display = "block";
+            });
+          } else {
+            console.log('Unsupported URL file!');
+            render_requested = false;
+            enable_disable( true );
+            if (gizmo) { gizmo.dispose(); }
+            document.getElementById('div_error').style.display = "block";
           }
         }
       }
@@ -1063,9 +1159,10 @@
         }
 
         if (!reset) {
-          // Page (re)loading so reset the file input, spinner, URL entry and disable controls
+          // Page (re)loading so reset the file input, spinner, error, URL entry and disable controls
           document.getElementById('file_input').value = "";
           document.getElementById('div_spinner').style.display = "block";
+          document.getElementById('div_error').style.display = "none";
           document.getElementById('url_entry').value = '';
           selected_url_file = '';
           enable_disable( true );

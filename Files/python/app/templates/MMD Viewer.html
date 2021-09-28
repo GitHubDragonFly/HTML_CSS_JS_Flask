@@ -54,6 +54,24 @@
       @-webkit-keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
       @keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
 
+      .error_msg {
+        position: absolute;
+        display: none;
+        background-color: transparent;
+        color: red;
+        text-align: center;
+        font-size: x-large;
+        width: 240px;
+        height: 40px;
+        top: 50%;
+        left: 50%;
+        margin-left: -127px;
+        padding: 10px;
+        border: 2px solid maroon;
+        -webkit-border-radius: 3%;
+        border-radius: 3%;
+      }
+
       p.full_screen {
         text-align: center;
         content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAf0lEQVRIie1VQQ6AMAjb/x9M4IRePICoK7GLB5eQbElpCTAY7j6YRiUPAvvxbNMkN76XIDhSRKCdjhmB494hzzwngcoBIa/eASgisMgTBo4ODqCTAiSFrW6Biv8LfL/I1DbtfDRV9VLgjVFhZp59A4g+7JaM6yULh7IyWUYX2AAPDxz26GjX+gAAAABJRU5ErkJggg==);
@@ -146,6 +164,7 @@
     </div><br />
 
     <div id="div_spinner" class="spinner"></div>
+    <div id="div_error" class="error_msg">E R R O R !</div>
 
     <div style="border: 0; margin: 0; padding: 0;">
       <canvas id="scene">
@@ -625,7 +644,13 @@
             else if (fi.files[i].name.toUpperCase().endsWith('.TGA')) { texture_files_tga.push( fi.files[i] ); }
           };
 
-          if (!selected_mmd_file && !selected_audio_file) { console.log('No valid PMD/PMX file selected!'); return; }
+          if (!selected_mmd_file && !selected_audio_file) {
+            console.log( 'No valid PMD/PMX or MP3/OGG file selected!' );
+            document.body.style.backgroundImage = "none";
+            document.getElementById('div_spinner').style.display = "none";
+            document.getElementById('div_error').style.display = "block";
+            return;
+          }
 
           selected_url_file = '';
         } else {
@@ -637,6 +662,7 @@
         if (selected_mmd_file || selected_url_file) {
           document.body.style.backgroundImage = "none";
           document.getElementById('div_spinner').style.display = "none";
+          document.getElementById('div_error').style.display = "none";
           enable_disable( false );
 
           if (renderer == undefined) {
@@ -949,6 +975,8 @@
 
           scene.add( mmd_obj );
           camera.lookAt( mmd_obj.position );
+
+          ready = true;
         }, function ( xhr ) {
           let today = new Date();
           let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -963,10 +991,12 @@
           console.log( error );
           render_requested = false;
           ready = false;
+          enable_disable( true );
+          if (gizmo) { gizmo.dispose(); }
+          document.getElementById('div_error').style.display = "block";
+
           URL.revokeObjectURL( selected_mmd_file );
         });
-
-        ready = true;
       }
 
       function loadMotionFiles(){
@@ -1160,6 +1190,9 @@
             console.log( error );
             render_requested = false;
             ready = false;
+            enable_disable( true );
+            if (gizmo) { gizmo.dispose(); }
+            document.getElementById('div_error').style.display = "block";
 
             URL.revokeObjectURL( selected_mmd_file );
             URL.revokeObjectURL( selected_vmd_file );
@@ -1332,6 +1365,9 @@
             console.log( error );
             render_requested = false;
             ready = false;
+            enable_disable( true );
+            if (gizmo) { gizmo.dispose(); }
+            document.getElementById('div_error').style.display = "block";
 
             URL.revokeObjectURL( selected_mmd_file );
             URL.revokeObjectURL( selected_vmd_file );
@@ -1364,6 +1400,9 @@
           console.log( error );
           render_requested = false;
           ready = false;
+          enable_disable( true );
+          if (gizmo) { gizmo.dispose(); }
+          document.getElementById('div_error').style.display = "block";
 
           URL.revokeObjectURL( selected_audio_file );
         });
@@ -1559,6 +1598,9 @@
           console.log( error );
           render_requested = false;
           ready = false;
+          enable_disable( true );
+          if (gizmo) { gizmo.dispose(); }
+          document.getElementById('div_error').style.display = "block";
 
           URL.revokeObjectURL( selected_mmd_file );
         });
@@ -1658,6 +1700,9 @@
                 console.log( error );
                 render_requested = false;
                 ready = false;
+                enable_disable( true );
+                if (gizmo) { gizmo.dispose(); }
+                document.getElementById('div_error').style.display = "block";
               });
             } else if (selected_url_file.toUpperCase().endsWith('.MP3') || selected_url_file.toUpperCase().endsWith('.OGG')) {
               audio_loader.load( selected_url_file, function( buffer ) {
@@ -1682,9 +1727,17 @@
                 console.log( error );
                 render_requested = false;
                 ready = false;
+                enable_disable( true );
+                if (gizmo) { gizmo.dispose(); }
+                document.getElementById('div_error').style.display = "block";
               });
             } else {
               console.log('Unsupported URL file!');
+              render_requested = false;
+              ready = false;
+              enable_disable( true );
+              if (gizmo) { gizmo.dispose(); }
+              document.getElementById('div_error').style.display = "block";
             }
           }
         }
@@ -1816,6 +1869,9 @@
           console.log( error );
           render_requested = false;
           ready = false;
+          enable_disable( true );
+          if (gizmo) { gizmo.dispose(); }
+          document.getElementById('div_error').style.display = "block";
         });
 
         ready = true;
@@ -1930,6 +1986,9 @@
             console.log( error );
             render_requested = false;
             ready = false;
+            enable_disable( true );
+            if (gizmo) { gizmo.dispose(); }
+            document.getElementById('div_error').style.display = "block";
           });
 
           ready = true;
@@ -2024,6 +2083,9 @@
             console.log( error );
             render_requested = false;
             ready = false;
+            enable_disable( true );
+            if (gizmo) { gizmo.dispose(); }
+            document.getElementById('div_error').style.display = "block";
           });
 
           ready = true;
@@ -2215,11 +2277,12 @@
         }
 
         if (!reset) {
-          // Page (re)loading so reset the file input, URL entry, spinner, extras / poses button and disable controls
+          // Page (re)loading so reset the file input, URL entry, spinner, error, extras / poses button and disable controls
           document.getElementById('file_input').value = '';
           document.getElementById('url_entry').value = '';
           selected_url_file = '';
           document.getElementById('div_spinner').style.display = "block";
+          document.getElementById('div_error').style.display = "none";
           document.getElementById('btn_extras').style.backgroundColor = '#d1cefc';
           document.getElementById('btn_extras').disabled = true;
           document.getElementById('btn_poses').style.backgroundColor = '#d1cefc';

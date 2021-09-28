@@ -563,6 +563,7 @@
           };
 
           if (!selected_fbx_file) {
+            console.log( 'No valid FBX file selected!' );
             document.body.style.backgroundImage = "none";
             document.getElementById('div_spinner').style.display = "none";
             document.getElementById('div_error').style.display = "block";

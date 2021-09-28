@@ -624,6 +624,7 @@
           };
 
           if (!selected_gltf_file && draco_files.length == 0) {
+            console.log( 'No valid GLTF/GLB or DRACO file selected!' );
             document.body.style.backgroundImage = "none";
             document.getElementById('div_spinner').style.display = "none";
             document.getElementById('div_error').style.display = "block";

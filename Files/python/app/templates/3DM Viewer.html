@@ -49,6 +49,24 @@
       @-webkit-keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
       @keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
 
+      .error_msg {
+        position: absolute;
+        display: none;
+        background-color: transparent;
+        color: red;
+        text-align: center;
+        font-size: x-large;
+        width: 240px;
+        height: 40px;
+        top: 50%;
+        left: 50%;
+        margin-left: -127px;
+        padding: 10px;
+        border: 2px solid maroon;
+        -webkit-border-radius: 3%;
+        border-radius: 3%;
+      }
+
       p.full_screen {
         text-align: center;
         content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAf0lEQVRIie1VQQ6AMAjb/x9M4IRePICoK7GLB5eQbElpCTAY7j6YRiUPAvvxbNMkN76XIDhSRKCdjhmB494hzzwngcoBIa/eASgisMgTBo4ODqCTAiSFrW6Biv8LfL/I1DbtfDRV9VLgjVFhZp59A4g+7JaM6yULh7IyWUYX2AAPDxz26GjX+gAAAABJRU5ErkJggg==);
@@ -137,6 +155,7 @@
     </div><br />
 
     <div id="div_spinner" class="spinner"></div>
+    <div id="div_error" class="error_msg">E R R O R !</div>
 
     <script>
       function show_url() {
@@ -472,7 +491,13 @@
             else if (fi.files[i].name.toUpperCase().endsWith('.GIF')) { texture_files_gif.push( fi.files[i] ); }
           };
 
-          if (!selected_rhino_file) { return; }
+          if (!selected_rhino_file) {
+            console.log( 'No valid 3DM file selected!' );
+            document.body.style.backgroundImage = "none";
+            document.getElementById('div_spinner').style.display = "none";
+            document.getElementById('div_error').style.display = "block";
+            return;
+          }
 
           selected_url_file = '';
         } else {
@@ -483,6 +508,7 @@
 
         document.body.style.backgroundImage = "none";
         document.getElementById('div_spinner').style.display = "none";
+        document.getElementById('div_error').style.display = "none";
         enable_disable( false );
 
         if (renderer == undefined) {
@@ -669,6 +695,10 @@
           console.log( 'Error loading 3DM!' );
           console.log( error );
           render_requested = false;
+          enable_disable( true );
+          if (gizmo) { gizmo.dispose(); }
+          document.getElementById('div_error').style.display = "block";
+
           URL.revokeObjectURL( selected_rhino_file );
         });
       }
@@ -731,6 +761,9 @@
               console.log( 'Error loading URL 3DM!' );
               console.log( error );
               render_requested = false;
+              enable_disable( true );
+              if (gizmo) { gizmo.dispose(); }
+              document.getElementById('div_error').style.display = "block";
             });
           }
         }
@@ -1002,9 +1035,10 @@
         }
 
         if (!reset) {
-          // Page (re)loading so reset the file input, spinner, URL entry and disable controls
+          // Page (re)loading so reset the file input, spinner, error, URL entry and disable controls
           document.getElementById('file_input').value = "";
           document.getElementById('div_spinner').style.display = "block";
+          document.getElementById('div_error').style.display = "none";
           document.getElementById('url_entry').value = '';
           selected_url_file = '';
           enable_disable( true );

@@ -50,6 +50,24 @@
       @-webkit-keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
       @keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
 
+      .error_msg {
+        position: absolute;
+        display: none;
+        background-color: transparent;
+        color: red;
+        text-align: center;
+        font-size: x-large;
+        width: 240px;
+        height: 40px;
+        top: 50%;
+        left: 50%;
+        margin-left: -127px;
+        padding: 10px;
+        border: 2px solid maroon;
+        -webkit-border-radius: 3%;
+        border-radius: 3%;
+      }
+
       p.full_screen {
         text-align: center;
         content: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAf0lEQVRIie1VQQ6AMAjb/x9M4IRePICoK7GLB5eQbElpCTAY7j6YRiUPAvvxbNMkN76XIDhSRKCdjhmB494hzzwngcoBIa/eASgisMgTBo4ODqCTAiSFrW6Biv8LfL/I1DbtfDRV9VLgjVFhZp59A4g+7JaM6yULh7IyWUYX2AAPDxz26GjX+gAAAABJRU5ErkJggg==);
@@ -149,6 +167,7 @@
     </div>
 
     <div id="div_spinner" class="spinner"></div>
+    <div id="div_error" class="error_msg">E R R O R !</div>
 
     <canvas id="scene">
       Your browser does not support HTML5 canvas tag
@@ -520,7 +539,13 @@
             else if (fi.files[i].name.toUpperCase().endsWith('.DDS')) { texture_files_dds.push( fi.files[i] ); }
           };
 
-          if (!selected_obj_file) { return; }
+          if (!selected_obj_file) {
+            console.log( 'No valid OBJ file selected!' );
+            document.body.style.backgroundImage = "none";
+            document.getElementById('div_spinner').style.display = "none";
+            document.getElementById('div_error').style.display = "block";
+            return;
+          }
 
           selected_url_file = '';
         } else {
@@ -531,6 +556,7 @@
 
         document.body.style.backgroundImage = "none";
         document.getElementById('div_spinner').style.display = "none";
+        document.getElementById('div_error').style.display = "none";
         enable_disable( false );
 
         if (renderer == undefined) {
@@ -775,6 +801,11 @@
               console.log( 'Error loading OBJ!' );
               console.log( error );
               render_requested = false;
+              enable_disable( true );
+              if (gizmo) { gizmo.dispose(); }
+              document.getElementById('div_error').style.display = "block";
+
+              URL.revokeObjectURL( selected_obj_file );
             });
           }, function ( xhr ) {
             let today = new Date();
@@ -789,11 +820,17 @@
             console.log( 'Error loading MTL!' );
             console.log( error );
             render_requested = false;
+            enable_disable( true );
+            if (gizmo) { gizmo.dispose(); }
+            document.getElementById('div_error').style.display = "block";
+
+            URL.revokeObjectURL( selected_mtl_file );
           });
         } else {
           // Launch loading of the selected file
           obj_loader.load( URL.createObjectURL( selected_obj_file ), function ( object ) {
             URL.revokeObjectURL( selected_obj_file );
+
             Obj = object.clone();
 
             textures = [];
@@ -846,6 +883,11 @@
             console.log( 'Error loading OBJ!' );
             console.log( error );
             render_requested = false;
+            enable_disable( true );
+            if (gizmo) { gizmo.dispose(); }
+            document.getElementById('div_error').style.display = "block";
+
+            URL.revokeObjectURL( selected_obj_file );
           });
         }
       }
@@ -942,55 +984,73 @@
                 console.log( 'Error loading URL OBJ!' );
                 console.log( error );
                 render_requested = false;
+                enable_disable( true );
+                if (gizmo) { gizmo.dispose(); }
+                document.getElementById('div_error').style.display = "block";
               });
             } else {
-              return;
+              console.log('Unsupported URL file!');
+              render_requested = false;
+              enable_disable( true );
+              if (gizmo) { gizmo.dispose(); }
+              document.getElementById('div_error').style.display = "block";
             }
           } else {
-            obj_loader.load( selected_url_file, function ( object ) {
-              Obj = object.clone();
+            if (selected_url_file.toUpperCase().endsWith('.OBJ')) {
+              obj_loader.load( selected_url_file, function ( object ) {
+                Obj = object.clone();
 
-              let child_count = 1;
+                let child_count = 1;
 
-              // Go through all children of the loaded object and search for a Mesh
-              Obj.traverse( function( child ) {
-                // This will allow us to check if the child is an instance of the Mesh constructor
-          	    if (child instanceof THREE.Mesh) {
-                  // Enable transparency for the Opacity control and enable shadows
-                  child.material.side = THREE.DoubleSide;
-                  child.material.skinning = true;
-                  child.material.transparent = true;
-                  child.castShadow = true;
-                  child.receiveShadow = false;
+                // Go through all children of the loaded object and search for a Mesh
+                Obj.traverse( function( child ) {
+                  // This will allow us to check if the child is an instance of the Mesh constructor
+            	    if (child instanceof THREE.Mesh) {
+                    // Enable transparency for the Opacity control and enable shadows
+                    child.material.side = THREE.DoubleSide;
+                    child.material.skinning = true;
+                    child.material.transparent = true;
+                    child.castShadow = true;
+                    child.receiveShadow = false;
 
-                  child.name = 'child_' + child_count;
-                  initial_opacity[ child.name ] = child.material.opacity;
-                  edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
-                  child_count += 1;
-    	  	      }
-    	        });
+                    child.name = 'child_' + child_count;
+                    initial_opacity[ child.name ] = child.material.opacity;
+                    edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
+                    child_count += 1;
+    	    	      }
+    	          });
 
-              set_initial_scale();
-              resize();
+                set_initial_scale();
+                resize();
 
-              // Add the 3D object in the scene
-              scene.add( Obj );
+                // Add the 3D object in the scene
+                scene.add( Obj );
 
-              camera.lookAt( Obj.position );
-            }, function ( xhr ) {
-              let today = new Date();
-              let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+                camera.lookAt( Obj.position );
+              }, function ( xhr ) {
+                let today = new Date();
+                let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
 
-              if (xhr.loaded == 0 && xhr.total == 0) {
-                console.log( 'URL OBJ 0% loaded - ' + time );
-              } else {
-                console.log( 'URL OBJ ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
-              }
-            }, function ( error ) {
-              console.log( 'Error loading URL OBJ!' );
-              console.log( error );
+                if (xhr.loaded == 0 && xhr.total == 0) {
+                  console.log( 'URL OBJ 0% loaded - ' + time );
+                } else {
+                  console.log( 'URL OBJ ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                }
+              }, function ( error ) {
+                console.log( 'Error loading URL OBJ!' );
+                console.log( error );
+                render_requested = false;
+                enable_disable( true );
+                if (gizmo) { gizmo.dispose(); }
+                document.getElementById('div_error').style.display = "block";
+              });
+            } else {
+              console.log('Unsupported URL file!');
               render_requested = false;
-            });
+              enable_disable( true );
+              if (gizmo) { gizmo.dispose(); }
+              document.getElementById('div_error').style.display = "block";
+            }
           }
         }
       }
@@ -1277,9 +1337,10 @@
         }
 
         if (!reset) {
-          // Page (re)loading so reset the file input, spinner, URL entry, textures button and disable controls
+          // Page (re)loading so reset the file input, spinner, error, URL entry, textures button and disable controls
           document.getElementById('file_input').value = "";
           document.getElementById('div_spinner').style.display = "block";
+          document.getElementById('div_error').style.display = "none";
           document.getElementById('url_entry').value = '';
           selected_url_file = '';
           document.getElementById('btn_textures').disabled = true;
