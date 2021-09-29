@@ -35,7 +35,9 @@
       .spinner {
         position: absolute;
         display: block;
+        color: cyan;
         background-color: transparent;
+        text-align: center;
         width: 240px;
         height: 240px;
         top: 50%;
@@ -47,12 +49,12 @@
         border-radius: 50%;
         border-top-color: lightblue;
         border-bottom-color: lightblue;
-        -webkit-animation: spin 4s ease-in-out infinite;
-        animation: spin 4s ease-in-out infinite;
+        -webkit-animation: spin 16s ease-in-out infinite;
+        animation: spin 16s ease-in-out infinite;
       }
 
-      @-webkit-keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
-      @keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
+      @-webkit-keyframes spin { to { -webkit-transform: rotate( 3600deg ); } }
+      @keyframes spin { to { -webkit-transform: rotate( 360deg ); } }
 
       .error_msg {
         position: absolute;
@@ -648,6 +650,7 @@
             console.log( 'No valid PMD/PMX or MP3/OGG file selected!' );
             document.body.style.backgroundImage = "none";
             document.getElementById('div_spinner').style.display = "none";
+            document.getElementById('div_spinner').innerHTML = "";
             document.getElementById('div_error').style.display = "block";
             return;
           }
@@ -1386,6 +1389,11 @@
 
           render_requested = false;
           ready = false;
+          enable_disable( true );
+          if (gizmo) { gizmo.dispose(); }
+          document.body.style.backgroundImage = "";
+          document.getElementById('div_spinner').innerHTML = "Audio";
+          document.getElementById('div_spinner').style.display = "block";
         }, function ( xhr ) {
           let today = new Date();
           let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -2181,6 +2189,8 @@
           ready = false;
           enable_disable( true );
           if (gizmo) { gizmo.dispose(); }
+          document.body.style.backgroundImage = "";
+          document.getElementById('div_spinner').innerHTML = "Audio";
           document.getElementById('div_spinner').style.display = "block";
         }, function ( xhr ) {
           let today = new Date();
