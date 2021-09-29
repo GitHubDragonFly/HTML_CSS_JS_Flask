@@ -1629,6 +1629,10 @@
               loadURLPoseFiles();
             } else if (selected_mmd_url_file && selected_vmd_url_file) {
               loadURLMotionFiles();
+            } else if (selected_mmd_url_file) {
+              loadURLMMDFile();
+            } else if (selected_audio_url_file) {
+              loadURLAudioFile();
             }
           } else {
             if (selected_url_file.toUpperCase().endsWith('.PMD') || selected_url_file.toUpperCase().endsWith('.PMX')) {
@@ -1705,32 +1709,8 @@
                 document.getElementById('div_error').style.display = "block";
               });
             } else if (selected_url_file.toUpperCase().endsWith('.MP3') || selected_url_file.toUpperCase().endsWith('.OGG')) {
-              audio_loader.load( selected_url_file, function( buffer ) {
-                sound.setBuffer( buffer );
-                sound.setLoop(true);
-                sound.setVolume(0.3);
-                sound.play();
-
-                render_requested = false;
-                ready = false;
-              }, function ( xhr ) {
-                let today = new Date();
-                let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
-
-                if (xhr.loaded == 0 && xhr.total == 0) {
-                  console.log( 'URL Audio File 0% loaded - ' + time );
-                } else {
-                  console.log( 'URL Audio File ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
-                }
-              }, function ( error ) {
-                console.log( 'Error loading URL Audio File!' );
-                console.log( error );
-                render_requested = false;
-                ready = false;
-                enable_disable( true );
-                if (gizmo) { gizmo.dispose(); }
-                document.getElementById('div_error').style.display = "block";
-              });
+              selected_audio_url_file = selected_url_file;
+              loadURLAudioFile();
             } else {
               console.log('Unsupported URL file!');
               render_requested = false;
@@ -2066,9 +2046,9 @@
             camera.lookAt( mmd_obj.position );
 
             if (extras.length > 0) {
-            document.getElementById('btn_extras').disabled = false;
-            current_extra = 0;
-          }
+              document.getElementById('btn_extras').disabled = false;
+              current_extra = 0;
+            }
           }, function ( xhr ) {
             let today = new Date();
             let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
@@ -2090,6 +2070,136 @@
 
           ready = true;
         }
+      }
+
+      function loadURLMMDFile(){
+        let ext = selected_mmd_url_file.toUpperCase().endsWith('.PMX') ? 'pmx' : 'pmd';
+
+        mmd_loader.load( selected_mmd_url_file, ext, mesh => {
+          // Go through all children of the loaded object and search for a Mesh
+          mesh.traverse( function( child ) {
+            // Check for morph targets
+            if (child.morphTargetDictionary) {
+              Object.keys( child.morphTargetDictionary ).forEach( ( key, index ) => {
+                extras.push( [ child.id, key, index ] );
+              });
+            }
+
+            // This will allow us to check if the child is an instance of the Mesh constructor
+            if (child instanceof THREE.Mesh) {
+              child.geometry.computeVertexNormals();
+
+              if (Array.isArray( child.material )) {
+                child.material.forEach( mtl => {
+                  // Enable transparency for the Opacity control
+                  mtl.opacity = 1;
+                  mtl.transparent = true;
+                  mtl.skinning = true;
+                  mtl.side = THREE.DoubleSide;
+                });
+              } else {
+                // Enable transparency for the Opacity control
+                child.material.opacity = 1;
+                child.material.transparent = true;
+                child.material.skinning = true;
+                child.material.side = THREE.DoubleSide;
+              }
+
+              // Enable shadows
+              child.castShadow = true;
+              child.receiveShadow = true;
+    	  	  }
+          });
+
+          if (extras.length > 0) {
+            document.getElementById('btn_extras').disabled = false;
+            current_extra = 0;
+          }
+
+          if (selected_audio_url_file) {
+            audio_loader.load( selected_audio_url_file, function( buffer ) {
+              sound.setBuffer( buffer );
+            	sound.setLoop(true);
+            	sound.setVolume(0.3);
+              sound.play();
+            }, function ( xhr ) {
+              let today = new Date();
+              let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+              if (xhr.loaded == 0 && xhr.total == 0) {
+                console.log( 'URL Audio File 0% loaded - ' + time );
+              } else {
+                console.log( 'URL Audio File ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              }
+            }, function ( error ) {
+              console.log( 'Error loading URL Audio File!' );
+              console.log( error );
+              render_requested = false;
+              ready = false;
+            });
+          }
+
+          mmd_obj = mesh;
+          mmd_obj.name = 'url_model';
+
+          set_initial_scale();
+          resize();
+
+          // Add mmd model to scene
+          scene.add( mmd_obj );
+          camera.lookAt( mmd_obj.position );
+
+          ready = true;
+        }, function ( xhr ) {
+          let today = new Date();
+          let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+          if (xhr.loaded == 0 && xhr.total == 0) {
+            console.log( 'URL MMD 0% loaded - ' + time );
+          } else {
+            console.log( 'URL MMD ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+          }
+        }, function ( error ) {
+          console.log( 'Error loading URL MMD!' );
+          console.log( error );
+          render_requested = false;
+          ready = false;
+          enable_disable( true );
+          if (gizmo) { gizmo.dispose(); }
+          document.getElementById('div_error').style.display = "block";
+        });
+      }
+
+      function loadURLAudioFile(){
+        audio_loader.load( selected_audio_url_file, function( buffer ) {
+          sound.setBuffer( buffer );
+          sound.setLoop(true);
+          sound.setVolume(0.3);
+          sound.play();
+
+          render_requested = false;
+          ready = false;
+          enable_disable( true );
+          if (gizmo) { gizmo.dispose(); }
+          document.getElementById('div_spinner').style.display = "block";
+        }, function ( xhr ) {
+          let today = new Date();
+          let time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds() + '.' + today.getMilliseconds();
+
+          if (xhr.loaded == 0 && xhr.total == 0) {
+            console.log( 'URL Audio File 0% loaded - ' + time );
+          } else {
+            console.log( 'URL Audio File ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+          }
+        }, function ( error ) {
+          console.log( 'Error loading URL Audio File!' );
+          console.log( error );
+          render_requested = false;
+          ready = false;
+          enable_disable( true );
+          if (gizmo) { gizmo.dispose(); }
+          document.getElementById('div_error').style.display = "block";
+        });
       }
 
       function show_polar_grid() {
