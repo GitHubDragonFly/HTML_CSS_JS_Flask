@@ -40,7 +40,8 @@ Additional Notes:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd`
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
    - `https://raw.githubusercontent.com/takahirox/mmd-viewer-js/master/model/default/meiko_sakine.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
-   - it includes TGA texture loader, which can be seen in action with the last example listed above
+   - it includes TGA texture loader, which can be seen in action if you replace the very first line in the last example listed above to:
+   - `https://raw.githubusercontent.com/takahirox/mmd-viewer-js/master/model/low_miku/gumi.pmd,`
  - GLTF / DAE / FBX viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
    - Xbot.glb is the multi-animation example that can be accessed in the GLTF viewer via the following URL:
@@ -56,7 +57,7 @@ Additional Notes:
  - PLY viewer now includes STL file loader
  - 3DM / PLY / OBJ viewers also include an experimental flat shading button, with letter "F", which will be disabled for STL files
  - FBX / OBJ viewers also include an experimental texture switching button, with letter "T", which can be tested as working with the `Cerberus.obj` example:
-   -  local loading of the this OBJ example should also include all the image files: Cerberus_A.jpg, Cerberus_M.jpg, Cerberus_N.jpg, Cerberus_R.jpg, Cerberus_RM.jpg
+   - local loading of the this OBJ example should also include all the image files: Cerberus_A.jpg, Cerberus_M.jpg, Cerberus_N.jpg, Cerberus_R.jpg, Cerberus_RM.jpg
    - URL loading of the same OBJ example should be done with multiple comma separated URLs: `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus.obj, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_A.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_M.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_N.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_R.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_RM.jpg`
    - for FBX viewer, you can experiment with the above just by changing the first line to: `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/fbx/cloth.fbx,`
  - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in all viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
