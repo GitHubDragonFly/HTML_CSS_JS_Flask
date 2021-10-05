@@ -231,7 +231,8 @@
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation, reset_rotation, events_initialized;
       var rot_x = 0, rot_y = 0, rot_z = 0;
-      var initial_opacity, previous_obj_scale = '1', bounding_box = new THREE.Box3();
+      var previous_obj_scale = '1', bounding_box = new THREE.Box3();
+      var initial_opacity, initial_opacity_array, flat_shading_enabled;
       var selected_url_file = '', url_displayed, url_loading;
       var selected_mtl_file, selected_mtl_url_file, selected_obj_file, selected_obj_url_file;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_gif;
@@ -267,8 +268,11 @@
             // This will allow us to check if the child is an instance of the Mesh constructor
     	      if (child instanceof THREE.Mesh) {
               if (Array.isArray( child.material )) {
+                let child_count_array = 1;
+
                 child.material.forEach( mtl => {
-                  mtl.opacity = initial_opacity[ child.name ] * opacity_value;
+                  mtl.opacity = initial_opacity_array[ child.name ][ child_count_array ] * opacity_value;
+                  child_count_array += 1;
                 });
               } else {
                 child.material.opacity = initial_opacity[ child.name ] * opacity_value;
@@ -521,6 +525,8 @@
         edges = {};
         edges_visible = false;
         initial_opacity = {};
+        initial_opacity_array = {};
+        flat_shading_enabled = false;
         grid_visible = false;
         polar_grid_visible = false;
         render_requested = false;
@@ -735,6 +741,11 @@
                       URL.revokeObjectURL( file );
                     }
 
+                    if (value.map_ke && file.name === value.map_ke) {
+                      mtl.materialsInfo[ key ]['map_ke'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
+                      URL.revokeObjectURL( file );
+                    }
+
                     if (value.map_ks && file.name === value.map_ks) {
                       mtl.materialsInfo[ key ]['map_ks'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
                       URL.revokeObjectURL( file );
@@ -768,6 +779,11 @@
 
                     if (value.map_ka && file.name === value.map_ka) {
                       mtl.materialsInfo[ key ]['map_ka'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
+                      URL.revokeObjectURL( file );
+                    }
+
+                    if (value.map_ke && file.name === value.map_ke) {
+                      mtl.materialsInfo[ key ]['map_ke'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
                       URL.revokeObjectURL( file );
                     }
 
@@ -807,6 +823,11 @@
                       URL.revokeObjectURL( file );
                     }
 
+                    if (value.map_ke && file.name === value.map_ke) {
+                      mtl.materialsInfo[ key ]['map_ke'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
+                      URL.revokeObjectURL( file );
+                    }
+
                     if (value.map_ks && file.name === value.map_ks) {
                       mtl.materialsInfo[ key ]['map_ks'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
                       URL.revokeObjectURL( file );
@@ -840,6 +861,11 @@
 
                     if (value.map_ka && file.name === value.map_ka) {
                       mtl.materialsInfo[ key ]['map_ka'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
+                      URL.revokeObjectURL( file );
+                    }
+
+                    if (value.map_ke && file.name === value.map_ke) {
+                      mtl.materialsInfo[ key ]['map_ke'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
                       URL.revokeObjectURL( file );
                     }
 
@@ -879,6 +905,11 @@
                       URL.revokeObjectURL( file );
                     }
 
+                    if (value.map_ke && file.name === value.map_ke) {
+                      mtl.materialsInfo[ key ]['map_ke'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
+                      URL.revokeObjectURL( file );
+                    }
+
                     if (value.map_ks && file.name === value.map_ks) {
                       mtl.materialsInfo[ key ]['map_ks'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
                       URL.revokeObjectURL( file );
@@ -909,6 +940,7 @@
               Obj = object.clone();
 
               let child_count = 1;
+              let child_count_array = 1;
 
               // Go through all children of the loaded object and search for a Mesh
               Obj.traverse( function ( child ) {
@@ -941,15 +973,16 @@
                   child_count += 1;
 
                   if (Array.isArray( child.material )) {
-                    initial_opacity[ child.name ] = {};
+                    initial_opacity_array[ child.name ] = {};
 
                     child.material.forEach( mtl => {
                       mtl.side = THREE.DoubleSide;
                       mtl.skinning = true;
                       mtl.transparent = true;
-                    });
 
-                    initial_opacity[ child.name ] = 1;
+                      initial_opacity_array[ child.name ][ child_count_array ] = mtl.opacity;
+                      child_count_array += 1;
+                    });
                   } else {
                     child.material.side = THREE.DoubleSide;
                     child.material.skinning = true;
@@ -1023,6 +1056,7 @@
             if (textures.length > 0) { document.getElementById('btn_textures').disabled = false; }
 
             let child_count = 1;
+            let child_count_array = 1;
 
             // Go through all children of the loaded object and search for a Mesh
             Obj.traverse( function( child ) {
@@ -1037,13 +1071,16 @@
                 child_count += 1;
 
                 if (Array.isArray( child.material )) {
+                  initial_opacity_array[ child.name ] = {};
+
                   child.material.forEach( mtl => {
                     mtl.side = THREE.DoubleSide;
                     mtl.skinning = true;
                     mtl.transparent = true;
-                  });
 
-                  initial_opacity[ child.name ] = 1;
+                    initial_opacity_array[ child.name ][ child_count_array ] = mtl.opacity;
+                    child_count_array += 1;
+                  });
                 } else {
                   child.material.side = THREE.DoubleSide;
                   child.material.skinning = true;
@@ -1135,6 +1172,7 @@
                 Obj = object.clone();
 
                 let child_count = 1;
+                let child_count_array = 1;
 
                 // Go through all children of the loaded object and search for a Mesh
                 Obj.traverse( function( child ) {
@@ -1149,14 +1187,17 @@
                     child_count += 1;
 
                     if (Array.isArray( child.material )) {
+                      initial_opacity_array[ child.name ] = {};
+
                       child.material.forEach( mtl => {
                         if (mtl.map) { mtl.map.generateMipmaps = true; }
                         mtl.side = THREE.DoubleSide;
                         mtl.skinning = true;
                         mtl.transparent = true;
-                      });
 
-                      initial_opacity[ child.name ] = 1;
+                        initial_opacity_array[ child.name ][ child_count_array ] = mtl.opacity;
+                        child_count_array += 1;
+                      });
                     } else {
                       if (child.material.map) { child.material.map.generateMipmaps = true; }
                       child.material.side = THREE.DoubleSide;
@@ -1205,6 +1246,7 @@
                 Obj = object.clone();
 
                 let child_count = 1;
+                let child_count_array = 1;
 
                 // Go through all children of the loaded object and search for a Mesh
                 Obj.traverse( function( child ) {
@@ -1219,13 +1261,16 @@
                     child_count += 1;
 
                     if (Array.isArray( child.material )) {
+                      initial_opacity_array[ child.name ] = {};
+
                       child.material.forEach( mtl => {
                         mtl.side = THREE.DoubleSide;
                         mtl.skinning = true;
                         mtl.transparent = true;
-                      });
 
-                      initial_opacity[ child.name ] = 1;
+                        initial_opacity_array[ child.name ][ child_count_array ] = mtl.opacity;
+                        child_count_array += 1;
+                      });
                     } else {
                       child.material.side = THREE.DoubleSide;
                       child.material.skinning = true;
@@ -1349,6 +1394,14 @@
       }
 
       function set_flat() {
+        if (flat_shading_enabled) {
+          document.getElementById('btn_flat').style.backgroundColor = '#d1cefc';
+          flat_shading_enabled = false;
+        } else {
+          document.getElementById('btn_flat').style.backgroundColor = 'lightgreen';
+          flat_shading_enabled = true;
+        }
+
         // Go through all children of the loaded object and search for a Mesh
         Obj.traverse( function( child ) {
           // This will allow us to check if the child is an instance of the Mesh constructor
@@ -1357,22 +1410,10 @@
               child.material.forEach( mtl => {
                 mtl.flatShading = !mtl.flatShading;
                 mtl.needsUpdate = true;
-
-                if (mtl.flatShading) {
-                  document.getElementById('btn_flat').style.backgroundColor = 'lightgreen';
-                } else {
-                  document.getElementById('btn_flat').style.backgroundColor = '#d1cefc';
-                }
               });
             } else {
               child.material.flatShading = !child.material.flatShading;
               child.material.needsUpdate = true;
-
-              if (child.material.flatShading) {
-                document.getElementById('btn_flat').style.backgroundColor = 'lightgreen';
-              } else {
-                document.getElementById('btn_flat').style.backgroundColor = '#d1cefc';
-              }
             }
     		  }
     	  });
@@ -1589,6 +1630,7 @@
         document.getElementById('scale_10x').checked = false;
 
         // Reset flat, edges and textures related values
+        flat_shading_enabled = false;
         document.getElementById('btn_flat').style.backgroundColor = '#d1cefc';
         edges_visible = false;
         document.getElementById('btn_edges').style.backgroundColor = '#d1cefc';
