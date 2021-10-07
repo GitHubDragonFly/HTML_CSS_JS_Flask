@@ -17,7 +17,7 @@ The main differences between these 2 projects:
  - KTX2 support was also added to the DAE Viewer
 
 Additional Notes:
- - Single character buttons, where applicable: `E` - edges, `F` - flatShading, `A` - animations, `X`- extras, `M` - materials, `T` - textures, `P` - poses, `#` - grid
+ - Single character buttons, where applicable: `E` - edges, `F` - flatShading, `K` - kinematics, `A` - animations, `X`- extras, `M` - materials, `T` - textures, `P` - poses, `#` - grid
  - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) non-module version was added to all viewers
  - VRML viewer is module based, requires a server and will not be functional in the online preview:
    - if using a server then try the following link via the URL option:
@@ -42,6 +42,9 @@ Additional Notes:
    - `https://raw.githubusercontent.com/takahirox/mmd-viewer-js/master/model/default/meiko_sakine.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
    - it includes TGA texture loader, which can be seen in action if you replace the very first line in the last example listed above to:
    - `https://raw.githubusercontent.com/takahirox/mmd-viewer-js/master/model/low_miku/gumi.pmd,`
+ - DAE viewer supports kinematics, controlled by the button with letter "K", is module based, requires server and will not work in the online preview
+   - if using a server then try the following link via the URL option:
+   - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/collada/abb_irb52_7_120.dae`
  - GLTF / DAE / FBX viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
    - Xbot.glb is the multi-animation example that can be accessed in the GLTF viewer via the following URL:
@@ -81,7 +84,7 @@ All it takes to run this project is to do either of the below listed:
 
 a) Even though this is all intended to be used with the `Flask` server, thanks to the [GitHub & BitBucket HTML Preview](https://github.com/htmlpreview/htmlpreview.github.com) you can still preview the [Exercise](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/Exercise.html) page online and use its fixed menu to access the rest, with the following limitations:
  - GLTF Viewer does allow loading DRACO files but does not allow loading KTX2 textures (check the module "import" console error)
- - DAE Viewer will not allow loading KTX2 textures (check the module "import" console error)
+ - DAE Viewer will not allow loading KTX2 textures or support kinematics (check the module "import" console error)
  - VRML viewer is module based, requires a server and will not be functional in the preview (check the module "import" console error)
  - The Form entries are set to be handled by the server and will not work in the preview
 
