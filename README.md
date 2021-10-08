@@ -42,10 +42,10 @@ Additional Notes:
    - `https://raw.githubusercontent.com/takahirox/mmd-viewer-js/master/model/default/meiko_sakine.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
    - it includes TGA texture loader, which can be seen in action if you replace the very first line in the last example listed above to:
    - `https://raw.githubusercontent.com/takahirox/mmd-viewer-js/master/model/low_miku/gumi.pmd,`
- - DAE viewer supports kinematics, controlled by the button with letter "K", is module based, requires server and will not work in the online preview
+ - DAE viewer also supports kinematics, controlled by the button with letter "K", which is module based, requires server and will not work in the online preview
    - if using a server then try the following link via the URL option:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/collada/abb_irb52_7_120.dae`
- - DAE viewer was also updated to support DDS textures, which can be tested via the viewer's URL option with the following example:
+ - DAE viewer was also updated to support DDS textures, which is functional in the online preview and can be tested via the viewer's URL option with the following example:
    - `https://raw.githubusercontent.com/SaschaWillems/VulkanSponza/master/data/sponza.dae`
  - GLTF / DAE / FBX viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
