@@ -1370,6 +1370,10 @@
 						loader = tgaLoader;
 						break;
 
+					case 'dds':
+						loader = ddsLoader;
+						break;
+	
 					default:
 						loader = textureLoader;
 
@@ -1410,7 +1414,7 @@
 					const sampler = effect.profile.samplers[ textureObject.id ];
 					let image = null; // get image
 
-					if ( sampler !== undefined ) {
+					if ( sampler && Object.keys(sampler).length !== 0 ) {
 
 						const surface = effect.profile.surfaces[ sampler.source ];
 						image = getImage( surface.init_from );
@@ -3655,11 +3659,19 @@
 			const textureLoader = new THREE.TextureLoader( this.manager );
 			textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 			let tgaLoader;
+			let ddsLoader;
 
 			if ( THREE.TGALoader ) {
 
 				tgaLoader = new THREE.TGALoader( this.manager );
 				tgaLoader.setPath( this.resourcePath || path );
+
+			} //
+
+			if ( THREE.DDSLoader ) {
+
+				ddsLoader = new THREE.DDSLoader( this.manager );
+				ddsLoader.setPath( this.resourcePath || path );
 
 			} //
 
