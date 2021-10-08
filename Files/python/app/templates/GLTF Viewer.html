@@ -7,6 +7,8 @@
     <script src="../static/js/three.js"></script>
     <script src="../static/js/DRACOLoader.js"></script>
     <script src="../static/js/GLTFLoader.js"></script>
+    <script src="../static/js/TGALoader.js"></script>
+    <script src="../static/js/DDSLoader.js"></script>
     <script src="../static/js/OrbitControls.js"></script>
     <script src="../static/js/OrbitControlsGizmo.js"></script>
     <script src="../static/js/libs/meshopt_decoder.js"></script>
@@ -246,6 +248,12 @@
       gltf_loader.setDRACOLoader( draco_loader );
 
       const texture_loader = new THREE.TextureLoader( manager );
+
+      const tga_loader = new THREE.TGALoader( manager );
+      manager.addHandler( /\.tga$/i, tga_loader );
+
+      const dds_loader = new THREE.DDSLoader( manager );
+      manager.addHandler( /\.dds$/i, dds_loader );
 
       function set_back_color() {
         scene.background = null;
@@ -952,7 +960,7 @@
                 });
               });
             } else {
-              let texture = texture_loader().load( 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAAzSURBVBhXFYrJDQAxDAIHl5tG9pWOI8/aICGunO9qP0JRNZqwltgspltKdtmfihNMoc0PFNkQjHSfyTIAAAAASUVORK5CYII=' );
+              let texture = texture_loader.load( 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAAzSURBVBhXFYrJDQAxDAIHl5tG9pWOI8/aICGunO9qP0JRNZqwltgspltKdtmfihNMoc0PFNkQjHSfyTIAAAAASUVORK5CYII=' );
               draco_material = new THREE.MeshStandardMaterial( { map: texture, opacity: 1, transparent: true } );
 
               gltf_obj = new THREE.Mesh( geometry, draco_material );
@@ -1000,7 +1008,7 @@
             draco_loader.load( selected_url_file, function( geometry ) {
               geometry.computeVertexNormals();
 
-              let texture = texture_loader().load( 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAAzSURBVBhXFYrJDQAxDAIHl5tG9pWOI8/aICGunO9qP0JRNZqwltgspltKdtmfihNMoc0PFNkQjHSfyTIAAAAASUVORK5CYII=' );
+              let texture = texture_loader.load( 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAAzSURBVBhXFYrJDQAxDAIHl5tG9pWOI8/aICGunO9qP0JRNZqwltgspltKdtmfihNMoc0PFNkQjHSfyTIAAAAASUVORK5CYII=' );
               draco_material = new THREE.MeshStandardMaterial( { map: texture, opacity: 1, transparent: true } );
 
               gltf_obj = new THREE.Mesh( geometry, draco_material );

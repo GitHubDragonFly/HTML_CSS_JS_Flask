@@ -5,6 +5,8 @@
     <link rel="shortcut icon" href="../static/favicon.ico" type="image/x-icon"/>
 
     <script src="../static/js/three.js"></script>
+    <script src="../static/js/TGALoader.js"></script>
+    <script src="../static/js/DDSLoader.js"></script>
     <script src="../static/js/OrbitControls.js"></script>
     <script src="../static/js/OrbitControlsGizmo.js"></script>
 
@@ -202,6 +204,12 @@
       var manager = new THREE.LoadingManager();
 
       const texture_loader = new THREE.TextureLoader();
+
+      const tga_loader = new THREE.TGALoader( manager );
+      manager.addHandler( /\.tga$/i, tga_loader );
+
+      const dds_loader = new THREE.DDSLoader( manager );
+      manager.addHandler( /\.dds$/i, dds_loader );
 
       function set_back_color() {
         scene.background = null;

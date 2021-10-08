@@ -6,6 +6,7 @@
 
     <script src="../static/js/three.js"></script>
     <script src="../static/js/ColladaLoader.js"></script>
+    <script src="../static/js/TGALoader.js"></script>
     <script src="../static/js/DDSLoader.js"></script>
     <script src="../static/js/OrbitControls.js"></script>
     <script src="../static/js/OrbitControlsGizmo.js"></script>
@@ -244,6 +245,9 @@
       const dae_loader = new THREE.ColladaLoader( manager );
 
       const texture_loader = new THREE.TextureLoader( manager );
+
+      const tga_loader = new THREE.TGALoader( manager );
+      manager.addHandler( /\.tga$/i, tga_loader );
 
       const dds_loader = new THREE.DDSLoader( manager );
       manager.addHandler( /\.dds$/i, dds_loader );
