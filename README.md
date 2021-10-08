@@ -45,6 +45,8 @@ Additional Notes:
  - DAE viewer supports kinematics, controlled by the button with letter "K", is module based, requires server and will not work in the online preview
    - if using a server then try the following link via the URL option:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/collada/abb_irb52_7_120.dae`
+ - DAE viewer was also updated to support DDS textures, which can be tested via the viewer's URL option with the following example:
+   - `https://raw.githubusercontent.com/SaschaWillems/VulkanSponza/master/data/sponza.dae`
  - GLTF / DAE / FBX viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
    - Xbot.glb is the multi-animation example that can be accessed in the GLTF viewer via the following URL:
