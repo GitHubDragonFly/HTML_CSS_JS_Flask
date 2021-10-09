@@ -233,7 +233,7 @@
       var initial_opacity, previous_dae_scale = '1', bounding_box = new THREE.Box3();
       var selected_dae_file, selected_url_file = '', url_displayed, url_loading;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_gif;
-      var ktx2_loader, texture_files_ktx2, texture_files_dds, surfaces;
+      var ktx2_loader, texture_files_ktx2, texture_files_dds, surfaces, tex, extra, technique;
 
       const target = {};
       const tweenParameters = {};
@@ -712,7 +712,6 @@
         // Launch loading of the selected file
         dae_loader.load( URL.createObjectURL( selected_dae_file ), function( collada ) {
           URL.revokeObjectURL( selected_dae_file );
-          console.log(collada);
 
           animations = collada.scene.animations;
 
@@ -733,7 +732,24 @@
                 texture_files_ktx2.forEach( file => {
                   for (const [ key1, value1 ] of Object.entries( surfaces )) {
                     if (collada.library.images[ value1.init_from ] && collada.library.images[ value1.init_from ].init_from === file.name) {
-                      let tex = ktx2_loader.load( URL.createObjectURL( file ) , function( texture ) { URL.revokeObjectURL( file ); });
+                      tex = ktx2_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                        URL.revokeObjectURL( file );
+
+                        extra = value.profile.technique.extra;
+
+                        if ( extra !== undefined && extra.technique !== undefined && isEmpty( extra.technique ) === false ) {
+                          technique = extra.technique;
+
+                          texture.wrapS = technique.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+                          texture.wrapT = technique.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+                          texture.offset.set( technique.offsetU || 0, technique.offsetV || 0 );
+                          texture.repeat.set( technique.repeatU || 1, technique.repeatV || 1 );
+                        } else {
+                          texture.wrapS = THREE.RepeatWrapping;
+                          texture.wrapT = THREE.RepeatWrapping;
+                        }
+                      });
+
                       for (const [ key2, value2 ] of Object.entries( collada.library.materials )) {
                         if (value2.url === key) collada.library.materials[ key2 ].build.map = tex;
                       }
@@ -748,7 +764,24 @@
                 files.forEach( file => {
                   for (const [ key1, value1 ] of Object.entries( surfaces )) {
                     if (collada.library.images[ value1.init_from ] && collada.library.images[ value1.init_from ].init_from === file.name) {
-                      let tex = texture_loader.load( URL.createObjectURL( file ) , function( texture ) { URL.revokeObjectURL( file ); });
+                      tex = texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                        URL.revokeObjectURL( file );
+
+                        extra = value.profile.technique.extra;
+
+                        if ( extra !== undefined && extra.technique !== undefined && isEmpty( extra.technique ) === false ) {
+                          technique = extra.technique;
+
+                          texture.wrapS = technique.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+                          texture.wrapT = technique.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+                          texture.offset.set( technique.offsetU || 0, technique.offsetV || 0 );
+                          texture.repeat.set( technique.repeatU || 1, technique.repeatV || 1 );
+                        } else {
+                          texture.wrapS = THREE.RepeatWrapping;
+                          texture.wrapT = THREE.RepeatWrapping;
+                        }
+                      });
+
                       for (const [ key2, value2 ] of Object.entries( collada.library.materials )) {
                         if (value2.url === key) collada.library.materials[ key2 ].build.map = tex;
                       }
@@ -761,7 +794,24 @@
                 texture_files_dds.forEach( file => {
                   for (const [ key1, value1 ] of Object.entries( surfaces )) {
                     if (collada.library.images[ value1.init_from ] && collada.library.images[ value1.init_from ].init_from === file.name) {
-                      let tex = dds_loader.load( URL.createObjectURL( file ) , function( texture ) { URL.revokeObjectURL( file ); });
+                      tex = dds_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                        URL.revokeObjectURL( file );
+
+                        extra = value.profile.technique.extra;
+
+                        if ( extra !== undefined && extra.technique !== undefined && isEmpty( extra.technique ) === false ) {
+                          technique = extra.technique;
+
+                          texture.wrapS = technique.wrapU ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+                          texture.wrapT = technique.wrapV ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+                          texture.offset.set( technique.offsetU || 0, technique.offsetV || 0 );
+                          texture.repeat.set( technique.repeatU || 1, technique.repeatV || 1 );
+                        } else {
+                          texture.wrapS = THREE.RepeatWrapping;
+                          texture.wrapT = THREE.RepeatWrapping;
+                        }
+                      });
+
                       for (const [ key2, value2 ] of Object.entries( collada.library.materials )) {
                         if (value2.url === key) collada.library.materials[ key2 ].build.map = tex;
                       }
