@@ -3,7 +3,7 @@ Generally intended for educational purposes.
 
 This is an expanded and modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project, set to be used with `python3` and `Flask` server.
 
-There are several three.js viewers, not necessarily perfect but functional as they are. Online preview links are available in the `Usage` section but do have some limitations. Do note  that loading any textures directly from your hard drive might make the object look either interesting or funny.
+There are several three.js viewers, not necessarily perfect but functional as they are. Online preview links are available in the `Usage` section but do have some limitations. Do note  that loading any textures directly from your hard drive might make the object look either correct or interesting or funny.
 
 The main differences between these 2 projects:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
