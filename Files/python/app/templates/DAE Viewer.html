@@ -221,18 +221,19 @@
     </script>
 
     <script>
-      var animations, animation_mixer, animation_running, current_animation, render_requested, clock;
-      var renderer, scene, camera, dae_obj, edges, edges_visible;
+      var animations, animation_mixer, animation_running, current_animation;
+      var renderer, render_requested, scene, camera, dae_obj, clock;
       var controls, gizmo, grid, polar_grid, grid_visible, polar_grid_visible;
       var ambientLight, hemisphereLight, spotLight, directionalLight;
-      var shadowMesh, shadowMaterial, kinematics, kinematics_running, kinematicsTween, tween;
+      var shadowMesh, shadowMaterial, edges, edges_visible;
+      var kinematics, kinematics_running, kinematicsTween, tween;
       var ww = window.innerWidth,	wh = window.innerHeight;
       var mouse_rotation, reset_rotation, events_initialized;
       var rot_x = 0, rot_y = 0, rot_z = 0;
       var initial_opacity, previous_dae_scale = '1', bounding_box = new THREE.Box3();
       var selected_dae_file, selected_url_file = '', url_displayed, url_loading;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_gif;
-      var ktx2_loader, texture_files_ktx2, texture_files_dds;
+      var ktx2_loader, texture_files_ktx2, texture_files_dds, surfaces;
 
       const target = {};
       const tweenParameters = {};
@@ -711,6 +712,7 @@
         // Launch loading of the selected file
         dae_loader.load( URL.createObjectURL( selected_dae_file ), function( collada ) {
           URL.revokeObjectURL( selected_dae_file );
+          console.log(collada);
 
           animations = collada.scene.animations;
 
@@ -722,6 +724,53 @@
 
           kinematics = collada.kinematics;
           if (Object.keys(kinematics).length !== 0 && tween) document.getElementById('btn_kinematics').disabled = false;
+
+          if (Object.keys(collada.library.effects).length !== 0) {
+            for (const [ key, value ] of Object.entries( collada.library.effects )) {
+              surfaces = value.profile.surfaces;
+
+              if (texture_files_ktx2.length > 0) {
+                texture_files_ktx2.forEach( file => {
+                  for (const [ key1, value1 ] of Object.entries( surfaces )) {
+                    if (collada.library.images[ value1.init_from ] && collada.library.images[ value1.init_from ].init_from === file.name) {
+                      let tex = ktx2_loader.load( URL.createObjectURL( file ) , function( texture ) { URL.revokeObjectURL( file ); });
+                      for (const [ key2, value2 ] of Object.entries( collada.library.materials )) {
+                        if (value2.url === key) collada.library.materials[ key2 ].build.map = tex;
+                      }
+                    }
+                  };
+                });
+              }
+              
+              if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_gif.length > 0) {
+                let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : ((texture_files_bmp.length > 0) ? texture_files_bmp : texture_files_gif));
+
+                files.forEach( file => {
+                  for (const [ key1, value1 ] of Object.entries( surfaces )) {
+                    if (collada.library.images[ value1.init_from ] && collada.library.images[ value1.init_from ].init_from === file.name) {
+                      let tex = texture_loader.load( URL.createObjectURL( file ) , function( texture ) { URL.revokeObjectURL( file ); });
+                      for (const [ key2, value2 ] of Object.entries( collada.library.materials )) {
+                        if (value2.url === key) collada.library.materials[ key2 ].build.map = tex;
+                      }
+                    }
+                  };
+                });
+              }
+              
+              if (texture_files_dds.length > 0) {
+                texture_files_dds.forEach( file => {
+                  for (const [ key1, value1 ] of Object.entries( surfaces )) {
+                    if (collada.library.images[ value1.init_from ] && collada.library.images[ value1.init_from ].init_from === file.name) {
+                      let tex = dds_loader.load( URL.createObjectURL( file ) , function( texture ) { URL.revokeObjectURL( file ); });
+                      for (const [ key2, value2 ] of Object.entries( collada.library.materials )) {
+                        if (value2.url === key) collada.library.materials[ key2 ].build.map = tex;
+                      }
+                    }
+                  };
+                });
+              }
+            }
+          }
 
           let child_count = 1;
 
@@ -757,74 +806,76 @@
               child.castShadow = true;
               child.receiveShadow = false;
 
-              if (texture_files_ktx2.length > 0) {
-                texture_files_ktx2.forEach( file => {
-                  ktx2_loader.load( URL.createObjectURL( file ) , function( texture ) {
-                    URL.revokeObjectURL( file );
+              if (Object.keys(collada.library.images).length === 0) {
+                if (texture_files_ktx2.length > 0) {
+                  texture_files_ktx2.forEach( file => {
+                    ktx2_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                      URL.revokeObjectURL( file );
 
-                    texture.encoding = THREE.sRGBEncoding;
-                    texture.wrapS = THREE.RepeatWrapping;
-                    texture.wrapT = THREE.RepeatWrapping;
-                    texture.magFilter = THREE.NearestFilter;
+                      texture.encoding = THREE.sRGBEncoding;
+                      texture.wrapS = THREE.RepeatWrapping;
+                      texture.wrapT = THREE.RepeatWrapping;
+                      texture.magFilter = THREE.NearestFilter;
 
-                    // Apply texture
-                    if (Array.isArray( child.material )) {
-                      child.material.forEach( mtl => {
-                        mtl.map = texture;
-                        mtl.needsUpdate = true;
-                      });
-                    } else {
-                      child.material.map = texture;
-                      child.material.needsUpdate = true;
-                    }
+                      // Apply texture
+                      if (Array.isArray( child.material )) {
+                        child.material.forEach( mtl => {
+                          mtl.map = texture;
+                          mtl.needsUpdate = true;
+                        });
+                      } else {
+                        child.material.map = texture;
+                        child.material.needsUpdate = true;
+                      }
+                    });
                   });
-                });
-              } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_gif.length > 0) {
-                let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : ((texture_files_bmp.length > 0) ? texture_files_bmp : texture_files_gif));
+                } else if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_gif.length > 0) {
+                  let files = (texture_files_png.length > 0) ? texture_files_png : ((texture_files_jpg.length > 0) ? texture_files_jpg : ((texture_files_bmp.length > 0) ? texture_files_bmp : texture_files_gif));
 
-                files.forEach( file => {
-                  texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
-                    URL.revokeObjectURL( file );
+                  files.forEach( file => {
+                    texture_loader.load( URL.createObjectURL( file ) , function( texture ) {
+                      URL.revokeObjectURL( file );
 
-                    texture.encoding = THREE.sRGBEncoding;
-                    texture.wrapS = THREE.RepeatWrapping;
-                    texture.wrapT = THREE.RepeatWrapping;
-                    texture.magFilter = THREE.NearestFilter;
+                      texture.encoding = THREE.sRGBEncoding;
+                      texture.wrapS = THREE.RepeatWrapping;
+                      texture.wrapT = THREE.RepeatWrapping;
+                      texture.magFilter = THREE.NearestFilter;
 
-                    // Apply texture
-                    if (Array.isArray( child.material )) {
-                      child.material.forEach( mtl => {
-                        mtl.map = texture;
-                        mtl.needsUpdate = true;
-                      });
-                    } else {
-                      child.material.map = texture;
-                      child.material.needsUpdate = true;
-                    }
+                      // Apply texture
+                      if (Array.isArray( child.material )) {
+                        child.material.forEach( mtl => {
+                          mtl.map = texture;
+                          mtl.needsUpdate = true;
+                        });
+                      } else {
+                        child.material.map = texture;
+                        child.material.needsUpdate = true;
+                      }
+                    });
                   });
-                });
-              } else if (texture_files_dds.length > 0) {
-                texture_files_dds.forEach( file => {
-                  dds_loader.load( URL.createObjectURL( file ), function( texture ) {
-                    URL.revokeObjectURL( file );
+                } else if (texture_files_dds.length > 0) {
+                  texture_files_dds.forEach( file => {
+                    dds_loader.load( URL.createObjectURL( file ), function( texture ) {
+                      URL.revokeObjectURL( file );
 
-                    texture.encoding = THREE.sRGBEncoding;
-                    texture.wrapS = THREE.RepeatWrapping;
-                    texture.wrapT = THREE.RepeatWrapping;
-                    texture.magFilter = THREE.NearestFilter;
+                      texture.encoding = THREE.sRGBEncoding;
+                      texture.wrapS = THREE.RepeatWrapping;
+                      texture.wrapT = THREE.RepeatWrapping;
+                      texture.magFilter = THREE.NearestFilter;
 
-                    // Apply texture
-                    if (Array.isArray( child.material )) {
-                      child.material.forEach( mtl => {
-                        mtl.map = texture;
-                        mtl.needsUpdate = true;
-                      });
-                    } else {
-                      child.material.map = texture;
-                      child.material.needsUpdate = true;
-                    }
+                      // Apply texture
+                      if (Array.isArray( child.material )) {
+                        child.material.forEach( mtl => {
+                          mtl.map = texture;
+                          mtl.needsUpdate = true;
+                        });
+                      } else {
+                        child.material.map = texture;
+                        child.material.needsUpdate = true;
+                      }
+                    });
                   });
-                });
+                }
               }
             }
           });
