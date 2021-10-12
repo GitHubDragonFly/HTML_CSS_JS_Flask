@@ -257,6 +257,16 @@
 					type = 'image/tga';
 					break;
 
+				case 'dds':
+					if ( this.manager.getHandler( '.dds' ) === null ) {
+	
+						console.warn( 'FBXLoader: DDS loader not found, skipping ', fileName );
+	
+					}
+	
+					type = 'image/vnd-ms.dds';
+					break;
+	
 				default:
 					console.warn( 'FBXLoader: Image type "' + extension + '" is not supported.' );
 					return;
@@ -360,6 +370,22 @@
 				if ( loader === null ) {
 
 					console.warn( 'FBXLoader: TGA loader not found, creating placeholder texture for', textureNode.RelativeFilename );
+					texture = new THREE.Texture();
+
+				} else {
+
+					loader.setPath( this.textureLoader.path );
+					texture = loader.load( fileName );
+
+				}
+
+			} else if ( extension === 'dds' ) {
+
+				const loader = this.manager.getHandler( '.dds' );
+
+				if ( loader === null ) {
+
+					console.warn( 'FBXLoader: DDS loader not found, creating placeholder texture for', textureNode.RelativeFilename );
 					texture = new THREE.Texture();
 
 				} else {
