@@ -43,12 +43,12 @@
         border-radius: 50%;
         border-top-color: lightblue;
         border-bottom-color: lightblue;
-        -webkit-animation: spin 4s ease-in-out infinite;
-        animation: spin 4s ease-in-out infinite;
+        -webkit-animation: spin 8s ease-in-out infinite;
+        animation: spin 8s ease-in-out infinite;
       }
 
-      @-webkit-keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
-      @keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
+      @-webkit-keyframes spin { to { -webkit-transform: rotate( 360deg ); } }
+      @keyframes spin { to { -webkit-transform: rotate( 360deg ); } }
 
       .error_msg {
         position: absolute;
@@ -233,8 +233,8 @@
       var initial_opacity, previous_dae_scale = '1', bounding_box = new THREE.Box3();
       var selected_dae_file, selected_url_file = '', url_displayed, url_loading;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_gif;
-      var ktx2_loader, texture_files_ktx2, texture_files_dds
-      var surfaces, tex, extra, technique, material_set;
+      var ktx2_loader, texture_files_ktx2, texture_files_dds;
+      var tex, extra, technique, material_set;
 
       const target = {};
       const tweenParameters = {};
@@ -731,9 +731,7 @@
 
               for (const [ key1, value1 ] of Object.entries( collada.library.effects )) {
                 if (key1 === value.url) {
-                  surfaces = value1.profile.surfaces;
-
-                  for (const [ key2, value2 ] of Object.entries( surfaces )) {
+                  for (const [ key2, value2 ] of Object.entries( value1.profile.surfaces )) {
                     if (texture_files_ktx2.length > 0) {
                       texture_files_ktx2.forEach( file => {
                         if (collada.library.images[ value2.init_from ] && collada.library.images[ value2.init_from ].init_from === file.name) {
@@ -763,7 +761,7 @@
                             material_set = true;
                           }
 
-                          surfaces[ key2 ].init_from = tex;
+                          value1.profile.surfaces[ key2 ].init_from = tex;
                         }
                       });
                     }
@@ -799,7 +797,7 @@
                             material_set = true;
                           }
 
-                          surfaces[ key2 ].init_from = tex;
+                          value1.profile.surfaces[ key2 ].init_from = tex;
                         }
                       });
                     }
@@ -833,7 +831,7 @@
                             material_set = true;
                           }
 
-                          surfaces[ key2 ].init_from = tex;
+                          value1.profile.surfaces[ key2 ].init_from = tex;
                         }
                       });
                     }

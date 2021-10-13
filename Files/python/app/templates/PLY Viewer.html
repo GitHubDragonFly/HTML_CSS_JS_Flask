@@ -43,12 +43,12 @@
         border-radius: 50%;
         border-top-color: lightblue;
         border-bottom-color: lightblue;
-        -webkit-animation: spin 4s ease-in-out infinite;
-        animation: spin 4s ease-in-out infinite;
+        -webkit-animation: spin 8s ease-in-out infinite;
+        animation: spin 8s ease-in-out infinite;
       }
 
-      @-webkit-keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
-      @keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
+      @-webkit-keyframes spin { to { -webkit-transform: rotate( 360deg ); } }
+      @keyframes spin { to { -webkit-transform: rotate( 360deg ); } }
 
       .error_msg {
         position: absolute;
@@ -1074,13 +1074,13 @@
             if (Math.abs(mesh.rotation.y) > 2 * Math.PI ) { mesh.rotation.y = 0; }
             if (Math.abs(mesh.rotation.z) > 2 * Math.PI ) { mesh.rotation.z = 0; }
           }
+
+          controls.update();
+          if (gizmo) { gizmo.update(); }
+
+          renderer.clear();
+        	renderer.render( scene, camera );
         }
-
-        controls.update();
-        if (gizmo) { gizmo.update(); }
-
-        renderer.clear();
-      	renderer.render( scene, camera );
       }
 
       function reset_only() {

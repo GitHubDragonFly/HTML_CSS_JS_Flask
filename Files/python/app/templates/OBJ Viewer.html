@@ -43,12 +43,12 @@
         border-radius: 50%;
         border-top-color: lightblue;
         border-bottom-color: lightblue;
-        -webkit-animation: spin 4s ease-in-out infinite;
-        animation: spin 4s ease-in-out infinite;
+        -webkit-animation: spin 8s ease-in-out infinite;
+        animation: spin 8s ease-in-out infinite;
       }
 
-      @-webkit-keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
-      @keyframes spin { to { -webkit-transform: rotate( 180deg ); } }
+      @-webkit-keyframes spin { to { -webkit-transform: rotate( 360deg ); } }
+      @keyframes spin { to { -webkit-transform: rotate( 360deg ); } }
 
       .error_msg {
         position: absolute;
@@ -107,7 +107,10 @@
     <!-- OrbitControlsGizmo from: https://github.com/Fennec-hub/ThreeOrbitControlsGizmo -->
     <!-- OBJ Examples from: https://github.com/mrdoob/three.js -->
     <!-- Also see: https://davidoreilly.itch.io/walt-disney-3d-head , http://www.davidoreilly.com/ -->
-    <!-- More OBJ examples: https://people.math.sc.edu/Burkardt/data/data.html , http://casual-effects.com/data/index.html-->
+    <!-- More OBJ examples: -->
+    <!-- https://people.math.sc.edu/Burkardt/data/data.html -->
+    <!-- http://casual-effects.com/data/index.html -->
+    <!-- https://www.videocopilot.net/blog/2016/05/free-star-wars-model-pack/ -->
     <title>OBJ Viewer</title>
   </head>
   <body onload="reset_all()" onresize="resize()">
@@ -236,7 +239,8 @@
       var selected_url_file = '', url_displayed, url_loading;
       var selected_mtl_file, selected_mtl_url_file, selected_obj_file, selected_obj_url_file;
       var texture_files_png, texture_files_jpg, texture_files_bmp, texture_files_gif;
-      var texture_files_dds, texture_files_tga, url_tga_loaded, current_texture, textures;
+      var texture_files_svg, texture_files_dds, texture_files_tga;
+      var url_tga_loaded, current_texture, textures;
 
       // Manager from ThreeJs to track a loader and its status
       var manager = new THREE.LoadingManager();
@@ -519,6 +523,7 @@
         texture_files_png = [];
         texture_files_bmp = [];
         texture_files_gif = [];
+        texture_files_svg = [];
         texture_files_dds = [];
         texture_files_tga = [];
         url_tga_loaded = false;
@@ -540,7 +545,7 @@
           // Loaded file(s)
           var fi = document.getElementById('file_input');
 
-          // Include check for JPG/PNG/BMP/GIF, TGA and DDS (DirectDraw Surface container file format)
+          // Include check for JPG/PNG/BMP/GIF/TIF, SVG, TGA and DDS (DirectDraw Surface container file format)
           for (let i = 0; i < fi.files.length; i++) {
             if (fi.files[i].name.toUpperCase().endsWith('.OBJ')) { selected_obj_file = fi.files[i]; }
             else if (fi.files[i].name.toUpperCase().endsWith('.MTL')) { selected_mtl_file = fi.files[i]; }
@@ -548,6 +553,7 @@
             else if (fi.files[i].name.toUpperCase().endsWith('.JPG')) { texture_files_jpg.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.BMP')) { texture_files_bmp.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.GIF')) { texture_files_gif.push( fi.files[i] ); }
+            else if (fi.files[i].name.toUpperCase().endsWith('.SVG')) { texture_files_svg.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.TGA')) { texture_files_tga.push( fi.files[i] ); }
             else if (fi.files[i].name.toUpperCase().endsWith('.DDS')) { texture_files_dds.push( fi.files[i] ); }
           };
@@ -681,7 +687,7 @@
           mtl_loader.load( URL.createObjectURL( selected_mtl_file ), ( mtl ) => {
             URL.revokeObjectURL( selected_mtl_file );
 
-            if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_gif.length > 0 || texture_files_tga.length > 0 || texture_files_dds.length > 0) {
+            if (texture_files_png.length > 0 || texture_files_jpg.length > 0 || texture_files_bmp.length > 0 || texture_files_gif.length > 0 || texture_files_svg.length > 0 || texture_files_tga.length > 0 || texture_files_dds.length > 0) {
               if (texture_files_png.length > 0) {
                 for (const [ key, value ] of Object.entries( mtl.materialsInfo )) {
                   texture_files_png.forEach( file => {
@@ -808,6 +814,47 @@
               if (texture_files_gif.length > 0) {
                 for (const [ key, value ] of Object.entries( mtl.materialsInfo )) {
                   texture_files_gif.forEach( file => {
+                    if (value.map_d && file.name === value.map_d) {
+                      mtl.materialsInfo[ key ]['map_d'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
+                      URL.revokeObjectURL( file );
+                    }
+
+                    if (value.map_kd && file.name === value.map_kd) {
+                      mtl.materialsInfo[ key ]['map_kd'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
+                      URL.revokeObjectURL( file );
+                    }
+
+                    if (value.map_ka && file.name === value.map_ka) {
+                      mtl.materialsInfo[ key ]['map_ka'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
+                      URL.revokeObjectURL( file );
+                    }
+
+                    if (value.map_ke && file.name === value.map_ke) {
+                      mtl.materialsInfo[ key ]['map_ke'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
+                      URL.revokeObjectURL( file );
+                    }
+
+                    if (value.map_ks && file.name === value.map_ks) {
+                      mtl.materialsInfo[ key ]['map_ks'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
+                      URL.revokeObjectURL( file );
+                    }
+
+                    if (value.map_bump && file.name === value.map_bump) {
+                      mtl.materialsInfo[ key ]['map_bump'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
+                      URL.revokeObjectURL( file );
+                    }
+
+                    if (value.bump && file.name === value.bump) {
+                      mtl.materialsInfo[ key ]['bump'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
+                      URL.revokeObjectURL( file );
+                    }
+                  });
+                }
+              }
+
+              if (texture_files_svg.length > 0) {
+                for (const [ key, value ] of Object.entries( mtl.materialsInfo )) {
+                  texture_files_svg.forEach( file => {
                     if (value.map_d && file.name === value.map_d) {
                       mtl.materialsInfo[ key ]['map_d'] = URL.createObjectURL( file ).substring(mtl.baseUrl.length);
                       URL.revokeObjectURL( file );
@@ -1050,6 +1097,7 @@
             if (texture_files_jpg.length > 0) { texture_files_jpg.forEach( file => { textures.push( file ); }); }
             if (texture_files_bmp.length > 0) { texture_files_bmp.forEach( file => { textures.push( file ); }); }
             if (texture_files_gif.length > 0) { texture_files_gif.forEach( file => { textures.push( file ); }); }
+            if (texture_files_svg.length > 0) { texture_files_svg.forEach( file => { textures.push( file ); }); }
             if (texture_files_tga.length > 0) { texture_files_tga.forEach( file => { textures.push( file ); }); }
             if (texture_files_dds.length > 0) { texture_files_dds.forEach( file => { textures.push( file ); }); }
 
@@ -1129,7 +1177,7 @@
             for (let i = 0; i < urls.length; i++) {
               let url = urls[i].trim();
 
-              if (url.toUpperCase().endsWith('.PNG') || url.toUpperCase().endsWith('.JPG') || url.toUpperCase().endsWith('.BMP') || url.toUpperCase().endsWith('.GIF')) {
+              if (url.toUpperCase().endsWith('.PNG') || url.toUpperCase().endsWith('.JPG') || url.toUpperCase().endsWith('.BMP') || url.toUpperCase().endsWith('.GIF') || url.toUpperCase().endsWith('.SVG')) {
                 texture_loader.load( url, function( texture ) { textures.push( texture ); });
               } else if (url.toUpperCase().endsWith('.DDS')) {
                 dds_loader.load( url, function( texture ) { textures.push( texture ); });

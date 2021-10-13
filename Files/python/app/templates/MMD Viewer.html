@@ -54,7 +54,7 @@
         animation: spin 16s ease-in-out infinite;
       }
 
-      @-webkit-keyframes spin { to { -webkit-transform: rotate( 3600deg ); } }
+      @-webkit-keyframes spin { to { -webkit-transform: rotate( 360deg ); } }
       @keyframes spin { to { -webkit-transform: rotate( 360deg ); } }
 
       .error_msg {
@@ -810,7 +810,8 @@
 
             // This will allow us to check if the child is an instance of the Mesh constructor
             if (child instanceof THREE.Mesh) {
-              child.geometry.computeVertexNormals();
+              if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
+              if ( child.isSkinnedMesh ) child.frustumCulled = false;
 
               if (Array.isArray( child.material )) {
                 child.material.forEach( mtl => {
@@ -1020,7 +1021,8 @@
             mmd.mesh.traverse( function( child ) {
               // This will allow us to check if the child is an instance of the Mesh constructor
               if (child instanceof THREE.Mesh) {
-                child.geometry.computeVertexNormals();
+                if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
+                if ( child.isSkinnedMesh ) child.frustumCulled = false;
 
                 if (Array.isArray( child.material )) {
                   child.material.forEach( mtl => {
@@ -1215,7 +1217,8 @@
             mmd.mesh.traverse( function( child ) {
               // This will allow us to check if the child is an instance of the Mesh constructor
               if (child instanceof THREE.Mesh) {
-                child.geometry.computeVertexNormals();
+                if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
+                if ( child.isSkinnedMesh ) child.frustumCulled = false;
 
                 if (Array.isArray( child.material )) {
                   child.material.forEach( mtl => {
@@ -1437,7 +1440,8 @@
 
             // This will allow us to check if the child is an instance of the Mesh constructor
             if (child instanceof THREE.Mesh) {
-              child.geometry.computeVertexNormals();
+              if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
+              if ( child.isSkinnedMesh ) child.frustumCulled = false;
 
               if (Array.isArray( child.material )) {
                 child.material.forEach( mtl => {
@@ -1653,7 +1657,8 @@
                 mesh.traverse( function( child ) {
                   // This will allow us to check if the child is an instance of the Mesh constructor
               	  if (child instanceof THREE.Mesh) {
-                    child.geometry.computeVertexNormals();
+                    if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
+                    if ( child.isSkinnedMesh ) child.frustumCulled = false;
 
                     // Check for morph targets
                     if (child.morphTargetDictionary) {
@@ -1751,7 +1756,8 @@
 
             // This will allow us to check if the child is an instance of the Mesh constructor
             if (child instanceof THREE.Mesh) {
-              child.geometry.computeVertexNormals();
+              if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
+              if ( child.isSkinnedMesh ) child.frustumCulled = false;
 
               // Check for morph targets
               if (child.morphTargetDictionary) {
@@ -1880,7 +1886,8 @@
             mmd.mesh.traverse( function( child ) {
               // This will allow us to check if the child is an instance of the Mesh constructor
               if (child instanceof THREE.Mesh) {
-                child.geometry.computeVertexNormals();
+                if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
+                if ( child.isSkinnedMesh ) child.frustumCulled = false;
 
                 // Check for morph targets
                 if (child.morphTargetDictionary) {
@@ -1992,7 +1999,8 @@
             mmd.mesh.traverse( function( child ) {
               // This will allow us to check if the child is an instance of the Mesh constructor
               if (child instanceof THREE.Mesh) {
-                child.geometry.computeVertexNormals();
+                if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
+                if ( child.isSkinnedMesh ) child.frustumCulled = false;
 
                 // Check for morph targets
                 if (child.morphTargetDictionary) {
@@ -2099,7 +2107,8 @@
 
             // This will allow us to check if the child is an instance of the Mesh constructor
             if (child instanceof THREE.Mesh) {
-              child.geometry.computeVertexNormals();
+              if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
+              if ( child.isSkinnedMesh ) child.frustumCulled = false;
 
               if (Array.isArray( child.material )) {
                 child.material.forEach( mtl => {
