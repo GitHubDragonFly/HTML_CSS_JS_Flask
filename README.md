@@ -3,18 +3,18 @@ Generally intended for educational purposes.
 
 This is an expanded and modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project, set to be used with `python3` and `Flask` server.
 
-There are several three.js viewers, not necessarily perfect but functional as they are. Online preview links are available in the `Usage` section but do have some limitations. Do note  that loading any textures directly from your hard drive might make the object look either correct or interesting or funny.
-
 The main differences between these 2 projects:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
  - uploading any pictures via the `Form` will then have those saved in the new `uploads` folder
- - new additions are three.js FBX, 3DM (rhino), VRML and MMD (Miku Miku Dance) viewers and a TGA texture viewer
- - almost all viewers in this project support `URL loading`, use `Orbit Controls`, have a `grid / polar grid` buttons and a `gizmo` present
+ - new additions are three.js FBX, VRML, 3DM (rhino) and MMD (Miku Miku Dance) viewers and a TGA texture viewer
+ - almost all viewers in this project support `URL` loading, use `Orbit Controls`, have a `grid / polar grid` buttons and a `gizmo` present
  - DRACO and KTX2 support were added to the GLTF Viewer:
    - this seems to work fine when using URL option (see the screenshot) so try using it for fetching files both locally from the server and from the Internet
    - this should work fine for browsing local files which are either in binary or embedded format (try loading some `.ktx2` or `JPG/PNG/BMP/GIF` texture file along just to see if and how it changes the object's appearance)
    - you can also open `.drc` file types either alone or together with some texture file
  - KTX2 support was also added to the DAE Viewer
+
+There are several three.js viewers, not necessarily perfect but functional as they are. Online preview links are available in the `Usage` section but do have some limitations.
 
 Additional Notes:
  - Single character buttons, where applicable: `E` - edges, `F` - flatShading, `K` - kinematics, `A` - animations, `X`- extras, `M` - materials, `T` - textures, `P` - poses, `#` - grid
@@ -29,14 +29,13 @@ Additional Notes:
    - it also includes dat.GUI controls to show layers
    - you could try the following example via the viewer's URL option:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/3dm/Rhino_Logo.3dm`
- - MMD viewer supports animation, changing pose, extras and audio:
-   - appears to be fully functional in online preview, see the `Usage` section for the link
-   - `ammo.wasm.wasm` file was added to the `templates` folder so the loading of local files would work - whatever the reason behind this is
+ - MMD viewer supports animation, pose, extras and audio and appears to be fully functional in the online preview, see the `Usage` section for the link:
+   - `ammo.wasm.wasm` file was added to the `templates` folder so the loading of local files would work
    - tested with three.js examples and has audio delayTime set for those (with current value of 3.5)
    - observe the LICENSES of that and any other content you want to use
-   - mainly designed to be used with local files, which should all be in the same folder (PMD, PMX, VMD, VPD, MP3)
+   - if loading local files then all those files need to be in the same folder (PMD, PMX, VMD, VPD, MP3)
    - try all the different combinations of the mentioned files to see what works
-   - URL option is set for either 1 or more comma separated URLs, allowing mixed sites, like the following:
+   - loading files via URL option is set for either 1 or more comma separated URLs, allowing mixed sites, like the following:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd`
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
    - `https://raw.githubusercontent.com/takahirox/mmd-viewer-js/master/model/default/meiko_sakine.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
@@ -56,7 +55,7 @@ Additional Notes:
  - GLTF viewer also includes an experimental extras / morph targets button (with letter "X") which was tested as working with this example:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/RobotExpressive/RobotExpressive.glb`
    - subsequent clicks of the button will run any subsequent morph target one at the time
-   - the facial expressions of the mentioned example are located at X6-X7-X8 for `Head_4` object, while X0 to X5 contain those same expressions but for `Head_2` and `Head_3` objects, which are parts of the whole `Head` and I am not really sure why those facial expressions exist as such
+   - visible facial expressions of the mentioned example are located at X6-X7-X8 for `Head_4` object, while X0 to X5 contain those same expressions but for `Head_2` and `Head_3` objects, which don't seem to have any functionality
    - do note that the above example seems to have some faults in it and has shown some disconnects and material issues, which are not necessarily visible in all viewers due to coding and design approach (try it in the viewers mentioned in the `Resources` section, with Don McCurdy's `GLTF Viewer` actually showing how many errors were detected)
    - other examples, like `Horse.glb` or `Parrot.glb`, will be showing those morph targets like frames of the animation itself
  - PLY viewer now includes STL file loader
@@ -67,14 +66,14 @@ Additional Notes:
    - for FBX viewer, you can experiment with the above just by changing the first line to: `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/fbx/cloth.fbx,`
    - also check this [link](https://casual-effects.com/data/) for additional OBJ examples, specifically `Crytek Sponza` and `Dabrovic Sponza`
  - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in all viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
- - TGA (Truevision TGA or TARGA) texture viewer is fully functional in online preview:
+ - TGA (Truevision TGA or TARGA) texture viewer is fully functional in the online preview:
    - it only serves a purpose of showing `tga` file when applied to a cube
    - source could be either local `tga` files or online files via their URLs (multiple URLs need to be comma separated), like the following:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/crate_grey8.tga, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/crate_color8.tga`
    - texture switching button ("T") will let you switch between multiple textures
 
 Notes about showing the edges (button with letter "E"):
- - these are aplied to the still version of the object itself and will not follow the animation in case of GLTF and DAE viewers
+ - these are aplied to the still version of the object itself and will not follow the animation in supported viewers but will follow kinematics in the DAE viewer
  - thresholdAngle is set to 30 which produces approximate outline edges (if no edges are visible then lower this number)
  - use a combination of different Opacity / Directional Light Intensity values to control visibility of the object vs edges
  - edges might not be visible if the wireframe is turned on
@@ -99,7 +98,7 @@ b) OR with the `Flask` server support:
  - Use the command prompt to navigate to the `app` folder and run the following command: `python -m app` or `python3 -m app`
  - The server will show you the IP address and the port, generally accessible in the Internet browser via `localhost:5000`.
 
-Note: Opening any of the three.js viewers `HTML` files directly from your hard drive in the browser will probably have some limitations due to the CORS restrictions that your browser might have enabled. This is why the `Flask` server should be used.
+Note: Opening any of the three.js viewers `HTML` files directly from your hard drive in the browser will probably have some limitations due to the CORS restrictions that your browser might have enabled. This is why the `Flask` server should be used. Also, loading any textures directly from your hard drive might make the object look either correct or interesting or funny.
 
 Optionally use VS Code for editing, troubleshooting and running the app, which should be far easier than using the command prompt.
 
