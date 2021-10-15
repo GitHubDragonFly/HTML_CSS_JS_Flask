@@ -406,12 +406,7 @@
       }
 
       function scale_10x_set() {
-        if (document.getElementById('scale_10x').checked) {
-          dae_obj.scale.multiplyScalar( 10 );
-        } else {
-          dae_obj.scale.multiplyScalar( 0.1 );
-        }
-
+        document.getElementById('scale_10x').checked ? dae_obj.scale.multiplyScalar( 10 ) : dae_obj.scale.multiplyScalar( 0.1 );
         set_polar_grid_y();
         set_grid_y();
       }
@@ -527,8 +522,8 @@
         if (scene) {
           scene.remove.apply( scene, scene.children );
 
-          if (shadowMesh) { shadowMesh = null; }
-          if (gizmo) { gizmo.dispose(); }
+          if (shadowMesh) shadowMesh = null;
+          if (gizmo) gizmo.dispose();
 
           // Reset all values
           reset_all( true );
@@ -615,14 +610,14 @@
 
         clock = new THREE.Clock();
 
-        if (scene == undefined) { scene = new THREE.Scene(); }
-        if (dae_obj == undefined) { dae_obj = new THREE.Object3D(); }
+        if (scene == undefined) scene = new THREE.Scene();
+        if (dae_obj == undefined) dae_obj = new THREE.Object3D();
 
         if (!events_initialized) { initialize_event_listeners(); events_initialized = true; }
 
         // Create a grid helper for use with Orbit Controls
-        if (polar_grid == undefined) { polar_grid = new THREE.PolarGridHelper( 40, 10 ); }
-        if (grid == undefined) { grid = new THREE.GridHelper( 200, 200, "yellow" ); }
+        if (polar_grid == undefined) polar_grid = new THREE.PolarGridHelper( 40, 10 );
+        if (grid == undefined) grid = new THREE.GridHelper( 200, 200, "yellow" );
 
         // Add axes helper
         //scene.add( new THREE.AxesHelper( 50 ) );
@@ -702,11 +697,7 @@
         render();
 
         // Load the dae file
-        if (selected_dae_file) {
-          loadFile();
-        } else {
-          loadURLFile();
-        }
+        selected_dae_file ? loadFile() : loadURLFile();
       }
 
       function loadFile(){
@@ -848,7 +839,7 @@
             // This allow us to check if the children is an instance of the Mesh constructor
             if (child instanceof THREE.Mesh) {
               if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
-              if ( child.isSkinnedMesh ) child.frustumCulled = false;
+              if (child.isSkinnedMesh) child.frustumCulled = false;
 
               child.name = 'child_' + child_count;
               edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
@@ -973,14 +964,14 @@
           if (xhr.loaded == 0 && xhr.total == 0) {
             console.log( 'DAE 0% loaded - ' + time );
           } else {
-            console.log( 'DAE ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+            console.log( 'DAE ' + parseInt(( xhr.loaded / xhr.total ) * 100 ) + '% loaded - ' + time );
           }
         }, function ( error ) {
           console.log( 'Error loading DAE!' );
           console.log( error );
           render_requested = false;
           enable_disable( true );
-          if (gizmo) { gizmo.dispose(); }
+          if (gizmo) gizmo.dispose();
           document.getElementById('div_error').style.display = "block";
 
           URL.revokeObjectURL( selected_dae_file );
@@ -1009,7 +1000,7 @@
                 // This allow us to check if the children is an instance of the Mesh constructor
             	  if (child instanceof THREE.Mesh) {
                   if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
-                  if ( child.isSkinnedMesh ) child.frustumCulled = false;
+                  if (child.isSkinnedMesh) child.frustumCulled = false;
 
                   child.name = 'child_' + child_count;
                   edges[ child.name ] = new THREE.LineSegments( new THREE.EdgesGeometry( child.geometry, 30 ), new THREE.LineBasicMaterial( { color: 0xA52A2A } ) );
@@ -1062,21 +1053,21 @@
               if (xhr.loaded == 0 && xhr.total == 0) {
                 console.log( 'URL DAE 0% loaded - ' + time );
               } else {
-                console.log( 'URL DAE ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                console.log( 'URL DAE ' + parseInt(( xhr.loaded / xhr.total ) * 100) + '% loaded - ' + time );
               }
             }, function ( error ) {
               console.log( 'Error loading URL DAE!' );
               console.log( error );
               render_requested = false;
               enable_disable( true );
-              if (gizmo) { gizmo.dispose(); }
+              if (gizmo) gizmo.dispose();
               document.getElementById('div_error').style.display = "block";
             });
           } else {
             console.log('Unsupported URL file!');
             render_requested = false;
             enable_disable( true );
-            if (gizmo) { gizmo.dispose(); }
+            if (gizmo) gizmo.dispose();
             document.getElementById('div_error').style.display = "block";
           }
         }
@@ -1191,7 +1182,7 @@
       }
 
       function render() {
-        if (render_requested) { requestAnimationFrame( render ); }
+        if (render_requested) requestAnimationFrame( render );
 
         if (dae_obj) {
           // Reset dae_obj rotational values
@@ -1206,12 +1197,12 @@
             dae_obj.rotation.y += rot_y;
             dae_obj.rotation.z += rot_z;
 
-            if (Math.abs(dae_obj.rotation.x) > 2 * Math.PI ) { dae_obj.rotation.x = 0; }
-            if (Math.abs(dae_obj.rotation.y) > 2 * Math.PI ) { dae_obj.rotation.y = 0; }
-            if (Math.abs(dae_obj.rotation.z) > 2 * Math.PI ) { dae_obj.rotation.z = 0; }
+            if (Math.abs(dae_obj.rotation.x) > 2 * Math.PI ) dae_obj.rotation.x = 0;
+            if (Math.abs(dae_obj.rotation.y) > 2 * Math.PI ) dae_obj.rotation.y = 0;
+            if (Math.abs(dae_obj.rotation.z) > 2 * Math.PI ) dae_obj.rotation.z = 0;
           }
 
-          if (animation_running) { animation_mixer.update( clock.getDelta() ); }
+          if (animation_running) animation_mixer.update( clock.getDelta() );
 
           controls.update();
           if (gizmo) gizmo.update();
@@ -1223,18 +1214,14 @@
       }
 
       function reset_only() {
-        if (polar_grid_visible) {show_polar_grid(); }
-        if (grid_visible) { show_grid(); }
+        if (polar_grid_visible) show_polar_grid();
+        if (grid_visible) show_grid();
 
         scene.remove( dae_obj );
 
         reset_all( true );
 
-        if (selected_dae_file) {
-          loadFile();
-        } else {
-          loadURLFile();
-        }
+        selected_dae_file ? loadFile() : loadURLFile();
       }
 
       function reset_all( reset = false ) {

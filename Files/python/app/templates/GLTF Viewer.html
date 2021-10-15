@@ -795,6 +795,8 @@
             gltf.scene.traverse( function( child ) {
               // This will allow us to check if the child is an instance of the Mesh constructor
           	  if (child instanceof THREE.Mesh) {
+                if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
+
                 // Check for morph targets
                 if (child.material.morphTargets) {
                   Object.keys( child.morphTargetDictionary ).forEach( ( key, index ) => {
@@ -875,7 +877,7 @@
             if (xhr.loaded == 0 && xhr.total == 0) {
               console.log( '0% loaded - ' + time );
             } else {
-              console.log( parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              console.log( parseInt(( xhr.loaded / xhr.total ) * 100 ) + '% loaded - ' + time );
             }
           }, function ( error ) {
             console.log( 'Error loading GLTF!' );
@@ -895,7 +897,7 @@
           draco_loader.load( URL.createObjectURL( file ), function( geometry ) {
             URL.revokeObjectURL( file );
 
-            geometry.computeVertexNormals();
+            if (!geometry.attributes.normal) geometry.computeVertexNormals();
 
             if (texture_files_ktx2.length > 0) {
               texture_files_ktx2.forEach( file => {
@@ -987,7 +989,7 @@
             if (xhr.loaded == 0 && xhr.total == 0) {
               console.log( '0% loaded - ' + time );
             } else {
-              console.log( parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+              console.log( parseInt(( xhr.loaded / xhr.total ) * 100 ) + '% loaded - ' + time );
             }
           }, function ( error ) {
             console.log( 'Error loading DRC!' );
@@ -1006,7 +1008,7 @@
         if (selected_url_file != '') {
           if (selected_url_file.toUpperCase().endsWith('.DRC')) {
             draco_loader.load( selected_url_file, function( geometry ) {
-              geometry.computeVertexNormals();
+              if (!geometry.attributes.normal) geometry.computeVertexNormals();
 
               let texture = texture_loader.load( 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsIAAA7CARUoSoAAAAAzSURBVBhXFYrJDQAxDAIHl5tG9pWOI8/aICGunO9qP0JRNZqwltgspltKdtmfihNMoc0PFNkQjHSfyTIAAAAASUVORK5CYII=' );
               draco_material = new THREE.MeshStandardMaterial( { map: texture, opacity: 1, transparent: true } );
@@ -1034,7 +1036,7 @@
               if (xhr.loaded == 0 && xhr.total == 0) {
                 console.log( 'URL DRC 0% loaded - ' + time );
               } else {
-                console.log( 'URL DRC ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                console.log( 'URL DRC ' + parseInt(( xhr.loaded / xhr.total ) * 100 ) + '% loaded - ' + time );
               }
             }, function ( error ) {
               console.log( 'Error loading URL DRC!' );
@@ -1075,6 +1077,8 @@
               gltf.scene.traverse( function( child ) {
                 // This will allow us to check if the child is an instance of the Mesh constructor
             	  if (child instanceof THREE.Mesh) {
+                  if (!child.geometry.attributes.normal) child.geometry.computeVertexNormals();
+
                   // Check for morph targets
                   if (child.material.morphTargets) {
                     Object.keys( child.morphTargetDictionary ).forEach( ( key, index ) => {
@@ -1125,7 +1129,7 @@
               if (xhr.loaded == 0 && xhr.total == 0) {
                 console.log( 'URL GLTF 0% loaded - ' + time );
               } else {
-                console.log( 'URL GLTF ' + parseInt(( xhr.loaded / xhr.total * 100 )) + '% loaded - ' + time );
+                console.log( 'URL GLTF ' + parseInt(( xhr.loaded / xhr.total ) * 100 ) + '% loaded - ' + time );
               }
             }, function ( error ) {
               console.log( 'Error loading URL GLTF!' );
@@ -1232,8 +1236,7 @@
           }
 
           if (animation_running) {
-            var delta = clock.getDelta();
-            animation_mixer.update( delta );
+            animation_mixer.update( clock.getDelta() );
           }
 
           controls.update();
