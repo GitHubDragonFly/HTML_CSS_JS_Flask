@@ -75,7 +75,7 @@ Additional Notes:
 Notes about showing the edges (button with letter "E"):
  - these are aplied to the still version of the object itself and will not follow the animation in supported viewers but will follow kinematics in the DAE viewer
  - thresholdAngle is set to 30 which produces approximate outline edges (if no edges are visible then lower this number)
- - use a combination of different Opacity / Directional Light Intensity values to control visibility of the object vs edges
+ - a combination of different Opacity / Directional Light Intensity values controls visibility of the object vs edges
  - edges might not be visible if the wireframe is turned on
  - some objects might have edges placed in awkward places (like the `Xbot.glb` example, barely visible between its feet)
  - edges are not set to cast shadow
