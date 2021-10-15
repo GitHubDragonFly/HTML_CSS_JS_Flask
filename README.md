@@ -1,4 +1,6 @@
 # HTML_CSS_JS_Flask
+Note about three.js viewers included in this project: all of the viewers should be fully functional on the main [webpage](https://githubdragonfly.github.io) and any future updates and additions will be maintained there.
+
 Generally intended for educational purposes.
 
 This is an expanded and modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project, set to be used with `python3` and `Flask` server.
