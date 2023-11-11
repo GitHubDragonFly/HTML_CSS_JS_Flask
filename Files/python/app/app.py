@@ -2,10 +2,10 @@
 
 # If required then implement user access authentication / authorization
 # Possibly include some sort of SQL for saving form data or just create a CSV file
-# The 'uploads' folder will be saving picture files uploaded via form
+# The newly created 'uploads' folder will be saving picture files uploaded via form
 
 import os
-from flask import Flask, send_from_directory, send_file, render_template, request, make_response
+from flask import Flask, Response, send_from_directory, send_file, render_template, request, make_response
 from flask_cors import CORS, cross_origin
 
 app = Flask( __name__ )
@@ -16,9 +16,6 @@ fname, lname, gender, vehicle1, vehicle2, vehicle3, favcolor, pictures, img = []
 
 uploads_dir = os.path.join( app.root_path, 'uploads' )
 os.makedirs( uploads_dir, mode=0o777, exist_ok=True )
-
-def page_not_found(e):
-    return render_template( '404.html' ), 404
 
 @app.route('/favicon.ico')
 def favicon():
@@ -52,21 +49,6 @@ def handle_form_data():
 def display_form_data():
     return render_template( 'FormData.html', fname=fname, lname=lname, gender=gender, vehicle1=vehicle1, vehicle2=vehicle2, vehicle3=vehicle3, favcolor=favcolor, pictures=pictures )
 
-@app.route('/static/js/libs/draco/draco_decoder.wasm')
-def send_draco_wasm():
-    file_path = app.root_path + os.path.normpath( '/static/js/libs/draco/draco_decoder.wasm' )
-    return send_file( file_path , mimetype = 'application/wasm')
-
-@app.route('/static/js/libs/basis/basis_transcoder.wasm')
-def send_basis_wasm():
-    file_path = app.root_path + os.path.normpath( '/static/js/libs/basis/basis_transcoder.wasm' )
-    return send_file( file_path , mimetype = 'application/wasm')
-
-@app.route('/static/js/libs/ammo.wasm.wasm')
-def send_ammo_wasm():
-    file_path = app.root_path + os.path.normpath( '/static/js/libs/ammo.wasm.wasm' )
-    return send_file( file_path , mimetype = 'application/wasm')
-
 @app.route('/<path:path>', methods=['GET'])
 @cross_origin()
 def get_path(path):
@@ -74,12 +56,18 @@ def get_path(path):
         try:
             if path.startswith('uploads/'):
                 return send_file( path )
+            elif path.endswith('.css'):
+                return Response( mimetype='text/css' )
+            elif path.endswith('.wasm'):
+                return Response( mimetype='application/wasm' )
+            elif path.endswith('.bin'):
+                return Response( mimetype='application/octet-stream' )
             else:
                 return render_template( path )
         except Exception as e:
-            return page_not_found( e )
+            return render_template( '404.html' ), 404
     else:
         return make_response( 'Path is undefined' )
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=False)
+    app.run(host='127.0.0.1', port=5000, debug=False)
