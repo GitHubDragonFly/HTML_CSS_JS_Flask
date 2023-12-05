@@ -1,5 +1,8 @@
 # HTML_CSS_JS_Flask
-Note about three.js viewers included in this project: all of the viewers plus new ones should be fully functional on the main [webpage](https://githubdragonfly.github.io) and any future updates and additions will be maintained there.
+Notes about three.js viewers included in this project:
+- all of these viewers should be considered obsolete and are here for historical purposes
+- all of these viewers, plus new ones, should be fully functional on the main [webpage](https://githubdragonfly.github.io)
+- any future updates and additions will be maintained on the main webpage
 
 Generally intended for educational purposes.
 
@@ -18,7 +21,12 @@ The main differences between these 2 projects:
 
 There are several three.js viewers, not necessarily perfect but functional as they are. Online preview links are available in the `Usage` section but do have some limitations.
 
-Additional Notes:
+## Mozilla Firefox screenshot
+
+Main Menu Page
+![Start Page](screenshot/Exercise.png?raw=true)
+
+Additional Viewers Notes:
  - Single character buttons, where applicable: `E` - edges, `F` - flatShading, `K` - kinematics, `A` - animations, `X`- extras, `M` - materials, `T` - textures, `P` - poses, `#` - grid
  - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) non-module version was added to all viewers
  - VRML viewer is module based, requires a server and will not be functional in the online preview:
