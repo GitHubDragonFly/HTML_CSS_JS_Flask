@@ -6,7 +6,7 @@ Notes about three.js viewers included in this project:
 
 Generally intended for educational purposes.
 
-This is an expanded and modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project, set to be used with `python3` and `Flask` server.
+This is an expanded and modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project, set to be used with `python3` and `Flask` server. There is lots of general information about the project in that other repository.
 
 The main differences between these 2 projects:
  - the `Form` entries are handled by the server so that part of the GUI is slightly different
@@ -83,7 +83,7 @@ Additional Viewers Notes:
    - texture switching button ("T") will let you switch between multiple textures
 
 Notes about showing the edges (button with letter "E"):
- - these are aplied to the still version of the object itself and will not follow the animation in supported viewers but will follow kinematics in the DAE viewer
+ - these are aplied to the still version of the object itself and will not follow the animation in supported viewers but will follow kinematics in the DAE (Collada) Viewer
  - thresholdAngle is set to 30 which produces approximate outline edges (if no edges are visible then lower this number)
  - a combination of different Opacity / Directional Light Intensity values controls visibility of the object vs edges
  - edges might not be visible if the wireframe is turned on
@@ -104,7 +104,7 @@ And just for the convenience, you can access three.js viewers directly here: [OB
 b) OR with the `Flask` server support:
 
  - Download a zip file of this project (or clone the repo), also useful for having the example files locally available for loading
- - Install `python3` and pip install the `flask` package
+ - Install `python3` and pip install the `flask` and `flask_cors` packages
  - Use the command prompt to navigate to the `app` folder and run the following command: `python -m app` or `python3 -m app`
  - The server will show you the IP address and the port, generally accessible in the Internet browser via `localhost:5000`.
 
@@ -126,10 +126,10 @@ Any and all trademarks, either directly or indirectly mentioned here, belong to 
 # Resources
 Check the resources mentioned in the original HTML_CSS_JS project.
 
-Here are links to other online viewers:
+Here are links to other online 3D model viewers:
 - [Online 3D Viewer](https://github.com/kovacsv/Online3DViewer)
 - [GLTF Viewer](https://gltf-viewer.donmccurdy.com/)
 - [3D Viewer](https://rufus31415.github.io/sandbox/3d-viewer)
 
-The following viewer is a Windows application, useful to a degree but the project appears to have been abandoned:
+The following 3D model viewer is a Windows application, useful to a degree but the project appears to have been abandoned:
 - [Open 3D Model Viewer](https://github.com/acgessler/open3mod)
