@@ -42,24 +42,24 @@ Additional Viewers Notes:
  - MMD viewer supports animation, pose, extras and audio and appears to be fully functional in the online preview, see the `Usage` section for the link:
    - `ammo.wasm.wasm` file was added to the `templates` folder so the loading of local files would work
    - tested with three.js examples and has audio delayTime set for those (with current value of 3.5)
-   - observe the LICENSES of that and any other content you want to use
+     - please observe the LICENSES of that and any other content you want to use
    - if loading local files then all those files need to be in the same folder (PMD, PMX, VMD, VPD, MP3)
    - try all the different combinations of the mentioned files to see what works
    - loading files via URL option is set for either 1 or more comma separated URLs, allowing mixed sites, like the following:
-   - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd`
-   - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
-   - `https://raw.githubusercontent.com/takahirox/mmd-viewer-js/master/model/default/meiko_sakine.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
+     - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd`
+     - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/miku/miku_v2.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
+     - `https://raw.githubusercontent.com/takahirox/mmd-viewer-js/master/model/default/meiko_sakine.pmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_v2.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/vmds/wavefile_camera.vmd, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/mmd/audios/wavefile_short.mp3`
    - it includes TGA texture loader, which can be seen in action if you replace the very first line in the last example listed above to:
-   - `https://raw.githubusercontent.com/takahirox/mmd-viewer-js/master/model/low_miku/gumi.pmd,`
+     - `https://raw.githubusercontent.com/takahirox/mmd-viewer-js/master/model/low_miku/gumi.pmd,`
  - DAE viewer also supports kinematics, controlled by the button with letter "K", which is module based, requires server and will not work in the online preview
    - if using a server then try the following link via the URL option:
-   - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/collada/abb_irb52_7_120.dae`
- - DAE viewer was also updated to support DDS textures, which is functional in the online preview and can be tested via the viewer's URL option with the following example:
-   - `https://raw.githubusercontent.com/SaschaWillems/VulkanSponza/master/data/sponza.dae`
+     - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/collada/abb_irb52_7_120.dae`
+   - the viewer was also updated to support DDS textures, which is functional in the online preview and can be tested via the viewer's URL option with the following example:
+     - `https://raw.githubusercontent.com/SaschaWillems/VulkanSponza/master/data/sponza.dae`
  - GLTF / DAE / FBX viewers support animation whose button, with letter "A", will change green if any animation is detected and run the first one automatically
    - subsequent clicks of the button will run any subsequent animations one at the time
    - Xbot.glb is the multi-animation example that can be accessed in the GLTF viewer via the following URL:
-   - `https://raw.githubusercontent.com/GitHubDragonFly/HTML_CSS_JS_Flask/main/Files/python/app/static/Images/gltf/Xbot.glb`
+     - `https://raw.githubusercontent.com/GitHubDragonFly/HTML_CSS_JS_Flask/main/Files/python/app/static/Images/gltf/Xbot.glb`
  - GLTF viewer also includes an experimental material switcher button (with letter "M") based on and specifically designed for this example:
    - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/gltf/MaterialsVariantsShoe/glTF/MaterialsVariantsShoe.gltf`
  - GLTF viewer also includes an experimental extras / morph targets button (with letter "X") which was tested as working with this example:
@@ -72,14 +72,15 @@ Additional Viewers Notes:
  - 3DM / PLY / OBJ viewers also include an experimental flat shading button, with letter "F", which will be disabled for STL files
  - FBX / OBJ viewers also include an experimental texture switching button, with letter "T", which can be tested as working with the `Cerberus.obj` example:
    - local loading of the this OBJ example should also include all the image files: Cerberus_A.jpg, Cerberus_M.jpg, Cerberus_N.jpg, Cerberus_R.jpg, Cerberus_RM.jpg
-   - URL loading of the same OBJ example should be done with multiple comma separated URLs: `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus.obj, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_A.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_M.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_N.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_R.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_RM.jpg`
+   - URL loading of the same OBJ example should be done with multiple comma separated URLs:
+     - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus.obj, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_A.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_M.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_N.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_R.jpg, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/obj/cerberus/Cerberus_RM.jpg`
    - for FBX viewer, you can experiment with the above just by changing the first line to: `https://raw.githubusercontent.com/GitHubDragonFly/HTML_CSS_JS_Flask/main/Files/python/app/static/Images/fbx/cloth.fbx,`
    - also check this [link](https://casual-effects.com/data/) for additional OBJ examples, specifically `Crytek Sponza` and `Dabrovic Sponza`
  - See GLTF / DRACO / DAE / STL examples in the `Images` folder, most of which were downloaded from [three.js](https://github.com/mrdoob/three.js) and there is more examples there if you bother checking it out (all of them should be accessible in all viewers via the URL option targeting `raw.githubusercontent.com`, just like the links above show)
  - TGA (Truevision TGA or TARGA) texture viewer is fully functional in the online preview:
    - it only serves a purpose of showing `tga` file when applied to a cube
    - source could be either local `tga` files or online files via their URLs (multiple URLs need to be comma separated), like the following:
-   - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/crate_grey8.tga, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/crate_color8.tga`
+     - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/crate_grey8.tga, https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/crate_color8.tga`
    - texture switching button ("T") will let you switch between multiple textures
 
 Notes about showing the edges (button with letter "E"):
