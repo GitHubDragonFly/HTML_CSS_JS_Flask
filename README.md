@@ -31,14 +31,14 @@ Additional Viewers Notes:
  - [OrbitControlsGizmo](https://github.com/Fennec-hub/ThreeOrbitControlsGizmo) non-module version was added to all viewers
  - VRML viewer is module based, requires a server and will not be functional in the online preview:
    - if using a server then try the following link via the URL option:
-   - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/vrml/house.wrl`
+     - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/vrml/house.wrl`
  - FBX viewer appears to be fully functional in the online preview, see the `Usage` section for the link
    - try the following link via the URL option or see a possible `cloth.fbx` experiment further below:
-   - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/fbx/Samba Dancing.fbx`
+     - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/fbx/Samba Dancing.fbx`
  - 3DM viewer appears to be fully functional in the online preview, see the `Usage` section for the link
    - it also includes dat.GUI controls to show layers
    - you could try the following example via the viewer's URL option:
-   - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/3dm/Rhino_Logo.3dm`
+     - `https://raw.githubusercontent.com/mrdoob/three.js/master/examples/models/3dm/Rhino_Logo.3dm`
  - MMD viewer supports animation, pose, extras and audio and appears to be fully functional in the online preview, see the `Usage` section for the link:
    - `ammo.wasm.wasm` file was added to the `templates` folder so the loading of local files would work
    - tested with three.js examples and has audio delayTime set for those (with current value of 3.5)
