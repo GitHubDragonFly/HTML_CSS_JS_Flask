@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta content="width=device-width, initial-scale=1" charset="utf-8" http-equiv="encoding">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="../static/favicon.ico" type="image/x-icon"/>
 
-    <script src="../static/js/jquery-3.6.0.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" defer></script>
 
     <style>
-      html { height: 100%;}
+      html { min-height: 100vh; min-width: 100vw; }
       body { min-height: 100vh; z-index: 2; background-image: url('../static/Images/dark_blue.png'); background-size: 100% 100%; overflow-x: hidden; }
-      div { background-color: aliceblue; width: 99%; border: 2px solid green; -webkit-border-radius: 5px; border-radius: 5px; padding: 3px; margin: 5px; }
-      p { text-align: center; color: blue; border: 1px solid lightblue; margin-bottom: 10px; }
+      div { background-color: aliceblue; border: 2px solid green; -webkit-border-radius: 5px; border-radius: 5px; padding: 3px; margin: 5px; }
+      p { text-align: center; font-size: 150%; color: blue; border: 1px solid lightblue; margin-bottom: 10px; }
       h1, h2, h3, h4, h5, h6 { margin-top: 1px; margin-bottom: 3px;}
 
       A { text-decoration: none; margin: 0px 3px 0px 3px; }
@@ -21,7 +21,7 @@
       }
 
       .dropdown { position: relative; display: inline-block; }
-      .dropdown-content { display: none; position: absolute; z-index: 1; }
+      .dropdown-content { display: none; position: absolute; z-index: 2; width: 120px; }
       .dropdown:hover .dropdown-content { display: block; }
 
       table { margin-left: auto; margin-right: auto; border: 1px solid black; padding: 2px; background-color: blue; }
@@ -41,8 +41,46 @@
       blkt { color: black; font-size: 75%; margin-right: 5px; }
 
       .required label:after { color: red; content: ' *'; display: inline; }
-      .fixed-menu { position: fixed; z-index: 1; left: 0px; top: 0px; margin: 0px; width: 99.7%; border: 1px solid navy; -webkit-border-radius: 3px; border-radius: 3px; background-color: whitesmoke; }
-      .footer { position: static; margin: 0px; left: 0px; bottom: 0px; width: 99.7%; background-color: yellow; text-align: center; }
+
+      .fixed-menu {
+        position: fixed;
+        z-index: 1;
+        left: 0px;
+        top: 0px;
+        margin: 0;
+        width: 99.2vw;
+        height: auto;
+        border: 1px solid navy;
+        -webkit-border-radius: 3px;
+        border-radius: 3px;
+        text-align: center;
+        font-size: 120%;
+        background-color: whitesmoke;
+      }
+
+      .footer {
+        position: static;
+        margin: 0px;
+        left: 0px;
+        bottom: 0px;
+        width: 99.7%;
+        text-align: center;
+        font-size: 130%;
+        background-color: yellow;
+      }
+
+      .videoContainer {
+        position: relative;
+        width: 99%;
+        height: auto;
+      }
+
+      .video {
+        position: absolute;
+        width: 98%;
+        height: auto;
+        object-fit: contain;
+      }
 
       .rotateX {
         -webkit-animation: rotationX 8s infinite linear;
@@ -310,49 +348,41 @@
   </head>
   <!-- Lots of code lines below have been separated to single lines for clarity -->
   <!-- Inline styling is generally used to override the preset for different appearance -->
-  <body>
-    <p class="fixed-menu">
-      <a href="#P1">Top</a>
-      <a href="#P2">SVG</a>
-      <a href="#P3">Headers</a>
-      <a href="#P4">Text</a>
-      <a href="#P5">Lists</a>
-      <a href="#P6">Table</a>
-      <a href="#P7">iFrame</a>
-      <a href="#P8">Form</a>
-      <a href="#P9">Images & Text</a>
-      <a href="#P10">Rotation</a>
-      <a href="#P11">Video</a>
-      <a href="#P12">JS + JQuery</a>
-      <button class="dropdown" style="color: blue; width: 126px; border: none;">3D Model Viewers
-        <div class="dropdown-content" style="text-align: left; margin-top: 1px; transform: translateX(-14px);">
-          <a href="3DM Viewer.html" target="_blank">3DM Viewer</a><br>
-          <a href="DAE Viewer.html" target="_blank">DAE Viewer</a><br>
-          <a href="FBX Viewer.html" target="_blank">FBX Viewer</a><br>
-          <a href="OBJ Viewer.html" target="_blank">OBJ Viewer</a><br>
-          <a href="TGA Viewer.html" target="_blank">TGA Viewer</a><br>
-          <a href="MMD Viewer.html" target="_blank">MMD Viewer</a><br>
-          <a href="GLTF Viewer.html" target="_blank">GLTF Viewer</a><br>
-          <a href="VRML Viewer.html" target="_blank">VRML Viewer</a><br>
-          <a href="PLY Viewer.html" target="_blank">PLY+STL Viewer</a><br>
+  <body onload="document_ready();">
+    <div class="fixed-menu">
+      <a href="#P1">Top</a>&nbsp;
+      <a href="#P2">SVG</a>&nbsp;
+      <a href="#P3">Headers</a>&nbsp;
+      <a href="#P4">Text</a>&nbsp;
+      <a href="#P5">Lists</a>&nbsp;
+      <a href="#P6">Table</a>&nbsp;
+      <a href="#P7">iFrame</a>&nbsp;
+      <a href="#P8">Form</a>&nbsp;
+      <a href="#P9">Images+Text</a>&nbsp;
+      <a href="#P10">Rotation</a>&nbsp;
+      <a href="#P11">Video</a>&nbsp;
+      <a href="#P12">JS+JQuery</a>&nbsp;
+      <button class="dropdown" style="color: blue; width: 126px; font-size: 92%; border: none;">3D Viewers
+        <div class="dropdown-content" style="text-align: center; margin-top: 1px; transform: translateX(-10px);">
+          <a href="./3DM Viewer.html" target="_blank">3DM</a><br>
+          <a href="./DAE Viewer.html" target="_blank">DAE</a><br>
+          <a href="./FBX Viewer.html" target="_blank">FBX</a><br>
+          <a href="./OBJ Viewer.html" target="_blank">OBJ</a><br>
+          <a href="./TGA Viewer.html" target="_blank">TGA</a><br>
+          <a href="./MMD Viewer.html" target="_blank">MMD</a><br>
+          <a href="./GLTF Viewer.html" target="_blank">GLTF</a><br>
+          <a href="./VRML Viewer.html" target="_blank">VRML</a><br>
+          <a href="./PLY Viewer.html" target="_blank">PLY+STL</a><br>
         </div>
       </button>
-    </p>
+    </div><br id="P1" /><br /><br /><br /><br />
 
-    <br id="P1" /><br /><br />
-    <p id="emojis" style="font-size: 24px; width: 300px; margin: auto; border: none;"><i>&#128578;</i> ~ Italicized Emojis ~ <i>&#128579;</i></p>
-
-    <script>
-      $(document).ready(function() {
-        $('#emojis').hover(
-          function(event){ $(this).addClass('rotateY'); },
-          function(event){ $(this).removeClass('rotateY'); }
-        );
-      });
-    </script>
+    <div id="emojis" style="font-size: 24px; width: 300px; margin: auto; border: none;">
+      <i>&#128578;</i> ~ Italicized Emojis ~ <i>&#128579;</i>
+    </div>
 
     <br id="P2" /><br />
-    <div style="text-align: center; display: -webkit-inline-box; -webkit-box-orient: vertical; display: inline-block;"><p>SVG</p>
+    <div style="min-width: 99%; display: -webkit-inline-box; -webkit-box-orient: vertical; display: inline-block; text-align: center;"><p>SVG</p>
       <!-- Side SVG pictures are drawn while the middle is just a free sample available for download -->
       <div id="div_svg1" class="dropdown" style="width: 115px; float: left;">
         <svg id="svg1" class="rotateZ" width="100" height="100">
@@ -401,39 +431,13 @@
         </div>
       </div>
       <div class="dropdown" style="text-align: center; width: 85px; margin-left: auto; margin-right: auto; margin-top: 10px;">
-        <img src="../static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 75px; height: 64px; display:block; margin: auto;" />
+        <img src="./static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 75px; height: 64px; display:block; margin: auto;" />
         <div class="dropdown-content" style="width: 400px; margin-top: 10px; transform: translateX(-150px);">
           <!-- Enlarged version of the SVG image to be displayed as a dropdown -->
-          <img src="../static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 400px; height: 340px;" />
+          <img src="./static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 400px; height: 340px;" />
         </div>
         </div>
     </div><br />
-
-    <script>
-      $(document).ready(function() {
-        $('.dropdown').mouseenter( function( event ) {
-            // Stop rotating the small SVG and start rotating its enlarged dropdown version
-            if (event.target.id === "div_svg1") {
-              $('#svg1').removeClass( 'rotateZ' );
-              $('#svg2').addClass( 'rotateZ' );
-            } else if (event.target.id === "div_svg3") {
-              $('#svg3').removeClass( 'rotateXYZ' );
-              $('#svg4').addClass( 'rotateXYZ' );
-            }}
-          );
-
-        $('.dropdown').mouseleave( function( event ) {
-            // Restore rotation of the small SVG and remove rotation class from its dropdown
-            if (event.target.id === "div_svg1") {
-              $('#svg1').addClass( 'rotateZ' );
-              $('#svg2').removeClass( 'rotateZ' );
-            } else if (event.target.id === "div_svg3") {
-              $('#svg3').addClass( 'rotateXYZ' );
-              $('#svg4').removeClass( 'rotateXYZ' );
-            }}
-          );
-      });
-    </script>
 
     <br id="P3" /><br />
     <div>
@@ -455,16 +459,9 @@
       <h6 style="color: turquoise;">This is TURQUOISE Header 6</h6>
 
     <br id="P4" /><br />
-    <div style="text-align: center;"><p>Mixed color and font-size inline text</p>
-        <blut>Blue</blut>
-        <gnt>Green</gnt>
-        <rdt>Red</rdt>
-        <dgt>DarkGrey</dgt>
-        <blkt>Black</blkt>
-        <dgt>DarkGrey</dgt>
-        <rdt>Red</rdt>
-        <gnt>Green</gnt>
-        <blut>Blue</blut>
+    <div style="text-align: center;"><p>Mixed color / font-size text</p>
+        <blut>Blue</blut><gnt>Green</gnt><rdt>Red</rdt><dgt>DarkGrey</dgt><br />
+        <dgt>DarkGrey</dgt><rdt>Red</rdt><gnt>Green</gnt><blut>Blue</blut>
     </div>
 
     <br id="P5" /><br />
@@ -504,8 +501,8 @@
         <li style="color: lightblue;">Lizard</li>
       </ul>
 
-      <br id="P6" /><br />
-      <p>Unboxed Centered Table</p><br />
+    <br id="P6" /><br />
+    <p>Unboxed Centered Table</p><br />
       <table style="font-size: 120%;">
         <thead>
           <tr>
@@ -529,11 +526,11 @@
         </thead>
       </table>
 
-      <br id="P7" /><br />
-      <div style="text-align: center;"><p>Inline Frame</p>
+    <br id="P7" /><br />
+    <div style="text-align: center;"><p>Inline Frame</p>
       <!-- Most websites will not allow openning their page in an embedded frame  -->
       <!-- Sandboxing could practically be removed since it uses both 'allow-scripts' and 'allow-same-origin' -->
-      <iframe src="iFrame1.html" name="ifrm" title="Inline Examples" style="background-color: white; width: 99%; height: 400px;" sandbox="allow-same-origin allow-scripts"></iframe>
+      <iframe src="./iFrame1.html" name="ifrm" title="Inline Examples" style="background-color: white; width: 99%; height: 400px;" sandbox="allow-same-origin allow-scripts"></iframe>
       <p>
         <a href="./Tabs.html" target="_blank">xTabs</a>
         <a href="./Tabs.html" target="ifrm">iTabs</a>
@@ -542,9 +539,11 @@
         <a href="./3D Cube 1.html" target="ifrm">3D Cube 1</a>
         <a href="./3D Cube 2.html" target="ifrm">3D Cube 2</a>
         <a href="./ShowDateTime.html" target="ifrm">Date/Time</a>
-        <label for="url" style="margin: 0px 2px 0px 3px;">URL:</label>
-        <input type="text" id="url" name="url" size="60" value="" style="margin-right: 5px;" />
-        <button id="btn_go" onclick="display_url()" style="-webkit-border-radius: 2px; border-radius: 2px; width: 30px; padding: 2px;">Go</button>
+      </p>
+      <p>
+        <label for="url" style="font-size: 80%; margin: 0px 2px 0px 3px;">URL</label>
+        <input type="text" id="url" value="" style="width: 60%; margin-right: 5px;" />
+        <button id="btn_go" onclick="display_url()" style="-webkit-border-radius: 2px; border-radius: 2px; width: 32px; padding: 2px;">Go</button>
       </p>
     </div>
 
@@ -605,14 +604,14 @@
         <input type="file" id="file_input" name="file" accept="image/png, image/jpeg, image/bmp, image/gif" /><br /><br /><br />
         <input type="submit" id="btn_submit" value="Submit" style="color: green; margin: 0 5px 5px 5px;" />
         <input type="reset" id="btn_reset" value="Reset" style="color: orange; margin: 0 15px 5px 0;" />
-        <iframe name="iFrame_response" onLoad="document.getElementById('btn_reset').click();" style="background-color: lightblue; width: 400px; height: 30px; margin: 0; padding: 0;" sandbox="allow-same-origin"></iframe>
+        <iframe name="iFrame_response" onLoad="document.getElementById('btn_reset').click();" style="background-color: lightblue; width: 300px; height: 30px; margin: 0; padding: 0;" sandbox="allow-same-origin"></iframe>
       </form>
     </div>
     <div>
-      <button id="btn_display_entries" onclick="display_form_data()" style="color: blue; margin: 0 10px 0 0;">Display Submitted Form Data</button>
-      <button id="btn_disappear" onclick="document.getElementById('btn_disappear').hidden = 'True';" style="color: lightgray;">I am here temporarily</button>
-      <button id="btn_silly_alert" style="float: right; color: red;" onclick="alert('ALERT !!!\n\nOMG ... you just clicked the RED button !?')">Click Me NOT</button>
-  </div>
+      <button id="btn_display_entries" onclick="display_form_data()" style="color: blue; margin: 0 10px 0 0;">See Submitted Entries</button>
+      <button id="btn_disappear" onclick="document.getElementById('btn_disappear').hidden = 'True';" style="color: lightgray;">Fictional</button>
+      <button id="btn_silly_alert" style="float: right; color: red;" onclick="alert('ALERT !!!\n\nOMG ... you just clicked the RED button !?')">NO Click</button>
+    </div>
 
     <script>
       function display_form_data() {
@@ -624,9 +623,9 @@
     </script>
 
     <br id="P9" /><br />
-    <div style="display: -webkit-inline-box; -webkit-box-orient: vertical; display: inline-block;"><p>Images & Text</p>
-      <div style="background-color: white; width: 45%; float: left;">
-        <img src="../static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 67px; height: 56px; float: left;" />
+    <div style="min-width: 99%; display: -webkit-inline-box; -webkit-box-orient: vertical; display: inline-block;"><p>Images & Text</p>
+      <div style="background-color: white; width: 40%; float: left;">
+        <img src="./static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 67px; height: 56px; float: left;" />
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec cursus dictum justo, nec finibus nisi auctor sed.
         In commodo odio et volutpat dictum. Vestibulum congue viverra orci, sit amet elementum eros.
         Morbi at quam in nibh sollicitudin sodales sit amet ut felis. Aenean at leo dignissim, gravida eros a, vulputate lectus.
@@ -634,8 +633,8 @@
         Cras faucibus mauris a faucibus suscipit. Nam vel elementum lectus. Integer vitae enim massa.
         Cras porttitor sit amet ex iaculis venenatis. Morbi nec arcu ac velit sagittis rutrum.
       </div>&nbsp;
-      <div style="background-color: white; width: 45%; float: right;">
-        <img src="../static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 67px; height: 56px; float: right;" />
+      <div style="background-color: white; width: 40%; float: right;">
+        <img src="./static/Images/Freesample.svg" alt="Free SVG Sample" style="width: 67px; height: 56px; float: right;" />
         Maecenas sit amet dolor vitae nisi maximus cursus. Curabitur ultricies in libero eget porttitor.
         Nulla congue luctus lobortis. Nulla efficitur, enim non euismod faucibus, nisl nibh facilisis nunc,
         sit amet luctus turpis nunc vel enim. Nulla eu lorem ex. Curabitur a justo dolor. Donec vel quam magna.
@@ -647,56 +646,56 @@
     </div><br />
 
     <br id="P10" /><br />
-    <div style="display: -webkit-inline-box; -webkit-box-orient: vertical; display: -moz-inline-box; display: -ms-inline-flexbox; display: inline-block;">
-      <p>Rotating over X, Y, Z axis</p>
-      <div class="rotateX" style="background-color: white; text-align: center; width: 10%; float: left;">Rotating over X axis</div><br /><br /><br /><br />
+    <div style="width: 99%; display: -webkit-inline-box; -webkit-box-orient: vertical; display: -moz-inline-box; display: -ms-inline-flexbox; display: inline-block;">
+      <p>Rotate over X, Y, Z axis</p>
+      <div class="rotateX" style="background-color: white; text-align: center; width: 100px; float: left;">Rotating over X axis</div><br /><br /><br />
 
-      <div class="rotateZ" style="background-color: white; text-align: center; width: 10%; margin: auto">Rotating over Z axis</div><br /><br />
+      <div class="rotateZ" style="background-color: white; text-align: center; width: 100px; margin: auto">Rotating over Z axis</div><br />
 
-      <div class="rotateY" style="background-color: white; text-align: center; width: 10%; float: right;">Rotating over Y axis</div>
+      <div class="rotateY" style="background-color: white; text-align: center; width: 100px; float: right;">Rotating over Y axis</div><br />
     </div><br />
 
-    <div style="display: -webkit-inline-box; -webkit-box-orient: vertical; display: -moz-inline-box; display: -ms-inline-flexbox; display: inline-block;">
-      <p>Rotating & Translating & Perspective - Alternate Reverse (1)</p>
-      <div class="rotateXtranslateX" style="background-color: white; text-align: center; width: 10%; float: left;">Rotate X Translate X</div><br /><br /><br /><br />
+    <div style="width: 99%; display: -webkit-inline-box; -webkit-box-orient: vertical; display: -moz-inline-box; display: -ms-inline-flexbox; display: inline-block;">
+      <p>Rotate & Translate & Perspective Alternate Reverse 1</p>
+      <div class="rotateXtranslateX" style="background-color: white; text-align: center; width: 100px; float: left;">Rotate X Translate X</div><br /><br /><br /><br />
 
       <div style="-webkit-perspective: 300px; -moz-perspective: 300px; -ms-perspective: 300px; perspective: 300px; border: none;">
-        <div class="rotateZtranslateZ" style="background-color: white; text-align: center; width: 10%; margin: auto">RTP over Z axis</div><br /><br />
+        <div class="rotateZtranslateZ" style="background-color: white; text-align: center; width: 100px; margin: auto">RTP over Z axis</div><br /><br />
       </div>
 
-      <div class="rotateYtranslateY" style="background-color: white; text-align: center; width: 10%; float: right;">Rotate Y Translate Y</div>
+      <div class="rotateYtranslateY" style="background-color: white; text-align: center; width: 100px; float: right;">Rotate Y Translate Y</div>
     </div><br />
 
-    <div style="height: 280px; display: -webkit-inline-box; -webkit-box-orient: vertical; -webkit-perspective: 300px; display: -moz-inline-box; -moz-perspective: 300px; display: -ms-inline-flexbox; -ms-perspective: 300px; display: inline-block; perspective: 300px;">
-      <p>Rotating & Translating & Perspective - Alternate Reverse (2)</p><br /><br />
-      <div class="rotateZtranslateXY" style="background-color: white; text-align: center; width: 10%; float: left;">Rotate Z Translate XY</div><br /><br />
+    <div style="width: 99%; height: 280px; display: -webkit-inline-box; -webkit-box-orient: vertical; -webkit-perspective: 300px; display: -moz-inline-box; -moz-perspective: 300px; display: -ms-inline-flexbox; -ms-perspective: 300px; display: inline-block; perspective: 300px;">
+      <p>Rotate & Translate & Perspective Alternate Reverse 2</p><br /><br />
+      <div class="rotateZtranslateXY" style="background-color: white; text-align: center; width: 100px; float: left;">Rotate Z Translate XY</div><br /><br />
 
-      <div class="rotateZtranslateX" style="background-color: white; text-align: center; width: 10%; margin: auto">Rotate Z Translate X</div><br /><br />
+      <div class="rotateZtranslateX" style="background-color: white; text-align: center; width: 100px; margin: auto">Rotate Z Translate X</div><br /><br />
 
-      <div class="rotateZtranslateZ" style="background-color: white; text-align: center; width: 10%; float: right;">RTP over Z axis w/ Float Right</div><br /><br />
+      <div class="rotateZtranslateZ" style="background-color: white; text-align: center; width: 100px; float: right;">RTP over Z axis w/ Float Right</div><br /><br />
     </div><br />
 
-    <div style="display: -webkit-inline-box; -webkit-box-orient: vertical; display: -moz-inline-box; display: -ms-inline-flexbox; display: inline-block;">
-      <p>Rotating over XY, XZ, YZ axes (cubic-bezier timing function alternate reverse)</p><br /><br /><br />
-      <div class="rotateXYCubic" style="background-color: white; text-align: center; width: 10%; float: left;">Rotating over XY axes</div><br />
+    <div style="width: 99%; display: -webkit-inline-box; -webkit-box-orient: vertical; display: -moz-inline-box; display: -ms-inline-flexbox; display: inline-block;">
+      <p>Rotate over XY, XZ, YZ Cubic-bezier alternate reverse</p><br /><br /><br />
+      <div class="rotateXYCubic" style="background-color: white; text-align: center; width: 100px; float: left;">Rotating over XY axes</div><br />
 
-      <div class="rotateXZCubic" style="background-color: white; text-align: center; width: 10%; margin: auto">Rotating over XZ axes</div>
+      <div class="rotateXZCubic" style="background-color: white; text-align: center; width: 100px; margin: auto">Rotating over XZ axes</div>
 
-      <div class="rotateYZCubic" style="background-color: white; text-align: center; width: 10%; float: right;">Rotating over YZ axes</div><br /><br /><br /><br /><br />
+      <div class="rotateYZCubic" style="background-color: white; text-align: center; width: 100px; float: right;">Rotating over YZ axes</div><br /><br /><br /><br /><br />
     </div><br />
 
-    <div style="display: -webkit-inline-box; -webkit-box-orient: vertical; -webkit-perspective: 400px; display: -moz-inline-box; -moz-perspective: 400px; display: -ms-inline-flexbox; -ms-perspective: 400px; display: inline-block; perspective: 400px;">
-      <p>Rotating XYZ & Translating 3D & Perspective - Alternate Reverse</p><br />
+    <div style="width: 99%; display: -webkit-inline-box; -webkit-box-orient: vertical; -webkit-perspective: 400px; display: -moz-inline-box; -moz-perspective: 400px; display: -ms-inline-flexbox; -ms-perspective: 400px; display: inline-block; perspective: 400px;">
+      <p>Rotate XYZ & Translate 3D & Perspective Alternate Reverse</p><br />
       <div class="rotateXYZtranslate3D" style="text-align: center; width: 215px; height: 111px; margin: auto;">
         <img src="../static/Images/cube-1963036_640.jpg" alt="Cube Image" style="width: 215px; height: 111px;" />
       </div><br /><br />
-      <p>Image by
+      <p style="font-size: 90%;">Image by
         <a href="https://pixabay.com/users/piro4d-2707530/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=1963036">PIRO4D</a>
         from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=1963036">Pixabay</a>
       </p>
     </div>
 
-    <div><p>Rotating SVG with multiple elements over mixed axes</p>
+    <div style="width: 99%; "><p>Rotating SVG with multiple elements over mixed axes</p>
       <div style="text-align: center; margin: auto; padding: 0px; border: none;">
         <svg width="200" height="200">
           <defs>
@@ -739,24 +738,25 @@
 
     <br id="P11" /><br />
     <div><p>Media - Video</p><br />
-      <div style="text-align: center; width: 640px; height: 360px; margin: auto;">
-        <video width="640" controls>
+      <div class="videoContainer" style="text-align: center; margin: auto;">
+        <video style="width: 320px;" controls>
           <source src="../static/Videos/Beach - 3998.mp4" type="video/mp4">
           Your browser does not support HTML video.
         </video><br />
       </div><br />
-      <p>Video by
+      <p style="font-size: 90%;">Video by
         <a href="https://pixabay.com/users/rc-aero-tech-2978946/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=3998">Rc-Aero-Tech</a>
         from <a href="https://pixabay.com/?utm_source=link-attribution&amp;utm_medium=referral&amp;utm_campaign=image&amp;utm_content=3998">Pixabay</a>
       </p><br />
-      <div style="text-align: center; background-color: cyan; width: 400px; height: 300px; margin: auto;">
-        <video id="video_element" autoplay="false" width="400" controls></video><br /><br />
+      <p>Camera</p>
+      <div class="videoContainer" style="text-align: center; background-color: cyan; width: 320px; height: auto; margin: auto;">
+        <video id="video_element" autoplay="false" width="320px" controls></video><br /><br />
       </div><br />
-      <div style="text-align: center; width: 400px; margin: auto;">
-        <button id="btn_start_camera" onclick="start_camera()" style="width: 80px;" disabled>Start Cam</button>&nbsp;
+      <div style="text-align: center; width: 96%; margin: auto;">
+        <button id="btn_start_camera" onclick="start_camera()" style="width: 50px;" disabled>START</button>&nbsp;
         <input type="number" id="camera_id" name="camera_id" min="0" max="0" value="0" style="width: 35px;" disabled>&nbsp;
-        <button id="btn_stop_camera" onclick="stop_camera()" style="width: 80px;" disabled>Stop Cam</button>&nbsp; &nbsp;
-        <button id="btn_start_record" onclick="start_recording()" style="width: 80px;"  disabled>Record</button>&nbsp; &nbsp;
+        <button id="btn_stop_camera" onclick="stop_camera()" style="width: 50px;" disabled>STOP</button>&nbsp; &nbsp;
+        <button id="btn_start_record" onclick="start_recording()" style="width: 50px;"  disabled>REC</button>&nbsp; &nbsp;
         <a id="link_save_recording" href = "javascript:void(0);" style="border: 1px solid black; -webkit-border-radius: 3px; border-radius: 3px; width: 50px; padding-left: 4px; padding-right: 4px;">Save</a>
       </div><br />
     </div>
@@ -793,7 +793,7 @@
       function stop_camera(e) {
         if (btn_start_recording.style.color == "red") {
           btn_start_recording.style.color = "";
-          btn_stop.innerHTML = "Stop Cam";
+          btn_stop.innerHTML = "STOP";
           recorder.stop();
         } else {
           let stream = video.srcObject;
@@ -814,7 +814,6 @@
 
       async function start_recording() {
         btn_start_recording.style.color = "red";
-        btn_stop.innerHTML = "Stop Rec";
         link_save.style.backgroundColor = "";
         link_save.href = "javascript:void(0);";
 
@@ -828,7 +827,7 @@
         link_save.download = "RecordedVideo" + video_file_count + ".webm";
         video_file_count += 1;
         btn_start_recording.style.color = "";
-        btn_stop.innerHTML = "Stop Cam";
+        btn_stop.innerHTML = "STOP";
         recorder = null;
       }
 
@@ -928,11 +927,11 @@
 
     <br id="P12" />
     <p id="jq">JQuery</p><br />
-      <button type="button" id="hide_div" style="width: 160px; float: left; margin-left: 30%;">Hide "div" Elements</button>
-      <button type="button" id="show_div" style="width: 160px; float: right; margin-right: 30%;">Show "div" Elements</button><br /><br />
-      <button type="button" id="fade_out" style="width: 130px; float: left; margin-left: 37%;">Footer FadeOut</button>
-      <button type="button" id="fade_in" style="width: 130px; float: right; margin-right: 37%;">Footer FadeIn</button><br /><br />
-      <button type="button" id="menu_animate" style="width: 160px; display: -webkit-box; display: block; margin: auto;">Animate Top Menu</button>
+      <button type="button" id="hide_div" style="width: 140px; float: left; margin-left: 5%;">Hide "div" Elements</button>
+      <button type="button" id="show_div" style="width: 140px; float: right; margin-right: 5%;">Show "div" Elements</button><br /><br />
+      <button type="button" id="fade_out" style="width: 120px; float: left; margin-left: 10%;">Footer FadeOut</button>
+      <button type="button" id="fade_in" style="width: 120px; float: right; margin-right: 10%;">Footer FadeIn</button><br /><br />
+      <button type="button" id="menu_animate" style="width: 130px; display: -webkit-box; display: block; margin: auto;">Animate Top Menu</button>
       <br /><br /><br />
 
       <script>
@@ -968,5 +967,36 @@
       </script>
 
     <p class="footer"><a href="https://github.com/GitHubDragonFly/HTML_CSS_JS" target="_blank">References</a></p>
+
+    <script>
+      function document_ready() {
+        $('#emojis').hover(
+          function(event){ $(this).addClass('rotateY'); },
+          function(event){ $(this).removeClass('rotateY'); }
+        );
+
+        $('.dropdown').mouseenter( function( event ) {
+          // Stop rotating the small SVG and start rotating its enlarged dropdown version
+          if (event.target.id === "div_svg1") {
+            $('#svg1').removeClass( 'rotateZ' );
+            $('#svg2').addClass( 'rotateZ' );
+          } else if (event.target.id === "div_svg3") {
+            $('#svg3').removeClass( 'rotateXYZ' );
+            $('#svg4').addClass( 'rotateXYZ' );
+          }}
+        );
+
+        $('.dropdown').mouseleave( function( event ) {
+          // Restore rotation of the small SVG and remove rotation class from its dropdown
+          if (event.target.id === "div_svg1") {
+            $('#svg1').addClass( 'rotateZ' );
+            $('#svg2').removeClass( 'rotateZ' );
+          } else if (event.target.id === "div_svg3") {
+            $('#svg3').addClass( 'rotateXYZ' );
+            $('#svg4').removeClass( 'rotateXYZ' );
+          }}
+        );
+      }
+    </script>
   </body>
 </html>
