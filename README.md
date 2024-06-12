@@ -97,6 +97,7 @@ Notes about showing the edges (button with letter "E"):
 All it takes to run this project is to do either of the below listed:
 
 a) Even though this is all intended to be used with the `Flask` server, thanks to the [GitHub & BitBucket HTML Preview](https://github.com/htmlpreview/htmlpreview.github.com) you can still preview the [Exercise](https://htmlpreview.github.io/?https://github.com/GitHubDragonFly/HTML_CSS_JS_Flask/blob/main/Files/python/app/templates/Exercise.html) page online and use its fixed menu to access the rest, with the following limitations:
+ - jQuery section might not work with this preview
  - GLTF Viewer does allow loading DRACO files but does not allow loading KTX2 textures (check the module "import" console error)
  - DAE Viewer will not allow loading KTX2 textures or support kinematics (check the module "import" console error)
  - VRML viewer is module based, requires a server and will not be functional in the preview (check the module "import" console error)
