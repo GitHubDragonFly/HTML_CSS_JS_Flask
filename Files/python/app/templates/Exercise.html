@@ -381,6 +381,37 @@
       <i>&#128578;</i> ~ Italicized Emojis ~ <i>&#128579;</i>
     </div>
 
+    <script>
+      function document_ready() {
+        $('#emojis').hover(
+          function(event){ $(this).addClass('rotateY'); },
+          function(event){ $(this).removeClass('rotateY'); }
+        );
+
+        $('.dropdown').mouseenter( function( event ) {
+          // Stop rotating the small SVG and start rotating its enlarged dropdown version
+          if (event.target.id === "div_svg1") {
+            $('#svg1').removeClass( 'rotateZ' );
+            $('#svg2').addClass( 'rotateZ' );
+          } else if (event.target.id === "div_svg3") {
+            $('#svg3').removeClass( 'rotateXYZ' );
+            $('#svg4').addClass( 'rotateXYZ' );
+          }}
+        );
+
+        $('.dropdown').mouseleave( function( event ) {
+          // Restore rotation of the small SVG and remove rotation class from its dropdown
+          if (event.target.id === "div_svg1") {
+            $('#svg1').addClass( 'rotateZ' );
+            $('#svg2').removeClass( 'rotateZ' );
+          } else if (event.target.id === "div_svg3") {
+            $('#svg3').addClass( 'rotateXYZ' );
+            $('#svg4').removeClass( 'rotateXYZ' );
+          }}
+        );
+      }
+    </script>
+
     <br id="P2" /><br />
     <div style="min-width: 99%; display: -webkit-inline-box; -webkit-box-orient: vertical; display: inline-block; text-align: center;"><p>SVG</p>
       <!-- Side SVG pictures are drawn while the middle is just a free sample available for download -->
@@ -967,36 +998,5 @@
       </script>
 
     <p class="footer"><a href="https://github.com/GitHubDragonFly/HTML_CSS_JS" target="_blank">References</a></p>
-
-    <script>
-      function document_ready() {
-        $('#emojis').hover(
-          function(event){ $(this).addClass('rotateY'); },
-          function(event){ $(this).removeClass('rotateY'); }
-        );
-
-        $('.dropdown').mouseenter( function( event ) {
-          // Stop rotating the small SVG and start rotating its enlarged dropdown version
-          if (event.target.id === "div_svg1") {
-            $('#svg1').removeClass( 'rotateZ' );
-            $('#svg2').addClass( 'rotateZ' );
-          } else if (event.target.id === "div_svg3") {
-            $('#svg3').removeClass( 'rotateXYZ' );
-            $('#svg4').addClass( 'rotateXYZ' );
-          }}
-        );
-
-        $('.dropdown').mouseleave( function( event ) {
-          // Restore rotation of the small SVG and remove rotation class from its dropdown
-          if (event.target.id === "div_svg1") {
-            $('#svg1').addClass( 'rotateZ' );
-            $('#svg2').removeClass( 'rotateZ' );
-          } else if (event.target.id === "div_svg3") {
-            $('#svg3').addClass( 'rotateXYZ' );
-            $('#svg4').removeClass( 'rotateXYZ' );
-          }}
-        );
-      }
-    </script>
   </body>
 </html>
