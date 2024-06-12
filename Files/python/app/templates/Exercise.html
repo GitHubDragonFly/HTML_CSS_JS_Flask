@@ -348,7 +348,7 @@
   </head>
   <!-- Lots of code lines below have been separated to single lines for clarity -->
   <!-- Inline styling is generally used to override the preset for different appearance -->
-  <body onload="document_ready();">
+  <body>
     <div class="fixed-menu">
       <a href="#P1">Top</a>&nbsp;
       <a href="#P2">SVG</a>&nbsp;
@@ -380,37 +380,6 @@
     <div id="emojis" style="font-size: 24px; width: 300px; margin: auto; border: none;">
       <i>&#128578;</i> ~ Italicized Emojis ~ <i>&#128579;</i>
     </div>
-
-    <script>
-      function document_ready() {
-        $('#emojis').hover(
-          function(event){ $(this).addClass('rotateY'); },
-          function(event){ $(this).removeClass('rotateY'); }
-        );
-
-        $('.dropdown').mouseenter( function( event ) {
-          // Stop rotating the small SVG and start rotating its enlarged dropdown version
-          if (event.target.id === "div_svg1") {
-            $('#svg1').removeClass( 'rotateZ' );
-            $('#svg2').addClass( 'rotateZ' );
-          } else if (event.target.id === "div_svg3") {
-            $('#svg3').removeClass( 'rotateXYZ' );
-            $('#svg4').addClass( 'rotateXYZ' );
-          }}
-        );
-
-        $('.dropdown').mouseleave( function( event ) {
-          // Restore rotation of the small SVG and remove rotation class from its dropdown
-          if (event.target.id === "div_svg1") {
-            $('#svg1').addClass( 'rotateZ' );
-            $('#svg2').removeClass( 'rotateZ' );
-          } else if (event.target.id === "div_svg3") {
-            $('#svg3').addClass( 'rotateXYZ' );
-            $('#svg4').removeClass( 'rotateXYZ' );
-          }}
-        );
-      }
-    </script>
 
     <br id="P2" /><br />
     <div style="min-width: 99%; display: -webkit-inline-box; -webkit-box-orient: vertical; display: inline-block; text-align: center;"><p>SVG</p>
@@ -965,38 +934,70 @@
       <button type="button" id="menu_animate" style="width: 130px; display: -webkit-box; display: block; margin: auto;">Animate Top Menu</button>
       <br /><br /><br />
 
-      <script>
-        $(document).ready(function(){
-          $("#fade_in").click(function(){
-            $(".footer").fadeIn();
-            $("html, body").animate({ scrollTop: $(document).height() }, 1000);
-          });
-          $("#fade_out").click(function(){
-            $(".footer").fadeOut();
-          });
-          $("#hide_div").click(function(){
-            $('div').each(function(index){
+    <p class="footer"><a href="https://github.com/GitHubDragonFly/HTML_CSS_JS" target="_blank">References</a></p>
+
+    <script>
+      $(document).ready(function() {
+        $('#emojis').hover(
+          function(event){ $(this).addClass('rotateY'); },
+          function(event){ $(this).removeClass('rotateY'); }
+        );
+
+        $('.dropdown').mouseenter( function( event ) {
+          // Stop rotating the small SVG and start rotating its enlarged dropdown version
+          if (event.target.id === "div_svg1") {
+            $('#svg1').removeClass( 'rotateZ' );
+            $('#svg2').addClass( 'rotateZ' );
+          } else if (event.target.id === "div_svg3") {
+            $('#svg3').removeClass( 'rotateXYZ' );
+            $('#svg4').addClass( 'rotateXYZ' );
+          }}
+        );
+
+        $('.dropdown').mouseleave( function( event ) {
+          // Restore rotation of the small SVG and remove rotation class from its dropdown
+          if (event.target.id === "div_svg1") {
+            $('#svg1').addClass( 'rotateZ' );
+            $('#svg2').removeClass( 'rotateZ' );
+          } else if (event.target.id === "div_svg3") {
+            $('#svg3').addClass( 'rotateXYZ' );
+            $('#svg4').removeClass( 'rotateXYZ' );
+          }}
+        );
+
+        $("#fade_in").click(function(){
+          $(".footer").fadeIn();
+          $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+        });
+
+        $("#fade_out").click(function(){
+          $(".footer").fadeOut();
+        });
+
+        $("#hide_div").click(function(){
+          $('div').each(function(index){
             // prevent all dropdowns from hiding
             if ($(this).attr('class') !== 'dropdown-content'){
-                $(this).hide();
-              }
-            });
-          });
-          $("#show_div").click(function(){
-            $('div').each(function(index){
-            // prevent all dropdowns from showing
-            if ($(this).attr('class') !== 'dropdown-content'){
-                $(this).show();
-              }
-            });
-            $("html, body").animate({ scrollTop: $(document).height() }, 1000);
-          });
-          $("#menu_animate").click(function(){
-            $(".fixed-menu").animate({top: '400px'}, 'slow', function() { $(".fixed-menu").animate({top: '0px'}, 'slow') });
+              $(this).hide();
+            }
           });
         });
-      </script>
 
-    <p class="footer"><a href="https://github.com/GitHubDragonFly/HTML_CSS_JS" target="_blank">References</a></p>
+        $("#show_div").click(function() {
+          $('div').each(function(index) {
+            // prevent all dropdowns from showing
+            if ($(this).attr('class') !== 'dropdown-content'){
+              $(this).show();
+            }
+          });
+
+          $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+        });
+
+        $("#menu_animate").click(function(){
+          $(".fixed-menu").animate({top: '400px'}, 'slow', function() { $(".fixed-menu").animate({top: '0px'}, 'slow') });
+        });
+      });
+    </script>
   </body>
 </html>
