@@ -6,6 +6,8 @@ Notes about three.js viewers included in this project:
 
 Generally intended for educational purposes.
 
+The latest GUI is slightly different than what the screenshot below shows. Also, the preview should show OK on mobile devices as well.
+
 This is an expanded and modified version of the [HTML_CSS_JS](https://github.com/GitHubDragonFly/HTML_CSS_JS) project, set to be used with `python3` and `Flask` server. There is lots of general information about the project in that other repository.
 
 The main differences between these 2 projects:
