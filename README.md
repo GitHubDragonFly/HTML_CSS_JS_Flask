@@ -1,3 +1,8 @@
+# Reality Check
+Just for those of you who might be concerned about the Climate Change, here are couple of sobering insights:
+- Neil deGrasse Tyson's perspective on climate change: [YouTube Video](https://www.youtube.com/watch?v=tRA2SfSk2Tc)
+- My perspective, with statements from two AI entities: [Climate Change](https://githubdragonfly.github.io/viewers/templates/Climate%20Change.txt)
+
 # HTML_CSS_JS_Flask
 Notes about three.js viewers included in this project:
 - all of these viewers should be considered obsolete and are here for historical purposes
