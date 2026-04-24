@@ -5,7 +5,7 @@
 # The newly created 'uploads' folder will be saving picture files uploaded via form
 
 import os
-from flask import Flask, Response, send_from_directory, send_file, render_template, request, make_response
+from flask import Flask, send_from_directory, send_file, render_template, request, make_response
 from flask_cors import CORS, cross_origin
 
 app = Flask( __name__ )
@@ -57,11 +57,13 @@ def get_path(path):
             if path.startswith('uploads/'):
                 return send_file( path )
             elif path.endswith('.css'):
-                return Response( mimetype='text/css' )
-            elif path.endswith('.wasm'):
-                return Response( mimetype='application/wasm' )
+                return send_file( path, mimetype='text/css' )
             elif path.endswith('.bin'):
-                return Response( mimetype='application/octet-stream' )
+                return send_file( path, mimetype='application/octet-stream' )
+            elif path.endswith('.map'):
+                return send_file( path, mimetype='application/json' )
+            elif path.endswith('.wasm'):
+                return send_file( path, mimetype='application/wasm' )
             else:
                 return render_template( path )
         except Exception as e:
